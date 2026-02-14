@@ -1,0 +1,61 @@
+---
+import Header from "@/components/layout/Header.astro";
+import Footer from "@/components/layout/Footer.astro";
+import "@/styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description = "Modern Day Roofing — GAF Master Elite roofing contractor serving Christiansburg, Roanoke, and the New River Valley. Premium materials. Premium roofs.",
+  ogImage,
+} = Astro.props;
+
+const siteTitle = `${title} | Modern Day Roofing`;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://moderndayroof.com");
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO -->
+    <title>{siteTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={siteTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+
+    <!-- Favicon (placeholder until real assets) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://cdn.sanity.io" />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <Header />
+
+    <!-- Spacer for fixed header -->
+    <div class="h-[68px]" aria-hidden="true"></div>
+
+    <main id="main-content" class="flex-1">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

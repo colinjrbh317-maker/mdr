@@ -1,0 +1,33 @@
+---
+interface Props {
+  variant?: "default" | "service" | "testimonial";
+  href?: string;
+  class?: string;
+}
+
+const { variant = "default", href, class: className = "" } = Astro.props;
+
+const baseStyles =
+  "rounded-xl bg-bg-card p-6 transition-all duration-300 border border-border";
+
+const variants: Record<string, string> = {
+  default: "hover:bg-bg-card-hover hover:-translate-y-1 hover:shadow-lg",
+  service:
+    "border-t-4 border-t-accent hover:bg-bg-card-hover hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/10",
+  testimonial: "bg-bg-darker border-border-light",
+};
+
+const classes = `${baseStyles} ${variants[variant]} ${className}`;
+---
+
+{
+  href ? (
+    <a href={href} class={`${classes} block no-underline`}>
+      <slot />
+    </a>
+  ) : (
+    <div class={classes}>
+      <slot />
+    </div>
+  )
+}

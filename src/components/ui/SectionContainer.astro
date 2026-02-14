@@ -1,0 +1,41 @@
+---
+interface Props {
+  background?: "dark" | "darker" | "accent";
+  padding?: "sm" | "md" | "lg";
+  maxWidth?: "content" | "narrow" | "full";
+  id?: string;
+  class?: string;
+}
+
+const {
+  background = "dark",
+  padding = "md",
+  maxWidth = "content",
+  id,
+  class: className = "",
+} = Astro.props;
+
+const backgrounds: Record<string, string> = {
+  dark: "bg-bg-dark",
+  darker: "bg-bg-darker",
+  accent: "bg-accent",
+};
+
+const paddings: Record<string, string> = {
+  sm: "py-8 md:py-12 px-4 md:px-6",
+  md: "py-12 md:py-20 px-4 md:px-6",
+  lg: "py-16 md:py-28 px-4 md:px-6",
+};
+
+const maxWidths: Record<string, string> = {
+  content: "max-w-[1200px]",
+  narrow: "max-w-[800px]",
+  full: "max-w-full",
+};
+---
+
+<section id={id} class={`${backgrounds[background]} ${paddings[padding]} ${className}`}>
+  <div class={`mx-auto ${maxWidths[maxWidth]}`}>
+    <slot />
+  </div>
+</section>

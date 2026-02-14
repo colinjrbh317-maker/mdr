@@ -1,0 +1,153 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Button from "@/components/ui/Button.astro";
+import Card from "@/components/ui/Card.astro";
+import TrustBar from "@/components/blocks/TrustBar.astro";
+import StatsCounter from "@/components/blocks/StatsCounter.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+
+const services = [
+  {
+    title: "Roof Replacement",
+    description:
+      "Complete tear-off and replacement with premium GAF roofing systems. Lifetime warranty available.",
+    href: "/services/roof-replacement",
+  },
+  {
+    title: "Shingle Roofing",
+    description:
+      "GAF Timberline HDZ architectural shingles with industry-leading wind warranty.",
+    href: "/services/shingle-roofing",
+  },
+  {
+    title: "Metal Roofing",
+    description:
+      "Durable standing seam and metal panel systems built to last 50+ years.",
+    href: "/services/metal-roofing",
+  },
+  {
+    title: "Roof Repair",
+    description:
+      "Fast emergency repairs and storm damage restoration. Same-day assessment available.",
+    href: "/services/roof-repair",
+  },
+  {
+    title: "Storm Damage",
+    description:
+      "Insurance claim assistance and emergency tarping. We work directly with your insurer.",
+    href: "/storm-damage",
+  },
+  {
+    title: "Gutters",
+    description:
+      "Seamless aluminum gutter installation with leaf protection options.",
+    href: "/services/gutters",
+  },
+];
+---
+
+<Layout title="Roofing Contractor in Christiansburg & Roanoke VA">
+  <!-- Hero Section -->
+  <section class="relative min-h-[85vh] flex items-center">
+    <!-- Background Placeholder -->
+    <div class="absolute inset-0 z-0">
+      <ImagePlaceholder
+        description="Hero background: Aerial drone shot of completed roof project with mountain backdrop"
+        class="w-full h-full rounded-none border-none"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/80 to-bg-darker/50"></div>
+    </div>
+
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-20 md:py-32">
+      <div class="max-w-2xl">
+        <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-4">
+          GAF Master Elite Certified — Top 2% of Contractors Nationwide
+        </p>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-text-primary">
+          Premium Materials.<br />
+          <span class="text-accent">Premium Roofs.</span>
+        </h1>
+        <p class="mt-6 text-lg md:text-xl text-text-muted max-w-xl leading-relaxed">
+          Christiansburg and Roanoke's trusted roofing experts. Protecting your home
+          with industry-leading materials and craftsmanship backed by a lifetime warranty.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          <Button href="/contact" size="lg">Get Your Free Estimate</Button>
+          <Button href="tel:5402045597" variant="outline" size="lg">
+            Call (540) 204-5597
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Bar -->
+  <SectionContainer background="darker" padding="sm">
+    <TrustBar />
+  </SectionContainer>
+
+  <!-- Stats Counter -->
+  <StatsCounter />
+
+  <!-- Services Preview -->
+  <SectionContainer background="dark" padding="md" id="services">
+    <div class="text-center mb-12">
+      <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-3">
+        Our Services
+      </p>
+      <h2 class="text-3xl md:text-4xl font-bold text-text-primary">
+        Complete Roofing Solutions
+      </h2>
+      <p class="mt-4 text-text-muted max-w-2xl mx-auto">
+        From residential repairs to full commercial installations, we deliver
+        quality craftsmanship on every project.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {
+        services.map((service) => (
+          <Card variant="service" href={service.href}>
+            <div class="mb-4">
+              <ImagePlaceholder
+                description={`${service.title} service photo`}
+                aspectRatio="16/9"
+                class="w-full"
+              />
+            </div>
+            <h3 class="text-lg font-semibold text-text-primary mb-2">
+              {service.title}
+            </h3>
+            <p class="text-sm text-text-muted">{service.description}</p>
+          </Card>
+        ))
+      }
+    </div>
+
+    <div class="text-center mt-10">
+      <Button href="/services" variant="outline">View All Services</Button>
+    </div>
+  </SectionContainer>
+
+  <!-- CTA Section -->
+  <SectionContainer background="accent" padding="md">
+    <div class="text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white">
+        Ready to Protect Your Home?
+      </h2>
+      <p class="mt-4 text-white/90 max-w-2xl mx-auto text-lg">
+        Get a free, no-obligation roof inspection and estimate. We'll assess your
+        roof's condition and provide honest recommendations.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <Button href="/contact" variant="secondary" size="lg">
+          Schedule Free Inspection
+        </Button>
+        <Button href="tel:5402045597" variant="ghost" size="lg" class="text-white border-white/30 hover:bg-white/10">
+          Call (540) 204-5597
+        </Button>
+      </div>
+    </div>
+  </SectionContainer>
+</Layout>

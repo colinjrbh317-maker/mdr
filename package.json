@@ -1,0 +1,28 @@
+{
+  "name": "mdr-astro-init",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.4.2",
+    "@astrojs/vercel": "^9.0.4",
+    "@sanity/astro": "^3.2.11",
+    "@sanity/client": "^7.14.1",
+    "@sanity/image-url": "^2.0.3",
+    "astro": "^5.17.1",
+    "astro-portabletext": "^0.13.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "tailwindcss": "^4.1.18"
+  }
+}

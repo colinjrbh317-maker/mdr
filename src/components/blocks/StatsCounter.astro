@@ -1,0 +1,81 @@
+---
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+
+interface Stat {
+  value: number;
+  suffix?: string;
+  label: string;
+}
+
+interface Props {
+  stats?: Stat[];
+  class?: string;
+}
+
+const {
+  stats = [
+    { value: 500, suffix: "+", label: "Roofs Completed" },
+    { value: 10, suffix: "+", label: "Years Experience" },
+    { value: 100, suffix: "%", label: "Satisfaction Rate" },
+    { value: 50, suffix: "mi", label: "Service Radius" },
+  ],
+  class: className = "",
+} = Astro.props;
+---
+
+<SectionContainer background="darker" padding="sm" class={className}>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+    {
+      stats.map((stat) => (
+        <div class="stat-item" data-target={stat.value} data-suffix={stat.suffix || ""}>
+          <p class="text-3xl md:text-4xl font-bold text-accent stat-value">0{stat.suffix || ""}</p>
+          <p class="text-sm text-text-dim mt-1">{stat.label}</p>
+        </div>
+      ))
+    }
+  </div>
+</SectionContainer>
+
+<script>
+  function initCounters() {
+    const items = document.querySelectorAll<HTMLElement>(".stat-item");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            const target = parseInt(el.dataset.target || "0", 10);
+            const suffix = el.dataset.suffix || "";
+            const valueEl = el.querySelector(".stat-value");
+            if (!valueEl) return;
+
+            let current = 0;
+            const duration = 2000;
+            const increment = target / (duration / 16);
+
+            function step() {
+              current += increment;
+              if (current >= target) {
+                current = target;
+                valueEl!.textContent = `${target}${suffix}`;
+              } else {
+                valueEl!.textContent = `${Math.floor(current)}${suffix}`;
+                requestAnimationFrame(step);
+              }
+            }
+
+            requestAnimationFrame(step);
+            observer.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    items.forEach((item) => observer.observe(item));
+  }
+
+  initCounters();
+  document.addEventListener("astro:after-swap", initCounters);
+</script>

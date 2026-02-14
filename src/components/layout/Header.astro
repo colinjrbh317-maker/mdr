@@ -1,0 +1,45 @@
+---
+import Navigation from "./Navigation.astro";
+import MobileMenu from "./MobileMenu.astro";
+---
+
+<header
+  id="site-header"
+  class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-bg-darker/80 backdrop-blur-md border-b border-transparent"
+>
+  <div class="mx-auto max-w-[1200px] px-4 md:px-6 py-3">
+    <Navigation />
+  </div>
+</header>
+
+<MobileMenu />
+
+<script>
+  function initHeader() {
+    const header = document.getElementById("site-header");
+    if (!header) return;
+
+    let lastScroll = 0;
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        const currentScroll = window.scrollY;
+
+        if (currentScroll > 50) {
+          header.classList.add("bg-bg-darker", "border-border", "shadow-lg");
+          header.classList.remove("bg-bg-darker/80", "border-transparent");
+        } else {
+          header.classList.remove("bg-bg-darker", "border-border", "shadow-lg");
+          header.classList.add("bg-bg-darker/80", "border-transparent");
+        }
+
+        lastScroll = currentScroll;
+      },
+      { passive: true }
+    );
+  }
+
+  initHeader();
+  document.addEventListener("astro:after-swap", initHeader);
+</script>

@@ -1,0 +1,99 @@
+---
+/**
+ * BlockRenderer — switches on Sanity `_type` to render page builder blocks.
+ * Phase 1: Returns placeholder divs. Real block components will be wired in Phase 2+.
+ */
+
+interface Props {
+  blocks: Array<{ _type: string; _key: string; [key: string]: unknown }>;
+}
+
+const { blocks = [] } = Astro.props;
+---
+
+{
+  blocks.map((block) => {
+    switch (block._type) {
+      case "hero":
+        return (
+          <div class="py-20 bg-bg-darker text-center" data-block-type="hero" data-key={block._key}>
+            <p class="text-text-dim text-sm">[Hero Block — Phase 2]</p>
+          </div>
+        );
+      case "trustBar":
+        return (
+          <div class="py-4 bg-bg-card" data-block-type="trustBar" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[Trust Bar Block — Phase 2]</p>
+          </div>
+        );
+      case "statsCounter":
+        return (
+          <div class="py-12 bg-bg-darker" data-block-type="statsCounter" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[Stats Counter Block — Phase 2]</p>
+          </div>
+        );
+      case "servicesGrid":
+        return (
+          <div class="py-16 bg-bg-dark" data-block-type="servicesGrid" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[Services Grid Block — Phase 2]</p>
+          </div>
+        );
+      case "testimonials":
+        return (
+          <div class="py-16 bg-bg-darker" data-block-type="testimonials" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[Testimonials Block — Phase 2]</p>
+          </div>
+        );
+      case "ctaSection":
+        return (
+          <div class="py-16 bg-accent" data-block-type="ctaSection" data-key={block._key}>
+            <p class="text-white text-sm text-center">[CTA Section Block — Phase 2]</p>
+          </div>
+        );
+      case "textWithImage":
+        return (
+          <div class="py-16 bg-bg-dark" data-block-type="textWithImage" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[Text With Image Block — Phase 2]</p>
+          </div>
+        );
+      case "faqSection":
+        return (
+          <div class="py-16 bg-bg-darker" data-block-type="faqSection" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[FAQ Section Block — Phase 2]</p>
+          </div>
+        );
+      case "gallerySection":
+        return (
+          <div class="py-16 bg-bg-dark" data-block-type="gallerySection" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[Gallery Section Block — Phase 2]</p>
+          </div>
+        );
+      case "videoSection":
+        return (
+          <div class="py-16 bg-bg-darker" data-block-type="videoSection" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[Video Section Block — Phase 2]</p>
+          </div>
+        );
+      case "richText":
+        return (
+          <div class="py-16 bg-bg-dark" data-block-type="richText" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[Rich Text Block — Phase 2]</p>
+          </div>
+        );
+      case "formSection":
+        return (
+          <div class="py-16 bg-bg-darker" data-block-type="formSection" data-key={block._key}>
+            <p class="text-text-dim text-sm text-center">[Form Section Block — Phase 2]</p>
+          </div>
+        );
+      default:
+        return (
+          <div class="py-8 bg-bg-card text-center" data-block-type={block._type} data-key={block._key}>
+            <p class="text-text-dim text-sm">
+              Unknown block type: <code>{block._type}</code>
+            </p>
+          </div>
+        );
+    }
+  })
+}

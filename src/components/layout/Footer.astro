@@ -1,0 +1,144 @@
+---
+import Logo from "@/components/common/Logo.astro";
+
+const currentYear = new Date().getFullYear();
+const phone = "(540) 204-5597";
+
+const companyLinks = [
+  { label: "About Us", href: "/about" },
+  { label: "Contact", href: "/contact" },
+  { label: "Blog", href: "/blog" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Financing", href: "/financing" },
+];
+
+const serviceLinks = [
+  { label: "Roof Replacement", href: "/services/roof-replacement" },
+  { label: "Shingle Roofing", href: "/services/shingle-roofing" },
+  { label: "Metal Roofing", href: "/services/metal-roofing" },
+  { label: "Roof Repair", href: "/services/roof-repair" },
+  { label: "Gutters", href: "/services/gutters" },
+  { label: "Maintenance", href: "/services/maintenance" },
+];
+
+const areaLinks = [
+  { label: "Christiansburg", href: "/areas/christiansburg" },
+  { label: "Roanoke", href: "/areas/roanoke" },
+  { label: "Blacksburg", href: "/areas/blacksburg" },
+  { label: "Salem", href: "/areas/salem" },
+  { label: "Radford", href: "/areas/radford" },
+];
+---
+
+<footer class="bg-bg-darker border-t border-border" role="contentinfo">
+  <div class="mx-auto max-w-[1200px] px-4 md:px-6 py-12 md:py-16">
+    <!-- Top Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8">
+      <!-- Company Info -->
+      <div class="sm:col-span-2 lg:col-span-1">
+        <a href="/" aria-label="Modern Day Roofing home">
+          <Logo />
+        </a>
+        <p class="mt-4 text-sm text-text-dim leading-relaxed">
+          GAF Master Elite contractor serving Christiansburg, Roanoke, and the New River
+          Valley. Premium materials. Premium roofs.
+        </p>
+        <div class="mt-4 flex flex-col gap-2">
+          <a
+            href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
+            class="text-sm font-semibold text-text-muted hover:text-accent transition-colors"
+          >
+            {phone}
+          </a>
+          <a
+            href="mailto:info@moderndayroof.com"
+            class="text-sm text-text-dim hover:text-accent transition-colors"
+          >
+            info@moderndayroof.com
+          </a>
+        </div>
+      </div>
+
+      <!-- Company -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-text-primary mb-4">
+          Company
+        </h3>
+        <ul class="flex flex-col gap-2.5">
+          {
+            companyLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="text-sm text-text-dim hover:text-text-primary transition-colors"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Services -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-text-primary mb-4">
+          Services
+        </h3>
+        <ul class="flex flex-col gap-2.5">
+          {
+            serviceLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="text-sm text-text-dim hover:text-text-primary transition-colors"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Service Areas -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-text-primary mb-4">
+          Service Areas
+        </h3>
+        <ul class="flex flex-col gap-2.5">
+          {
+            areaLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="text-sm text-text-dim hover:text-text-primary transition-colors"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div
+      class="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4"
+    >
+      <p class="text-xs text-text-dim">
+        &copy; {currentYear} Modern Day Roofing. All rights reserved.
+      </p>
+      <div class="flex items-center gap-4 text-xs text-text-dim">
+        <a href="/privacy" class="hover:text-text-primary transition-colors"
+          >Privacy Policy</a
+        >
+        <a href="/terms" class="hover:text-text-primary transition-colors"
+          >Terms of Service</a
+        >
+        <a href="/sitemap.xml" class="hover:text-text-primary transition-colors">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>
