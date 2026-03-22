@@ -1,0 +1,23 @@
+---
+import StatsCounter from "./StatsCounter.astro";
+
+interface Stat {
+  value: number;
+  suffix?: string;
+  label: string;
+}
+
+interface Props {
+  stats?: Stat[];
+}
+
+const { stats } = Astro.props;
+
+const formattedStats = stats?.map((s) => ({
+  value: s.value,
+  suffix: s.suffix || "",
+  label: s.label,
+}));
+---
+
+<StatsCounter stats={formattedStats} />

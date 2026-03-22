@@ -1,0 +1,41 @@
+---
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+
+const certifications = [
+  {
+    name: "GAF President's Club",
+    image: "/assets/logos/Presidents-Club_3-Star_Residential-with-Year_2026.png",
+  },
+  {
+    name: "GAF Triple Excellence",
+    image: "/assets/logos/gallery_Triple-Excellence-Award-1-_1693320411-1.png",
+  },
+  {
+    name: "GAF Roofs for Troops",
+    image: "/assets/logos/4.png",
+  },
+  {
+    name: "BBB Accredited",
+    image: "/assets/logos/bbb-button.png",
+  },
+  {
+    name: "NAHB Member",
+    image: "/assets/logos/nahb-logo-color-1153x808.png",
+  },
+];
+---
+
+<SectionContainer background="light" padding="sm">
+  <div class="flex flex-wrap items-center justify-center gap-8 md:gap-14 py-4">
+    {certifications.map((cert) => (
+      <div class="flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity">
+        <img
+          src={cert.image}
+          alt={cert.name}
+          class="h-16 md:h-20 w-auto object-contain"
+          loading="lazy"
+        />
+      </div>
+    ))}
+  </div>
+</SectionContainer>

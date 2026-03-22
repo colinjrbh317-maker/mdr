@@ -6,6 +6,8 @@ export default defineType({
   title: 'Navigation',
   type: 'document',
   icon: MenuIcon,
+  // Singleton: prevent creating multiple documents in the desk structure
+  __experimental_actions: [/* 'create', */ 'update', /* 'delete', */ 'publish'],
   fields: [
     defineField({
       name: 'title',

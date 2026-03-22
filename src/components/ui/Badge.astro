@@ -1,6 +1,6 @@
 ---
 interface Props {
-  variant?: "certification" | "rating" | "award";
+  variant?: "certification" | "rating" | "award" | "warm";
   text: string;
   class?: string;
 }
@@ -8,9 +8,10 @@ interface Props {
 const { variant = "certification", text, class: className = "" } = Astro.props;
 
 const variants: Record<string, string> = {
-  certification: "bg-accent/15 text-accent-light border-accent/30",
-  rating: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-  award: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+  certification: "bg-accent/10 text-accent border-accent/20",
+  rating: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
+  award: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+  warm: "bg-warm/10 text-warm-dark border-warm/20",
 };
 ---
 

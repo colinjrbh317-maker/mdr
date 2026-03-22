@@ -1,0 +1,28 @@
+{
+  "redirects": [
+    { "source": "/home/", "destination": "/", "permanent": true },
+    { "source": "/contact-us/", "destination": "/contact", "permanent": true },
+    { "source": "/services/", "destination": "/services", "permanent": true },
+    { "source": "/roof-replacement/", "destination": "/services/roof-replacement", "permanent": true },
+    { "source": "/roof-repair/", "destination": "/services/roof-repair", "permanent": true },
+    { "source": "/roof-inspections-and-safety/", "destination": "/services/roof-maintenance", "permanent": true },
+    { "source": "/blog/", "destination": "/blog", "permanent": true },
+    { "source": "/faqs/", "destination": "/", "permanent": true },
+    { "source": "/local-roofing-services/", "destination": "/areas", "permanent": true },
+    { "source": "/roanoke/", "destination": "/areas/roanoke", "permanent": true },
+    { "source": "/radford/", "destination": "/areas/radford", "permanent": true },
+    { "source": "/pulaski/", "destination": "/areas/pulaski", "permanent": true },
+    { "source": "/christiansburg-roofing-company/", "destination": "/areas/christiansburg", "permanent": true },
+    { "source": "/blacksburg-roofing-company/", "destination": "/areas/blacksburg", "permanent": true },
+    { "source": "/salem-roofing-company/", "destination": "/areas/salem", "permanent": true },
+    { "source": "/floyd-roofing-company/", "destination": "/areas/floyd", "permanent": true },
+    { "source": "/wytheville-roofing-company/", "destination": "/areas/wytheville", "permanent": true },
+    { "source": "/troutville-roofing-company/", "destination": "/areas/troutville", "permanent": true },
+    { "source": "/smith-mountain-lake-roofing-company/", "destination": "/areas/smith-mountain-lake", "permanent": true },
+    { "source": "/privacy-policy/", "destination": "/", "permanent": true },
+    { "source": "/sitemap/", "destination": "/sitemap-index.xml", "permanent": true },
+    { "source": "/referral-program/", "destination": "/", "permanent": true },
+    { "source": "/roofgiveaway2026/", "destination": "/", "permanent": true },
+    { "source": "/custom-testimonial/:path*", "destination": "/", "permanent": true }
+  ]
+}

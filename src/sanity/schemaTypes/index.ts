@@ -7,6 +7,7 @@ import blogCategory from "./documents/blog-category";
 import testimonial from "./documents/testimonial";
 import serviceArea from "./documents/service-area";
 import service from "./documents/service";
+import beforeAfterProject from "./documents/before-after-project";
 
 // Objects
 import { seo } from "./objects/seo";
@@ -38,6 +39,7 @@ export const schemaTypes = [
   testimonial,
   serviceArea,
   service,
+  beforeAfterProject,
   // Objects
   seo,
   link,

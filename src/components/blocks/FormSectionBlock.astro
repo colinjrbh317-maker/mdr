@@ -1,0 +1,32 @@
+---
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
+
+interface Props {
+  heading?: string;
+  description?: string;
+  formType?: "contact" | "quote" | "callback";
+  successMessage?: string;
+}
+
+const { heading, description, formType = "quote" } = Astro.props;
+---
+
+<SectionContainer background="warm" padding="md">
+  <div class="max-w-2xl mx-auto">
+    {heading && (
+      <h2 class="text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
+        {heading}
+      </h2>
+    )}
+    {description && (
+      <p class="text-text-muted text-center mb-8 max-w-xl mx-auto">
+        {description}
+      </p>
+    )}
+
+    <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8 shadow-sm">
+      <LeadCaptureForm client:load source={`page-${formType}`} />
+    </div>
+  </div>
+</SectionContainer>

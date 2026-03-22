@@ -1,0 +1,63 @@
+---
+import HeroBackground from './HeroBackground';
+import Button from '@/components/ui/Button.astro';
+
+const heroVideoUrl = "";
+const heroPosterUrl = "/assets/hero/hero-main.jpg";
+---
+
+<section class="relative min-h-screen md:min-h-[600px] md:h-[85vh] flex flex-col md:block">
+
+  {/* Background Image/Video */}
+  <div class="relative w-full h-[50vh] md:absolute md:inset-0 md:h-full z-0 overflow-hidden">
+    <HeroBackground client:load videoUrl={heroVideoUrl} posterUrl={heroPosterUrl} />
+  </div>
+
+  {/* Content Container */}
+  <div class="relative z-10 w-full flex-1 bg-white md:bg-transparent flex items-center md:h-full pointer-events-none md:pointer-events-auto">
+    <div class="w-full max-w-[1280px] mx-auto md:px-6 pointer-events-auto">
+
+      {/* Erie Style: White Card Container */}
+      <div class="bg-white p-8 pb-12 md:p-12 md:rounded-xl md:shadow-2xl max-w-xl animate-fade-in md:border-t-4 md:border-accent">
+
+        {/* Eyebrow / Trust Indicator */}
+        <p class="text-xs font-bold text-accent uppercase tracking-[0.15em] mb-4">
+          GAF Master Elite® — Top 2% of U.S. Contractors
+        </p>
+
+        {/* Main Headline */}
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-text-primary leading-[1.05] mb-6">
+          Virginia's Premier<br />
+          <span class="text-accent">Roofing Contractor</span>
+        </h1>
+
+        {/* Subheadline */}
+        <p class="text-lg text-text-body leading-relaxed mb-8">
+          Serving Christiansburg, Roanoke &amp; the New River Valley.
+          Premium materials. Lifetime protection. 1,200+ roofs completed.
+        </p>
+
+        {/* Dual CTA Buttons */}
+        <div class="flex flex-col sm:flex-row gap-4">
+          <Button href="/contact" size="lg" class="shadow-lg hover:shadow-xl w-full sm:w-auto text-center justify-center">
+            Get My Free Estimate
+          </Button>
+          <Button href="/about" variant="outline" size="lg" class="w-full sm:w-auto text-center justify-center">
+            Why Choose MDR?
+          </Button>
+        </div>
+
+        {/* Trust Badges Row */}
+        <div class="mt-8 pt-6 border-t border-border flex items-center gap-6">
+          <div class="flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <span class="text-xs font-bold text-text-muted">4.9 Google Rating</span>
+          </div>
+          <span class="text-xs font-bold text-text-muted">BBB A+ Rated</span>
+          <span class="text-xs font-bold text-text-muted">Licensed &amp; Insured</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

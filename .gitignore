@@ -19,3 +19,14 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Sensitive credentials
+credentials.json
+token.json
+
+# Local dev artifacts
+.claude/
+.planning/
+.playwright-mcp/
+test-results/
+*.png

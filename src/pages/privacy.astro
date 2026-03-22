@@ -1,0 +1,124 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+
+export const prerender = true;
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Privacy Policy" },
+];
+
+const lastUpdated = "February 15, 2026";
+---
+
+<Layout
+  title="Privacy Policy"
+  description="Modern Day Roofing privacy policy. Learn how we collect, use, and protect your personal information."
+>
+  <SectionContainer background="warm" padding="lg">
+    <Breadcrumb items={breadcrumbItems} />
+    <div class="mt-6 max-w-3xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-bold text-text-primary">Privacy Policy</h1>
+      <p class="mt-3 text-text-dim text-sm">Last updated: {lastUpdated}</p>
+    </div>
+  </SectionContainer>
+
+  <SectionContainer background="white" padding="md">
+    <div class="max-w-3xl mx-auto prose-dark">
+      <div class="space-y-8">
+        <section>
+          <h2 class="text-xl font-bold text-text-primary mb-3">Information We Collect</h2>
+          <p class="text-text-muted leading-relaxed mb-3">
+            Modern Day Roofing ("we," "our," or "us") collects information you voluntarily provide when you:
+          </p>
+          <ul class="list-disc list-inside text-text-muted space-y-1.5 ml-2">
+            <li>Submit a contact form or request a quote</li>
+            <li>Call our business phone number</li>
+            <li>Send us an email</li>
+            <li>Interact with our website</li>
+          </ul>
+          <p class="text-text-muted leading-relaxed mt-3">
+            This may include your name, phone number, email address, street address, and details about your roofing project.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-primary mb-3">How We Use Your Information</h2>
+          <p class="text-text-muted leading-relaxed mb-3">We use the information we collect to:</p>
+          <ul class="list-disc list-inside text-text-muted space-y-1.5 ml-2">
+            <li>Respond to your inquiries and provide estimates</li>
+            <li>Schedule inspections and roofing services</li>
+            <li>Communicate about your project</li>
+            <li>Send follow-up information you've requested</li>
+            <li>Improve our website and services</li>
+          </ul>
+          <p class="text-text-muted leading-relaxed mt-3">
+            We do not sell, rent, or share your personal information with third parties for their marketing purposes.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-primary mb-3">Cookies & Analytics</h2>
+          <p class="text-text-muted leading-relaxed mb-3">
+            Our website uses cookies and similar technologies to improve your browsing experience and help us understand how visitors use our site. These include:
+          </p>
+          <ul class="list-disc list-inside text-text-muted space-y-1.5 ml-2">
+            <li><strong class="text-text-primary">Google Analytics</strong> — Collects anonymous usage data such as pages visited, time on site, and general location</li>
+            <li><strong class="text-text-primary">Meta Pixel</strong> — Tracks conversions from Facebook and Instagram advertising</li>
+            <li><strong class="text-text-primary">Hotjar</strong> — Records anonymous user behavior (mouse movements, clicks) to improve the website experience</li>
+          </ul>
+          <p class="text-text-muted leading-relaxed mt-3">
+            You can disable cookies through your browser settings. Note that some website features may not function properly with cookies disabled.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-primary mb-3">Data Security</h2>
+          <p class="text-text-muted leading-relaxed">
+            We implement reasonable security measures to protect your personal information. Our website uses SSL encryption to secure data transmitted between your browser and our servers. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-primary mb-3">Third-Party Services</h2>
+          <p class="text-text-muted leading-relaxed">
+            We may use third-party services (such as form processing, analytics, and advertising platforms) that collect information on our behalf. These services have their own privacy policies governing the use of your information.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-primary mb-3">Your Rights</h2>
+          <p class="text-text-muted leading-relaxed mb-3">You have the right to:</p>
+          <ul class="list-disc list-inside text-text-muted space-y-1.5 ml-2">
+            <li>Request access to the personal information we hold about you</li>
+            <li>Request correction of inaccurate information</li>
+            <li>Request deletion of your personal information</li>
+            <li>Opt out of marketing communications</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-primary mb-3">Contact Us</h2>
+          <p class="text-text-muted leading-relaxed">
+            If you have questions about this privacy policy or want to exercise your data rights, contact us:
+          </p>
+          <div class="mt-3 text-text-muted">
+            <p><strong class="text-text-primary">Modern Day Roofing</strong></p>
+            <p>Christiansburg, VA 24073</p>
+            <p>Phone: <a href="tel:5405536007" class="text-accent hover:underline">(540) 553-6007</a></p>
+            <p>Email: <a href="mailto:info@moderndayroof.com" class="text-accent hover:underline">info@moderndayroof.com</a></p>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-primary mb-3">Changes to This Policy</h2>
+          <p class="text-text-muted leading-relaxed">
+            We may update this privacy policy from time to time. Any changes will be posted on this page with an updated revision date. Your continued use of our website after any changes constitutes acceptance of the updated policy.
+          </p>
+        </section>
+      </div>
+    </div>
+  </SectionContainer>
+</Layout>

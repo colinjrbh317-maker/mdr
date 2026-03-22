@@ -1,0 +1,18 @@
+---
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import { PortableText } from "astro-portabletext";
+
+interface Props {
+  content?: any[];
+}
+
+const { content } = Astro.props;
+---
+
+{content && (
+  <SectionContainer background="white" padding="md" maxWidth="narrow">
+    <div class="prose max-w-none text-text-body prose-headings:text-text-primary prose-a:text-accent prose-strong:text-text-primary">
+      <PortableText value={content} />
+    </div>
+  </SectionContainer>
+)}

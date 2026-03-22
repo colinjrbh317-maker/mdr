@@ -1,8 +1,16 @@
 ---
-/**
- * BlockRenderer — switches on Sanity `_type` to render page builder blocks.
- * Phase 1: Returns placeholder divs. Real block components will be wired in Phase 2+.
- */
+import HeroBlock from "./HeroBlock.astro";
+import TrustBarBlock from "./TrustBarBlock.astro";
+import StatsCounterBlock from "./StatsCounterBlock.astro";
+import ServicesGridBlock from "./ServicesGridBlock.astro";
+import TestimonialsBlock from "./TestimonialsBlock.astro";
+import CtaSectionBlock from "./CtaSectionBlock.astro";
+import TextWithImageBlock from "./TextWithImageBlock.astro";
+import FaqSectionBlock from "./FaqSectionBlock.astro";
+import GallerySectionBlock from "./GallerySectionBlock.astro";
+import VideoSectionBlock from "./VideoSectionBlock.astro";
+import RichTextBlock from "./RichTextBlock.astro";
+import FormSectionBlock from "./FormSectionBlock.astro";
 
 interface Props {
   blocks: Array<{ _type: string; _key: string; [key: string]: unknown }>;
@@ -15,77 +23,29 @@ const { blocks = [] } = Astro.props;
   blocks.map((block) => {
     switch (block._type) {
       case "hero":
-        return (
-          <div class="py-20 bg-bg-darker text-center" data-block-type="hero" data-key={block._key}>
-            <p class="text-text-dim text-sm">[Hero Block — Phase 2]</p>
-          </div>
-        );
+        return <HeroBlock {...block} />;
       case "trustBar":
-        return (
-          <div class="py-4 bg-bg-card" data-block-type="trustBar" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[Trust Bar Block — Phase 2]</p>
-          </div>
-        );
+        return <TrustBarBlock {...block} />;
       case "statsCounter":
-        return (
-          <div class="py-12 bg-bg-darker" data-block-type="statsCounter" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[Stats Counter Block — Phase 2]</p>
-          </div>
-        );
+        return <StatsCounterBlock {...block} />;
       case "servicesGrid":
-        return (
-          <div class="py-16 bg-bg-dark" data-block-type="servicesGrid" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[Services Grid Block — Phase 2]</p>
-          </div>
-        );
+        return <ServicesGridBlock {...block} />;
       case "testimonials":
-        return (
-          <div class="py-16 bg-bg-darker" data-block-type="testimonials" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[Testimonials Block — Phase 2]</p>
-          </div>
-        );
+        return <TestimonialsBlock {...block} />;
       case "ctaSection":
-        return (
-          <div class="py-16 bg-accent" data-block-type="ctaSection" data-key={block._key}>
-            <p class="text-white text-sm text-center">[CTA Section Block — Phase 2]</p>
-          </div>
-        );
+        return <CtaSectionBlock {...block} />;
       case "textWithImage":
-        return (
-          <div class="py-16 bg-bg-dark" data-block-type="textWithImage" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[Text With Image Block — Phase 2]</p>
-          </div>
-        );
+        return <TextWithImageBlock {...block} />;
       case "faqSection":
-        return (
-          <div class="py-16 bg-bg-darker" data-block-type="faqSection" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[FAQ Section Block — Phase 2]</p>
-          </div>
-        );
+        return <FaqSectionBlock {...block} />;
       case "gallerySection":
-        return (
-          <div class="py-16 bg-bg-dark" data-block-type="gallerySection" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[Gallery Section Block — Phase 2]</p>
-          </div>
-        );
+        return <GallerySectionBlock {...block} />;
       case "videoSection":
-        return (
-          <div class="py-16 bg-bg-darker" data-block-type="videoSection" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[Video Section Block — Phase 2]</p>
-          </div>
-        );
+        return <VideoSectionBlock {...block} />;
       case "richText":
-        return (
-          <div class="py-16 bg-bg-dark" data-block-type="richText" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[Rich Text Block — Phase 2]</p>
-          </div>
-        );
+        return <RichTextBlock {...block} />;
       case "formSection":
-        return (
-          <div class="py-16 bg-bg-darker" data-block-type="formSection" data-key={block._key}>
-            <p class="text-text-dim text-sm text-center">[Form Section Block — Phase 2]</p>
-          </div>
-        );
+        return <FormSectionBlock {...block} />;
       default:
         return (
           <div class="py-8 bg-bg-card text-center" data-block-type={block._type} data-key={block._key}>

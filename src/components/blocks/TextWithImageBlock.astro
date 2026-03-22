@@ -1,0 +1,58 @@
+---
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+import { PortableText } from "astro-portabletext";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+
+interface Props {
+  heading?: string;
+  text?: any[];
+  image?: any;
+  imagePosition?: "left" | "right";
+}
+
+const { heading, text, image, imagePosition = "right" } = Astro.props;
+
+const imageUrl = image
+  ? urlForImage(image).width(800).height(600).url()
+  : null;
+
+const isLeft = imagePosition === "left";
+---
+
+<SectionContainer background="white" padding="md">
+  <div class={`grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center`}>
+    {/* Text Column */}
+    <div class={isLeft ? "order-2" : "order-1"}>
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold text-text-primary mb-6">
+          {heading}
+        </h2>
+      )}
+      {text && (
+        <div class="prose max-w-none text-text-muted">
+          <PortableText value={text} />
+        </div>
+      )}
+    </div>
+
+    {/* Image Column */}
+    <div class={isLeft ? "order-1" : "order-2"}>
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={heading || ""}
+          class="w-full rounded-xl object-cover"
+          style="aspect-ratio: 4/3;"
+          loading="lazy"
+        />
+      ) : (
+        <ImagePlaceholder
+          description={heading || "Section image"}
+          aspectRatio="4/3"
+          class="w-full"
+        />
+      )}
+    </div>
+  </div>
+</SectionContainer>

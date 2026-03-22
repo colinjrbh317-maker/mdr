@@ -1,0 +1,146 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Card from "@/components/ui/Card.astro";
+import Button from "@/components/ui/Button.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+import { loadQuery } from "@/sanity/lib/load-query";
+import { SERVICES_QUERY } from "@/sanity/lib/queries";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+
+export const prerender = true;
+
+interface Service {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+  featuredImage?: any;
+  sortOrder?: number;
+  isParent: boolean;
+  parentService?: {
+    _id: string;
+    name: string;
+    slug: string;
+  };
+}
+
+const services = await loadQuery<Service[]>(SERVICES_QUERY);
+const parentServices = services.filter((s) => s.isParent);
+const childServices = services.filter((s) => !s.isParent);
+
+function getChildren(parentId: string) {
+  return childServices.filter((c) => c.parentService?._id === parentId);
+}
+---
+
+<Layout
+  title="Roofing Services | Modern Day Roofing"
+  description="Complete roofing services in Christiansburg & Roanoke VA. Roof replacement, shingle roofing, metal roofing, repairs, maintenance, gutters, and storm damage restoration."
+>
+  <SectionContainer background="warm" padding="lg">
+    <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Services" }]} />
+    <div class="mt-6 max-w-3xl">
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary">
+        Our Roofing Services
+      </h1>
+      <p class="mt-4 text-lg text-text-muted">
+        From full roof replacements to emergency storm damage repairs, Modern Day Roofing
+        delivers expert craftsmanship backed by manufacturer warranties across Christiansburg,
+        Roanoke, and the New River Valley.
+      </p>
+    </div>
+  </SectionContainer>
+
+  <SectionContainer background="white" padding="md">
+    {parentServices.length === 0 && (
+      <p class="text-center text-text-dim py-12">No services available yet.</p>
+    )}
+
+    <div class="space-y-16">
+      {parentServices.map((parent) => {
+        const children = getChildren(parent._id);
+        return (
+          <div>
+            {/* Parent service - wide horizontal card */}
+            <a
+              href={`/services/${parent.slug}`}
+              class="group grid grid-cols-1 md:grid-cols-5 gap-6 bg-bg-card border border-border rounded-xl overflow-hidden hover:border-accent/30 transition-colors"
+            >
+              <div class="md:col-span-2 aspect-video md:aspect-auto">
+                {parent.featuredImage ? (
+                  <img
+                    src={urlForImage(parent.featuredImage).width(600).height(400).url()}
+                    alt={parent.name}
+                    class="w-full h-full object-cover"
+                  />
+                ) : (
+                  <ImagePlaceholder
+                    description={`${parent.name} service photo`}
+                    aspectRatio="3/2"
+                    class="w-full h-full rounded-none border-none"
+                  />
+                )}
+              </div>
+              <div class="md:col-span-3 p-6 md:py-8 flex flex-col justify-center">
+                <h2 class="text-2xl md:text-3xl font-bold text-text-primary group-hover:text-accent transition-colors">
+                  {parent.name}
+                </h2>
+                {parent.description && (
+                  <p class="mt-3 text-text-muted leading-relaxed">
+                    {parent.description}
+                  </p>
+                )}
+                <div class="mt-4">
+                  <span class="text-accent font-semibold text-sm group-hover:underline">
+                    Learn More &rarr;
+                  </span>
+                </div>
+              </div>
+            </a>
+
+            {/* Child services grid */}
+            {children.length > 0 && (
+              <div class="mt-6 ml-0 md:ml-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {children.map((child) => (
+                    <Card variant="service" href={`/services/${child.slug}`}>
+                      <div class="mb-4">
+                        {child.featuredImage ? (
+                          <img
+                            src={urlForImage(child.featuredImage).width(400).height(225).url()}
+                            alt={child.name}
+                            class="w-full rounded-lg object-cover"
+                            style="aspect-ratio: 16/9;"
+                          />
+                        ) : (
+                          <ImagePlaceholder
+                            description={`${child.name} service photo`}
+                            aspectRatio="16/9"
+                            class="w-full"
+                          />
+                        )}
+                      </div>
+                      <h3 class="text-lg font-semibold text-text-primary mb-2">
+                        {child.name}
+                      </h3>
+                      {child.description && (
+                        <p class="text-sm text-text-muted">{child.description}</p>
+                      )}
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="text-center mt-16">
+      <Button href="/contact" size="lg">Get Your Free Estimate</Button>
+    </div>
+  </SectionContainer>
+</Layout>

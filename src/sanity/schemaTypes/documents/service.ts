@@ -1,4 +1,4 @@
-import { defineType, defineField } from 'sanity'
+import { defineType, defineField, defineArrayMember } from 'sanity'
 import { WrenchIcon } from '@sanity/icons'
 
 export default defineType({
@@ -49,6 +49,47 @@ export default defineType({
       options: {
         hotspot: true,
       },
+    }),
+    defineField({
+      name: 'body',
+      title: 'Body Content',
+      type: 'portableText',
+      description: 'Main service description (target 500+ words for SEO)',
+    }),
+    defineField({
+      name: 'pageBuilder',
+      title: 'Page Builder',
+      type: 'array',
+      description: 'Optional additional sections below the body content',
+      of: [
+        defineArrayMember({ type: 'hero' }),
+        defineArrayMember({ type: 'trustBar' }),
+        defineArrayMember({ type: 'statsCounter' }),
+        defineArrayMember({ type: 'servicesGrid' }),
+        defineArrayMember({ type: 'testimonials' }),
+        defineArrayMember({ type: 'ctaSection' }),
+        defineArrayMember({ type: 'textWithImage' }),
+        defineArrayMember({ type: 'faqSection' }),
+        defineArrayMember({ type: 'gallerySection' }),
+        defineArrayMember({ type: 'videoSection' }),
+        defineArrayMember({ type: 'richText' }),
+        defineArrayMember({ type: 'formSection' }),
+      ],
+    }),
+    defineField({
+      name: 'relatedServices',
+      title: 'Related Services',
+      type: 'array',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'service' }] })],
+      validation: (rule) => rule.max(4),
+      description: 'Cross-link to related services (max 4)',
+    }),
+    defineField({
+      name: 'sortOrder',
+      title: 'Sort Order',
+      type: 'number',
+      initialValue: 10,
+      description: 'Controls display order on services listing page (lower = first)',
     }),
     defineField({
       name: 'seo',

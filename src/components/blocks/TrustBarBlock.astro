@@ -1,0 +1,70 @@
+---
+import TrustBar from "./TrustBar.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+
+interface TrustItem {
+  icon?: any;
+  label?: string;
+  value?: string;
+}
+
+interface Props {
+  items?: TrustItem[];
+}
+
+const { items } = Astro.props;
+---
+
+{/* If CMS provides items, render them; otherwise fall back to hardcoded TrustBar */}
+{items && items.length > 0 ? (
+  <SectionContainer background="light" padding="sm">
+    <div
+      class="flex items-center gap-6 overflow-x-auto py-4 px-2 scrollbar-hide"
+      role="list"
+      aria-label="Trust indicators"
+    >
+      {items.map((item, i) => (
+        <>
+          {i > 0 && (
+            <div class="flex-shrink-0 w-px h-12 bg-border hidden sm:block" aria-hidden="true"></div>
+          )}
+          <div class="flex-shrink-0" role="listitem">
+            <div class="flex items-center gap-3">
+              {item.icon && (
+                <img
+                  src={urlForImage(item.icon).width(60).height(60).url()}
+                  alt={item.label || ""}
+                  class="w-[60px] h-[60px] rounded-lg object-contain"
+                  loading="lazy"
+                />
+              )}
+              <div>
+                {item.value && (
+                  <p class="text-2xl font-bold text-text-primary">{item.value}</p>
+                )}
+                {item.label && (
+                  <p class="text-xs text-text-dim">{item.label}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      ))}
+    </div>
+  </SectionContainer>
+) : (
+  <SectionContainer background="light" padding="sm">
+    <TrustBar />
+  </SectionContainer>
+)}
+
+<style>
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+</style>

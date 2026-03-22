@@ -1,0 +1,20 @@
+---
+import ProcessTimeline from './ProcessTimeline';
+import SectionContainer from '@/components/ui/SectionContainer.astro';
+---
+
+<SectionContainer background="warm" padding="lg">
+  <div class="text-center mb-16">
+    <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-2">
+      The Modern Day Standard
+    </p>
+    <h2 class="text-3xl md:text-5xl font-display font-bold text-text-primary">
+      Peace of Mind, <span class="text-accent">Guaranteed.</span>
+    </h2>
+    <p class="mt-4 text-text-body max-w-2xl mx-auto text-lg">
+      Our proven process ensures your roof replacement is smooth, transparent, and built to last a lifetime.
+    </p>
+  </div>
+
+  <ProcessTimeline client:visible />
+</SectionContainer>

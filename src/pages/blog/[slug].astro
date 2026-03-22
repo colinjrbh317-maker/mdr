@@ -1,0 +1,168 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Badge from "@/components/ui/Badge.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+import SocialShare from "@/components/blog/SocialShare.astro";
+import RelatedPosts from "@/components/blog/RelatedPosts.astro";
+import { PortableText } from "astro-portabletext";
+import { loadQuery } from "@/sanity/lib/load-query";
+import {
+  BLOG_POST_BY_SLUG_QUERY,
+  ALL_BLOG_SLUGS_QUERY,
+  RELATED_POSTS_QUERY,
+} from "@/sanity/lib/queries";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const posts = await loadQuery<Array<{ slug: string }>>(ALL_BLOG_SLUGS_QUERY);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const post = await loadQuery<any>(BLOG_POST_BY_SLUG_QUERY, { slug });
+
+if (!post) {
+  return Astro.redirect("/404");
+}
+
+// Fetch related posts
+const relatedPosts = post.category?._id
+  ? await loadQuery<any[]>(RELATED_POSTS_QUERY, {
+      categoryId: post.category._id,
+      currentSlug: slug,
+    }).catch(() => [])
+  : [];
+
+const seoTitle = post.seo?.metaTitle || `${post.title} | Modern Day Roofing`;
+const seoDescription = post.seo?.metaDescription;
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Blog", href: "/blog" },
+  { label: post.title },
+];
+
+const siteUrl = Astro.site?.href || "https://moderndayroofing.com";
+const postUrl = `${siteUrl}blog/${slug}`;
+
+// BlogPosting JSON-LD
+const blogPostingJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.title,
+  datePublished: post.publishedAt,
+  dateModified: post.publishedAt,
+  author: {
+    "@type": "Person",
+    name: post.author || "Modern Day Roofing",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "Modern Day Roofing",
+    url: siteUrl,
+  },
+  url: postUrl,
+  ...(seoDescription ? { description: seoDescription } : {}),
+  ...(post.featuredImage
+    ? { image: urlForImage(post.featuredImage).width(1200).height(630).url() }
+    : {}),
+};
+
+function formatDate(dateStr: string | undefined): string {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+---
+
+<Layout title={seoTitle} description={seoDescription} ogImage={post.featuredImage ? urlForImage(post.featuredImage).width(1200).height(630).url() : undefined}>
+  <script type="application/ld+json" set:html={JSON.stringify(blogPostingJsonLd)} />
+
+  <article>
+    {/* Hero */}
+    <SectionContainer background="warm" padding="lg">
+      <div class="max-w-3xl mx-auto">
+        <Breadcrumb items={breadcrumbItems} />
+        <div class="mt-6 text-center">
+          <div class="flex items-center justify-center gap-3 mb-4">
+            {post.category?.title && (
+              <a href={`/blog/category/${post.category.slug}`}>
+                <Badge variant="certification" text={post.category.title} />
+              </a>
+            )}
+            {post.publishedAt && (
+              <span class="text-sm text-text-dim">
+                {formatDate(post.publishedAt)}
+              </span>
+            )}
+          </div>
+          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary leading-tight">
+            {post.title}
+          </h1>
+          {post.author && (
+            <p class="mt-4 text-text-muted">By {post.author}</p>
+          )}
+
+          {/* Social Share */}
+          <div class="mt-6 flex justify-center">
+            <SocialShare url={postUrl} title={post.title} />
+          </div>
+        </div>
+      </div>
+    </SectionContainer>
+
+    {/* Featured Image */}
+    {post.featuredImage && (
+      <SectionContainer background="white" padding="sm">
+        <div class="max-w-4xl mx-auto">
+          <img
+            src={urlForImage(post.featuredImage).width(1200).height(630).url()}
+            alt={post.title}
+            class="w-full rounded-xl object-cover"
+            style="aspect-ratio: 1200/630;"
+          />
+        </div>
+      </SectionContainer>
+    )}
+
+    {/* Body */}
+    <SectionContainer background="white" padding="md" maxWidth="narrow">
+      {post.body ? (
+        <div class="prose max-w-none text-text-body prose-headings:text-text-primary prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl">
+          <PortableText value={post.body} />
+        </div>
+      ) : (
+        <p class="text-text-dim text-center">No content yet.</p>
+      )}
+    </SectionContainer>
+
+    {/* Tags */}
+    {post.tags && post.tags.length > 0 && (
+      <SectionContainer background="light" padding="sm" maxWidth="narrow">
+        <div class="flex flex-wrap gap-2">
+          {post.tags.map((tag: string) => (
+            <span class="px-3 py-1 bg-bg-card border border-border rounded-full text-xs text-text-dim">
+              {tag}
+            </span>
+          ))}
+        </div>
+      </SectionContainer>
+    )}
+
+    {/* Related Posts */}
+    {relatedPosts.length > 0 && (
+      <SectionContainer background="warm" padding="md">
+        <RelatedPosts posts={relatedPosts} />
+      </SectionContainer>
+    )}
+  </article>
+</Layout>

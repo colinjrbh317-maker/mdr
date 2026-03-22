@@ -1,0 +1,61 @@
+---
+import ServiceGrid from './ServiceGrid';
+import BeforeAfter from './BeforeAfter';
+import SectionContainer from '@/components/ui/SectionContainer.astro';
+import Button from '@/components/ui/Button.astro';
+
+// Real before/after pair from Google Drive
+const beforeImg = "/assets/web/IMG_8457-2.jpg";
+const afterImg = "/assets/web/IMG_8458-2.jpg";
+---
+
+{/* Services Section */}
+<SectionContainer background="white" padding="lg">
+  <div class="text-center mb-16">
+    <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-2">
+      Expert Exterior Solutions
+    </p>
+    <h2 class="text-3xl md:text-5xl font-display font-bold text-text-primary">
+      More Than Just A Roof.
+    </h2>
+    <p class="mt-4 text-text-muted max-w-2xl mx-auto text-lg">
+      We provide complete protection for your home's exterior, from the shingles to the gutters.
+    </p>
+  </div>
+  
+  <ServiceGrid client:visible />
+  
+  <div class="text-center mt-12">
+    <Button href="/services" variant="outline" size="lg">
+      View All Services
+    </Button>
+  </div>
+</SectionContainer>
+
+{/* Before/After Section */}
+<SectionContainer background="dark" padding="none">
+    <div class="grid grid-cols-1 md:grid-cols-2">
+        {/* Content Side */}
+        <div class="p-8 md:p-20 flex flex-col justify-center bg-bg-darker text-white">
+            <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-4">
+                Real Results
+            </p>
+            <h2 class="text-3xl md:text-5xl font-display font-bold mb-6">
+                See The Transformation.
+            </h2>
+            <p class="text-white/90 text-lg mb-8 leading-relaxed">
+                A new roof does more than leak protection—it dramatically transforms your home's curb appeal. Slide to see the difference GAF Master Elite craftsmanship makes.
+            </p>
+            <div>
+              <Button href="/gallery" variant="secondary">View Project Gallery</Button>
+            </div>
+        </div>
+
+        {/* Interactive Side */}
+        <div class="relative h-[400px] md:h-auto min-h-[500px]">
+             <div class="absolute inset-0">
+                <BeforeAfter client:visible beforeImage={beforeImg} afterImage={afterImg} />
+             </div>
+        </div>
+    </div>
+</SectionContainer>

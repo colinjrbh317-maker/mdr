@@ -1,0 +1,52 @@
+---
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Button from "@/components/ui/Button.astro";
+
+interface Props {
+  heading: string;
+  text?: string;
+  primaryCta?: { text?: string; link?: string };
+  secondaryCta?: { text?: string; link?: string };
+  background?: "accent" | "dark" | "darker";
+}
+
+const { heading, text, primaryCta, secondaryCta, background = "accent" } = Astro.props;
+
+const isAccent = background === "accent";
+---
+
+<SectionContainer background={background} padding="md">
+  <div class="text-center">
+    <h2 class={`text-3xl md:text-4xl font-bold ${isAccent ? "text-white" : "text-text-primary"}`}>
+      {heading}
+    </h2>
+    {text && (
+      <p class={`mt-4 max-w-2xl mx-auto text-lg ${isAccent ? "text-white/90" : "text-text-muted"}`}>
+        {text}
+      </p>
+    )}
+    {(primaryCta?.text || secondaryCta?.text) && (
+      <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        {primaryCta?.text && (
+          <Button
+            href={primaryCta.link || "/contact"}
+            variant={isAccent ? "secondary" : "primary"}
+            size="lg"
+          >
+            {primaryCta.text}
+          </Button>
+        )}
+        {secondaryCta?.text && (
+          <Button
+            href={secondaryCta.link || "#"}
+            variant="ghost"
+            size="lg"
+            class={isAccent ? "text-white border-white/30 hover:bg-white/10" : ""}
+          >
+            {secondaryCta.text}
+          </Button>
+        )}
+      </div>
+    )}
+  </div>
+</SectionContainer>

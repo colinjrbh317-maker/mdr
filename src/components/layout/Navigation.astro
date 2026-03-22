@@ -2,7 +2,34 @@
 import Button from "@/components/ui/Button.astro";
 import Logo from "@/components/common/Logo.astro";
 
-const navItems = [
+interface Props {
+  navigation?: any;
+  siteSettings?: any;
+}
+
+const { navigation, siteSettings } = Astro.props;
+
+// Helper to resolve a navItem link object to an href string
+function resolveLink(link: any): string {
+  if (!link) return "#";
+  if (link.linkType === "external" && link.externalUrl) return link.externalUrl;
+  if (link.linkType === "internal" && link.internalLink) {
+    const ref = link.internalLink;
+    const slug = ref.slug;
+    if (!slug) return "#";
+    switch (ref._type) {
+      case "page": return `/${slug}`;
+      case "service": return `/services/${slug}`;
+      case "serviceArea": return `/areas/${slug}`;
+      case "blogPost": return `/blog/${slug}`;
+      default: return `/${slug}`;
+    }
+  }
+  return "#";
+}
+
+// Fallback hardcoded nav
+const fallbackNavItems = [
   {
     label: "Services",
     href: "/services",
@@ -12,7 +39,7 @@ const navItems = [
       { label: "Metal Roofing", href: "/services/metal-roofing" },
       { label: "Timber Seal", href: "/services/timber-seal" },
       { label: "Roof Repair", href: "/services/roof-repair" },
-      { label: "Maintenance", href: "/services/maintenance" },
+      { label: "Maintenance", href: "/services/roof-maintenance" },
       { label: "Gutters", href: "/services/gutters" },
     ],
   },
@@ -23,15 +50,31 @@ const navItems = [
     children: [
       { label: "Blog", href: "/blog" },
       { label: "FAQ", href: "/faq" },
-      { label: "Roofing System", href: "/roofing-system" },
+      { label: "Roofing Systems", href: "/roofing-systems" },
     ],
   },
-  { label: "Storm Damage", href: "/storm-damage" },
+  { label: "Storm Damage", href: "/services/storm-damage" },
   { label: "About Us", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 
-const phone = "(540) 204-5597";
+// Build nav items from CMS or fall back to hardcoded
+const navItems = navigation?.items?.length
+  ? navigation.items.map((item: any) => ({
+      label: item.label,
+      href: resolveLink(item.link),
+      openInNewTab: item.link?.openInNewTab,
+      children: item.children?.map((child: any) => ({
+        label: child.label,
+        href: resolveLink(child.link),
+        openInNewTab: child.link?.openInNewTab,
+      })),
+    }))
+  : fallbackNavItems;
+
+const phone = siteSettings?.phone || "(540) 553-6007";
+const ctaText = navigation?.ctaText || "Get a Free Quote";
+const ctaLink = navigation?.ctaLink || "/contact";
 ---
 
 <nav class="flex items-center justify-between w-full" aria-label="Main navigation">
@@ -43,13 +86,16 @@ const phone = "(540) 204-5597";
   <!-- Desktop Nav -->
   <ul class="hidden lg:flex items-center gap-1" role="menubar">
     {
-      navItems.map((item) => (
+      navItems.map((item: any) => (
         <li class="relative group" role="none">
           <a
             href={item.href}
             role="menuitem"
-            class="px-3 py-2 text-sm font-medium text-text-muted hover:text-text-primary transition-colors rounded-lg hover:bg-bg-card"
+            class="px-3 py-2 text-sm font-medium transition-colors rounded-lg bg-transparent hover:bg-black/5"
+            style="color: var(--nav-text);"
             aria-haspopup={item.children ? "true" : undefined}
+            target={item.openInNewTab ? "_blank" : undefined}
+            rel={item.openInNewTab ? "noopener noreferrer" : undefined}
           >
             {item.label}
             {item.children && (
@@ -73,12 +119,14 @@ const phone = "(540) 204-5597";
               class="absolute left-0 top-full pt-2 hidden group-hover:block z-50"
               role="menu"
             >
-              <li class="bg-bg-card border border-border rounded-xl shadow-xl py-2 min-w-[200px]">
-                {item.children.map((child) => (
+              <li class="bg-bg-darker border border-white/10 rounded-xl shadow-xl py-2 min-w-[200px]">
+                {item.children.map((child: any) => (
                   <a
                     href={child.href}
                     role="menuitem"
-                    class="block px-4 py-2.5 text-sm text-text-muted hover:text-text-primary hover:bg-bg-card-hover transition-colors"
+                    class="block px-4 py-2.5 text-sm text-text-on-dark-muted hover:text-text-on-dark hover:bg-white/10 transition-colors"
+                    target={child.openInNewTab ? "_blank" : undefined}
+                    rel={child.openInNewTab ? "noopener noreferrer" : undefined}
                   >
                     {child.label}
                   </a>
@@ -95,44 +143,173 @@ const phone = "(540) 204-5597";
   <div class="hidden lg:flex items-center gap-4">
     <a
       href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
-      class="text-sm font-semibold text-text-muted hover:text-text-primary transition-colors"
+      class="text-sm font-semibold transition-colors"
+      style="color: var(--nav-text)"
     >
       {phone}
     </a>
-    <Button href="/contact" size="sm">Get a Free Quote</Button>
+    <Button href={ctaLink} size="sm">{ctaText}</Button>
   </div>
 
-  <!-- Mobile: Phone + Hamburger -->
-  <div class="flex lg:hidden items-center gap-3">
+  <!-- Mobile: Configured to look like Erie Home (Logo | Actions | Hamburger) -->
+  <div class="flex lg:hidden items-center gap-2">
+    
+    {/* 1. Phone Icon (Icon Only to save space) */}
     <a
       href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
-      class="p-2 text-text-muted hover:text-text-primary"
+      class="p-2 w-10 h-10 flex items-center justify-center rounded-full bg-bg-light text-text-primary border border-border"
       aria-label="Call us"
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-        ></path>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
       </svg>
     </a>
+
+    {/* 2. Primary CTA "Get Estimate" - Always visible on sticky header */}
+    <a
+      href={ctaLink}
+      class="bg-accent text-white hover:bg-accent-dark px-3 py-2 rounded-md text-xs font-bold uppercase tracking-wide shadow-sm transition-colors"
+    >
+      Get Estimate
+    </a>
+
+    {/* 3. Hamburger Menu Trigger */}
     <button
       type="button"
       id="mobile-menu-toggle"
-      class="p-2 text-text-muted hover:text-text-primary min-w-[48px] min-h-[48px] flex items-center justify-center"
+      class="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center transition-colors"
+      style="color: var(--nav-text)"
       aria-label="Open menu"
       aria-expanded="false"
       aria-controls="mobile-menu"
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 6h16M4 12h16M4 18h16"></path>
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
       </svg>
     </button>
   </div>
+  <!-- Mobile Menu Drawer (Erie Style) -->
+  <div
+    id="mobile-menu"
+    class="fixed inset-0 z-50 transform translate-x-full transition-transform duration-300 lg:hidden"
+    aria-hidden="true"
+  >
+    {/* Backdrop */}
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity opacity-0" id="mobile-menu-backdrop"></div>
+    
+    {/* Drawer Content */}
+    <div class="absolute right-0 top-0 bottom-0 w-[85%] max-w-[320px] bg-white shadow-2xl flex flex-col h-full transform transition-transform duration-300 translate-x-full" id="mobile-menu-content">
+      
+      {/* Drawer Header */}
+      <div class="flex items-center justify-between p-4 border-b border-border-light bg-bg-light">
+        <span class="font-display font-bold text-lg text-text-primary uppercase tracking-wider">
+          Menu
+        </span>
+        <button
+          type="button"
+          id="mobile-menu-close"
+          class="p-2 text-text-muted hover:text-accent transition-colors"
+          aria-label="Close menu"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Primary Actions (Erie Style - Top of Drawer) */}
+      <div class="p-4 space-y-3 bg-white border-b border-border-light">
+        <Button href="/contact" size="lg" class="w-full justify-center shadow-md">
+          Get Free Estimate
+        </Button>
+        <a 
+          href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
+          class="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg border-2 border-accent text-accent font-bold hover:bg-accent hover:text-white transition-all duration-300"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          Call {phone}
+        </a>
+      </div>
+
+      {/* Navigation Links */}
+      <div class="flex-1 overflow-y-auto py-2">
+        <ul class="space-y-1 p-2">
+          {navItems.map((item: any) => (
+            <li>
+              {item.children ? (
+                <details class="group/mobile-sub">
+                  <summary class="flex items-center justify-between px-4 py-3 text-text-primary font-medium hover:bg-bg-light rounded-lg cursor-pointer select-none">
+                    {item.label}
+                    <svg class="w-4 h-4 text-text-muted transition-transform group-open/mobile-sub:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                  </summary>
+                  <ul class="pl-4 pr-2 pb-2 space-y-1 bg-bg-light/50 rounded-b-lg">
+                    {item.children.map((child: any) => (
+                      <li>
+                        <a
+                          href={child.href}
+                          class="block px-4 py-2.5 text-sm text-text-body hover:text-accent hover:bg-white rounded-md transition-colors"
+                        >
+                          {child.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ) : (
+                <a
+                  href={item.href}
+                  class="block px-4 py-3 text-text-primary font-medium hover:bg-bg-light rounded-lg transition-colors"
+                >
+                  {item.label}
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Drawer Footer */}
+      <div class="p-4 border-t border-border-light bg-bg-light text-center">
+        <p class="text-xs text-text-muted">
+          &copy; {new Date().getFullYear()} Modern Day Roofing
+        </p>
+      </div>
+
+    </div>
+  </div>
 </nav>
+
+<script>
+  const menu = document.getElementById("mobile-menu");
+  const menuContent = document.getElementById("mobile-menu-content");
+  const backdrop = document.getElementById("mobile-menu-backdrop");
+  const toggle = document.getElementById("mobile-menu-toggle");
+  const closeBtn = document.getElementById("mobile-menu-close");
+
+  function toggleMenu() {
+    const isExpanded = toggle?.getAttribute("aria-expanded") === "true";
+    toggle?.setAttribute("aria-expanded", (!isExpanded).toString());
+    
+    if (!isExpanded) {
+      // Open
+      menu?.classList.remove("translate-x-full");
+      setTimeout(() => {
+          backdrop?.classList.remove("opacity-0");
+          menuContent?.classList.remove("translate-x-full");
+      }, 10);
+      document.body.style.overflow = "hidden";
+    } else {
+      // Close
+      backdrop?.classList.add("opacity-0");
+      menuContent?.classList.add("translate-x-full");
+      setTimeout(() => {
+        menu?.classList.add("translate-x-full");
+        document.body.style.overflow = "";
+      }, 300);
+    }
+  }
+
+  toggle?.addEventListener("click", toggleMenu);
+  closeBtn?.addEventListener("click", toggleMenu);
+  backdrop?.addEventListener("click", toggleMenu);
+</script>

@@ -1,0 +1,299 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Card from "@/components/ui/Card.astro";
+import Button from "@/components/ui/Button.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+import BlockRenderer from "@/components/blocks/BlockRenderer.astro";
+import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
+import { PortableText } from "astro-portabletext";
+import { loadQuery } from "@/sanity/lib/load-query";
+import {
+  SERVICE_AREA_BY_SLUG_QUERY,
+  ALL_SERVICE_AREA_SLUGS_QUERY,
+} from "@/sanity/lib/queries";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+import ScrollReveal from "@/components/common/ScrollReveal.astro";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const areas = await loadQuery<Array<{ slug: string }>>(ALL_SERVICE_AREA_SLUGS_QUERY);
+  return areas.map((a) => ({
+    params: { slug: a.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const area = await loadQuery<any>(SERVICE_AREA_BY_SLUG_QUERY, { slug });
+
+if (!area) {
+  return Astro.redirect("/404");
+}
+
+const isHub = area.isHubPage === true;
+const childAreas = area.childAreas || [];
+const siblingAreas = area.siblingAreas || [];
+const servicesOffered = area.servicesOffered || [];
+
+const seoTitle = area.seo?.metaTitle || `Roofing Services in ${area.name}, VA | Modern Day Roofing`;
+const seoDescription =
+  area.seo?.metaDescription || area.description || `Professional roofing services in ${area.name}, Virginia. Roof replacement, repair, maintenance, gutters, and storm damage restoration.`;
+
+// Breadcrumb items
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Service Areas", href: "/areas" },
+];
+if (!isHub && area.parentHub) {
+  breadcrumbItems.push({
+    label: area.parentHub.name,
+    href: `/areas/${area.parentHub.slug}`,
+  });
+}
+breadcrumbItems.push({ label: area.name });
+
+// JSON-LD structured data
+const siteUrl = Astro.site?.href || "https://moderndayroofing.com";
+
+const areaServed = isHub
+  ? childAreas.map((child: any) => ({
+      "@type": "City",
+      name: `${child.name}, VA`,
+    }))
+  : [{ "@type": "City", name: `${area.name}, VA` }];
+
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": ["LocalBusiness", "RoofingContractor"],
+  name: "Modern Day Roofing",
+  url: siteUrl,
+  telephone: "(540) 553-6007",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "80 College St. STE R",
+    addressLocality: "Christiansburg",
+    addressRegion: "VA",
+    postalCode: "24073",
+    addressCountry: "US",
+  },
+  areaServed,
+  description: seoDescription,
+};
+---
+
+<Layout title={seoTitle} description={seoDescription} ogImage={area.featuredImage ? urlForImage(area.featuredImage).width(1200).height(630).url() : undefined}>
+  <script type="application/ld+json" set:html={JSON.stringify(localBusinessJsonLd)} />
+
+  {/* Split Hero: Content + Map */}
+  <section class="relative dark-section bg-bg-darker">
+    <div class="mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        {/* Left: Content */}
+        <div>
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold text-white">
+            Roofing Services in {area.name}, VA
+          </h1>
+          {area.description && (
+            <p class="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed">
+              {area.description}
+            </p>
+          )}
+          <div class="mt-8 flex flex-col sm:flex-row gap-4">
+            <Button href="#get-estimate" size="lg">Get Your Free Estimate</Button>
+            <Button href="tel:5405536007" variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
+              Call (540) 553-6007
+            </Button>
+          </div>
+        </div>
+        {/* Right: Map or Image */}
+        <div class="rounded-xl overflow-hidden border border-white/10" style="aspect-ratio: 4/3;">
+          {area.mapEmbedUrl ? (
+            <iframe
+              src={area.mapEmbedUrl}
+              width="100%"
+              height="100%"
+              style="border:0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title={`Google Maps showing ${area.name}, Virginia`}
+            ></iframe>
+          ) : area.featuredImage ? (
+            <img
+              src={urlForImage(area.featuredImage).width(800).height(600).url()}
+              alt={area.name}
+              class="w-full h-full object-cover"
+              loading="eager"
+            />
+          ) : (
+            <ImagePlaceholder
+              description={`${area.name} area`}
+              class="w-full h-full rounded-none border-none"
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Services available badge bar */}
+  {servicesOffered.length > 0 && (
+    <SectionContainer background="light" padding="sm">
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <span class="text-sm text-text-muted mr-2">Services in {area.name}:</span>
+        {servicesOffered.map((service: any) => (
+          <a
+            href={`/services/${service.slug}`}
+            class="px-4 py-1.5 rounded-full text-sm font-medium bg-warm/10 text-warm-dark border border-warm/20 hover:bg-warm/20 transition-colors no-underline"
+          >
+            {service.name}
+          </a>
+        ))}
+      </div>
+    </SectionContainer>
+  )}
+
+  {/* Body Content */}
+  {area.body && (
+    <SectionContainer background="white" padding="md" maxWidth="narrow">
+      <div class="prose max-w-none text-text-body prose-headings:text-text-primary prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl">
+        <PortableText value={area.body} />
+      </div>
+    </SectionContainer>
+  )}
+
+  {/* Child Areas Grid (Hub pages only) */}
+  {isHub && childAreas.length > 0 && (
+    <SectionContainer background="light" padding="md">
+      <h2 class="text-2xl md:text-3xl font-bold text-text-primary mb-8">
+        Communities We Serve in the {area.name} Area
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {childAreas.map((child: any, i: number) => (
+          <ScrollReveal delay={i * 100}>
+            <Card variant="service" href={`/areas/${child.slug}`}>
+              <div class="mb-4">
+                {child.featuredImage ? (
+                  <img
+                    src={urlForImage(child.featuredImage).width(400).height(225).url()}
+                    alt={child.name}
+                    class="w-full rounded-lg object-cover"
+                    style="aspect-ratio: 16/9;"
+                  />
+                ) : (
+                  <ImagePlaceholder
+                    description={`${child.name} area photo`}
+                    aspectRatio="16/9"
+                    class="w-full"
+                  />
+                )}
+              </div>
+              <h3 class="text-lg font-semibold text-text-primary mb-2">
+                {child.name}
+              </h3>
+              {child.description && (
+                <p class="text-sm text-text-muted">{child.description}</p>
+              )}
+            </Card>
+          </ScrollReveal>
+        ))}
+      </div>
+    </SectionContainer>
+  )}
+
+  {/* Services Offered */}
+  {servicesOffered.length > 0 && (
+    <SectionContainer background={isHub ? "warm" : "light"} padding="md">
+      <h2 class="text-2xl md:text-3xl font-bold text-text-primary mb-8">
+        Roofing Services in {area.name}
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {servicesOffered.map((service: any, i: number) => (
+          <ScrollReveal delay={i * 100}>
+            <Card variant="service" href={`/services/${service.slug}`}>
+              <div class="mb-4">
+                {service.featuredImage ? (
+                  <img
+                    src={urlForImage(service.featuredImage).width(400).height(225).url()}
+                    alt={service.name}
+                    class="w-full rounded-lg object-cover"
+                    style="aspect-ratio: 16/9;"
+                  />
+                ) : (
+                  <ImagePlaceholder
+                    description={`${service.name} service photo`}
+                    aspectRatio="16/9"
+                    class="w-full"
+                  />
+                )}
+              </div>
+              <h3 class="text-lg font-semibold text-text-primary mb-2">
+                {service.name}
+              </h3>
+              {service.description && (
+                <p class="text-sm text-text-muted">{service.description}</p>
+              )}
+            </Card>
+          </ScrollReveal>
+        ))}
+      </div>
+    </SectionContainer>
+  )}
+
+  {/* Page Builder Blocks */}
+  {area.pageBuilder && area.pageBuilder.length > 0 && (
+    <BlockRenderer blocks={area.pageBuilder} />
+  )}
+
+  {/* Lead Capture Form */}
+  <SectionContainer background="warm" padding="md" id="get-estimate">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-text-primary">
+          Get Your Free Roofing Estimate in {area.name}
+        </h2>
+        <p class="mt-3 text-text-muted">
+          Free inspection. No obligation. We'll provide an honest assessment and competitive quote for your {area.name} property.
+        </p>
+      </div>
+      <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8">
+        <LeadCaptureForm client:load source={`area-${slug}`} />
+      </div>
+    </div>
+  </SectionContainer>
+
+  {/* Sibling Areas Cross-links (Child pages only) */}
+  {!isHub && (siblingAreas.length > 0 || area.parentHub) && (
+    <SectionContainer background="dark" padding="sm">
+      <div class="text-center">
+        {area.parentHub && (
+          <p class="text-text-muted mb-4">
+            Part of our{" "}
+            <a href={`/areas/${area.parentHub.slug}`} class="text-accent hover:underline font-semibold">
+              {area.parentHub.name}
+            </a>{" "}
+            service area
+          </p>
+        )}
+        {siblingAreas.length > 0 && (
+          <div>
+            <p class="text-sm text-text-dim mb-3">Also serving nearby:</p>
+            <div class="flex flex-wrap justify-center gap-2">
+              {siblingAreas.map((sibling: any) => (
+                <a
+                  href={`/areas/${sibling.slug}`}
+                  class="inline-block px-4 py-2 bg-bg-card border border-border rounded-full text-sm text-text-muted hover:text-accent hover:border-accent/30 transition-colors"
+                >
+                  {sibling.name}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </SectionContainer>
+  )}
+</Layout>

@@ -1,0 +1,257 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Card from "@/components/ui/Card.astro";
+import Button from "@/components/ui/Button.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+import BlockRenderer from "@/components/blocks/BlockRenderer.astro";
+import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
+import { PortableText } from "astro-portabletext";
+import { loadQuery } from "@/sanity/lib/load-query";
+import {
+  SERVICE_BY_SLUG_QUERY,
+  ALL_SERVICE_SLUGS_QUERY,
+} from "@/sanity/lib/queries";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+import ScrollReveal from "@/components/common/ScrollReveal.astro";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const services = await loadQuery<Array<{ slug: string }>>(ALL_SERVICE_SLUGS_QUERY);
+  return services.map((s) => ({
+    params: { slug: s.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const service = await loadQuery<any>(SERVICE_BY_SLUG_QUERY, { slug });
+
+if (!service) {
+  return Astro.redirect("/404");
+}
+
+const seoTitle = service.seo?.metaTitle || `${service.name} | Modern Day Roofing`;
+const seoDescription =
+  service.seo?.metaDescription || service.description || `Professional ${service.name.toLowerCase()} services in Christiansburg & Roanoke VA.`;
+
+// Breadcrumb items
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/services" },
+];
+if (service.parentService) {
+  breadcrumbItems.push({
+    label: service.parentService.name,
+    href: `/services/${service.parentService.slug}`,
+  });
+}
+breadcrumbItems.push({ label: service.name });
+
+// Related services: combine manual + auto child services, deduplicated, max 4
+const manualRelated = service.relatedServices || [];
+const childServices = service.childServices || [];
+const seenIds = new Set<string>();
+const allRelated: any[] = [];
+
+for (const s of [...manualRelated, ...childServices]) {
+  if (s?._id && !seenIds.has(s._id)) {
+    seenIds.add(s._id);
+    allRelated.push(s);
+  }
+  if (allRelated.length >= 4) break;
+}
+
+// JSON-LD structured data
+const siteUrl = Astro.site?.href || "https://moderndayroofing.com";
+const serviceJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: service.name,
+  description: service.description || seoDescription,
+  provider: {
+    "@type": "RoofingContractor",
+    name: "Modern Day Roofing",
+    url: siteUrl,
+    telephone: "(540) 553-6007",
+    areaServed: [
+      { "@type": "City", name: "Christiansburg, VA" },
+      { "@type": "City", name: "Roanoke, VA" },
+      { "@type": "City", name: "Blacksburg, VA" },
+    ],
+  },
+  url: `${siteUrl}services/${slug}`,
+};
+---
+
+<Layout title={seoTitle} description={seoDescription} ogImage={service.featuredImage ? urlForImage(service.featuredImage).width(1200).height(630).url() : undefined}>
+  <script type="application/ld+json" set:html={JSON.stringify(serviceJsonLd)} />
+
+  {/* Hero (stays dark) */}
+  <section class="relative min-h-[50vh] flex items-center dark-section">
+    <div class="absolute inset-0 z-0">
+      {service.featuredImage ? (
+        <img
+          src={urlForImage(service.featuredImage).width(1600).height(800).url()}
+          alt={service.name}
+          class="w-full h-full object-cover"
+          loading="eager"
+        />
+      ) : (
+        <ImagePlaceholder
+          description={`${service.name} hero background`}
+          class="w-full h-full rounded-none border-none"
+        />
+      )}
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/60"></div>
+    </div>
+
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <Breadcrumb items={breadcrumbItems} />
+      <h1 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold text-white">
+        {service.name}
+      </h1>
+      {service.description && (
+        <p class="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed">
+          {service.description}
+        </p>
+      )}
+      <div class="mt-8 flex flex-col sm:flex-row gap-4">
+        <Button href="#get-estimate" size="lg">Get Your Free Estimate</Button>
+        <Button href="tel:5405536007" variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
+          Call (540) 553-6007
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  {/* Content + Sidebar Layout */}
+  <SectionContainer background="white" padding="md">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
+      {/* Main Content (2/3) */}
+      <div class="lg:col-span-2">
+        {service.body && (
+          <ScrollReveal>
+            <div class="prose max-w-none text-text-body prose-headings:text-text-primary prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl">
+              <PortableText value={service.body} />
+            </div>
+          </ScrollReveal>
+        )}
+
+        {/* Child Services (parent pages only) */}
+        {childServices.length > 0 && (
+          <div class="mt-12">
+            <h2 class="text-2xl md:text-3xl font-bold text-text-primary mb-8">
+              {service.name} Options
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {childServices.map((child: any) => (
+                <Card variant="service" href={`/services/${child.slug}`}>
+                  <div class="mb-4">
+                    {child.featuredImage ? (
+                      <img
+                        src={urlForImage(child.featuredImage).width(400).height(225).url()}
+                        alt={child.name}
+                        class="w-full rounded-lg object-cover"
+                        style="aspect-ratio: 16/9;"
+                      />
+                    ) : (
+                      <ImagePlaceholder
+                        description={`${child.name} service photo`}
+                        aspectRatio="16/9"
+                        class="w-full"
+                      />
+                    )}
+                  </div>
+                  <h3 class="text-lg font-semibold text-text-primary mb-2">
+                    {child.name}
+                  </h3>
+                  {child.description && (
+                    <p class="text-sm text-text-muted">{child.description}</p>
+                  )}
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sidebar (1/3) */}
+      <aside class="lg:col-span-1">
+        <div class="sticky top-[100px] space-y-6">
+          {/* Quick Contact Form */}
+          <div class="bg-bg-card border border-border rounded-xl p-6 shadow-sm">
+            <h3 class="text-lg font-bold text-text-primary mb-1">Get a Free Quote</h3>
+            <p class="text-text-muted text-sm mb-4">No obligation. Fast response.</p>
+            <LeadCaptureForm client:load source={`service-${slug}`} compact />
+          </div>
+
+          {/* Phone CTA */}
+          <div class="bg-accent rounded-xl p-6 text-center">
+            <p class="text-white/90 text-sm mb-2">Prefer to talk?</p>
+            <a href="tel:5405536007" class="text-white text-xl font-bold hover:underline">
+              (540) 553-6007
+            </a>
+          </div>
+
+          {/* Related Services */}
+          {allRelated.length > 0 && (
+            <div>
+              <h3 class="text-sm font-semibold uppercase tracking-wider text-text-muted mb-4">
+                Related Services
+              </h3>
+              <div class="space-y-3">
+                {allRelated.map((related: any) => (
+                  <a
+                    href={`/services/${related.slug}`}
+                    class="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-accent/30 hover:shadow-sm transition-all no-underline"
+                  >
+                    <div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden">
+                      {related.featuredImage ? (
+                        <img
+                          src={urlForImage(related.featuredImage).width(100).height(100).url()}
+                          alt={related.name}
+                          class="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div class="w-full h-full bg-bg-warm flex items-center justify-center">
+                          <svg class="w-5 h-5 text-text-dim" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <span class="text-sm font-medium text-text-primary">{related.name}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </aside>
+    </div>
+  </SectionContainer>
+
+  {/* Page Builder Blocks */}
+  {service.pageBuilder && service.pageBuilder.length > 0 && (
+    <BlockRenderer blocks={service.pageBuilder} />
+  )}
+
+  {/* Lead Capture Form (mobile/fallback) */}
+  <SectionContainer background="warm" padding="md" id="get-estimate" class="lg:hidden">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-text-primary">
+          Get Your Free {service.name} Estimate
+        </h2>
+        <p class="mt-3 text-text-muted">
+          Free inspection. No obligation. We'll provide an honest assessment and competitive quote.
+        </p>
+      </div>
+      <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8 shadow-sm">
+        <LeadCaptureForm client:load source={`service-${slug}`} />
+      </div>
+    </div>
+  </SectionContainer>
+</Layout>

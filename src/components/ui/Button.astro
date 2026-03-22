@@ -18,16 +18,16 @@ const {
 } = Astro.props;
 
 const baseStyles =
-  "inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 cursor-pointer text-center no-underline";
+  "inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 cursor-pointer text-center no-underline group";
 
 const variants: Record<string, string> = {
   primary:
     "bg-accent text-white hover:bg-accent-dark active:bg-accent-dark shadow-lg shadow-accent/20 hover:shadow-accent/30",
   secondary:
-    "bg-bg-card text-text-primary border border-border hover:bg-bg-card-hover hover:border-border-light",
+    "bg-bg-card text-text-primary border border-border hover:bg-bg-card-hover hover:border-border-light hover:shadow-md",
   outline:
     "bg-transparent text-accent border-2 border-accent hover:bg-accent hover:text-white",
-  ghost: "bg-transparent text-text-muted hover:text-text-primary hover:bg-bg-card",
+  ghost: "bg-transparent text-text-muted hover:text-text-primary hover:bg-bg-warm",
 };
 
 const sizes: Record<string, string> = {
@@ -37,17 +37,26 @@ const sizes: Record<string, string> = {
 };
 
 const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;
-const Tag = href ? "a" : "button";
 ---
 
 {
   href ? (
     <a href={href} class={classes} id={id}>
       <slot />
+      {variant === "primary" && (
+        <svg class="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      )}
     </a>
   ) : (
     <button type={type} class={classes} id={id}>
       <slot />
+      {variant === "primary" && type !== "submit" && (
+        <svg class="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      )}
     </button>
   )
 }

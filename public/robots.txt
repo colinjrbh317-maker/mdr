@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://moderndayroof.com/sitemap-index.xml
+
+# Block admin/studio routes
+Disallow: /studio
+Disallow: /api/

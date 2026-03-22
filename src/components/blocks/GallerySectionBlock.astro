@@ -1,0 +1,56 @@
+---
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+
+interface GalleryImage {
+  _key?: string;
+  asset?: any;
+  alt?: string;
+  caption?: string;
+}
+
+interface Props {
+  heading?: string;
+  images?: GalleryImage[];
+}
+
+const { heading, images = [] } = Astro.props;
+---
+
+<SectionContainer background="light" padding="md">
+  {heading && (
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-text-primary">
+        {heading}
+      </h2>
+    </div>
+  )}
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {images.map((img) => (
+      <figure class="overflow-hidden rounded-xl">
+        {img.asset ? (
+          <img
+            src={urlForImage(img).width(600).height(450).url()}
+            alt={img.alt || ""}
+            class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            style="aspect-ratio: 4/3;"
+            loading="lazy"
+          />
+        ) : (
+          <ImagePlaceholder
+            description={img.alt || "Gallery image"}
+            aspectRatio="4/3"
+            class="w-full"
+          />
+        )}
+        {img.caption && (
+          <figcaption class="mt-2 text-xs text-text-dim text-center">
+            {img.caption}
+          </figcaption>
+        )}
+      </figure>
+    ))}
+  </div>
+</SectionContainer>

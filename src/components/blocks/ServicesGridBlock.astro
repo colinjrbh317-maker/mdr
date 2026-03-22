@@ -1,0 +1,69 @@
+---
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Card from "@/components/ui/Card.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+
+interface ServiceRef {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  featuredImage?: any;
+}
+
+interface Props {
+  heading?: string;
+  subheading?: string;
+  services?: ServiceRef[];
+}
+
+const { heading, subheading, services = [] } = Astro.props;
+---
+
+<SectionContainer background="light" padding="md">
+  {(heading || subheading) && (
+    <div class="text-center mb-12">
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold text-text-primary">
+          {heading}
+        </h2>
+      )}
+      {subheading && (
+        <p class="mt-4 text-text-muted max-w-2xl mx-auto">
+          {subheading}
+        </p>
+      )}
+    </div>
+  )}
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {services.map((service) => (
+      <Card variant="service" href={`/services/${service.slug}`}>
+        <div class="mb-4">
+          {service.featuredImage ? (
+            <img
+              src={urlForImage(service.featuredImage).width(600).height(340).url()}
+              alt={service.name}
+              class="w-full rounded-lg object-cover"
+              style="aspect-ratio: 16/9;"
+              loading="lazy"
+            />
+          ) : (
+            <ImagePlaceholder
+              description={`${service.name} service photo`}
+              aspectRatio="16/9"
+              class="w-full"
+            />
+          )}
+        </div>
+        <h3 class="text-lg font-semibold text-text-primary mb-2">
+          {service.name}
+        </h3>
+        {service.description && (
+          <p class="text-sm text-text-muted">{service.description}</p>
+        )}
+      </Card>
+    ))}
+  </div>
+</SectionContainer>

@@ -1,0 +1,15 @@
+---
+// Captures gclid/fclid from URL params and stores in sessionStorage for lead attribution
+---
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const gclid = params.get("gclid");
+  const fclid = params.get("fclid");
+
+  if (gclid) sessionStorage.setItem("gclid", gclid);
+  if (fclid) sessionStorage.setItem("fclid", fclid);
+  if (gclid || fclid) {
+    sessionStorage.setItem("landing_page", window.location.href);
+  }
+</script>

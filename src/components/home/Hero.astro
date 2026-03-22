@@ -1,0 +1,56 @@
+---
+import HeroBackground from './HeroBackground';
+import Button from '@/components/ui/Button.astro';
+
+// This would connect to Sanity eventually to get the real video URL
+const heroVideoUrl = ""; // Leave empty for now to show placeholder gradient
+const heroPosterUrl = ""; // Placeholder image
+---
+
+<section class="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+  <HeroBackground client:load videoUrl={heroVideoUrl} posterUrl={heroPosterUrl} />
+
+  <div class="relative z-10 w-full max-w-[1280px] px-4 md:px-8 text-center text-white">
+    <div class="animate-fade-in space-y-8">
+      
+      {/* Eyebrow / Trust Indicator */}
+      <p class="text-white/80 uppercase tracking-[0.2em] text-sm md:text-base font-medium mb-4">
+        GAF Master Elite® Certified Contractor
+      </p>
+
+      {/* Main Headline */}
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold uppercase tracking-tight leading-[0.9]">
+        We Protect <br class="md:hidden" />
+        <span class="text-white">Your Home</span>
+      </h1>
+
+      {/* Subheadline/Description */}
+      <p class="max-w-2xl mx-auto text-lg md:text-xl text-white/90 font-light leading-relaxed">
+        Premium roofing solutions for homeowners who value longevity, craftsmanship, and peace of mind.
+      </p>
+
+      {/* CTA Buttons */}
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+        <Button href="/contact" size="lg" class="min-w-[200px] shadow-xl hover:shadow-2xl transition-all duration-300">
+          Get Your Free Estimate
+        </Button>
+        <Button 
+          href="tel:5405536007" 
+          variant="outline" 
+          size="lg" 
+          class="min-w-[200px] text-white border-white/30 hover:bg-white/10 hover:border-white transition-all duration-300 backdrop-blur-sm"
+        >
+          Call (540) 553-6007
+        </Button>
+      </div>
+
+    </div>
+  </div>
+
+  {/* Scroll Indicator */}
+  <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 hidden md:block">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+      <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+    </svg>
+  </div>
+</section>

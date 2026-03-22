@@ -1,43 +1,64 @@
 ---
 import Navigation from "./Navigation.astro";
 import MobileMenu from "./MobileMenu.astro";
+
+interface Props {
+  navigation?: any;
+  siteSettings?: any;
+}
+
+const { navigation, siteSettings } = Astro.props;
 ---
 
 <header
   id="site-header"
-  class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-bg-darker/80 backdrop-blur-md border-b border-transparent"
+  class="fixed top-0 left-0 right-0 z-40 transition-all duration-500 bg-transparent border-b border-transparent"
+  style="--nav-text: var(--color-text-on-dark);"
 >
   <div class="mx-auto max-w-[1200px] px-4 md:px-6 py-3">
-    <Navigation />
+    <Navigation navigation={navigation} siteSettings={siteSettings} />
   </div>
 </header>
 
-<MobileMenu />
+<MobileMenu navigation={navigation} siteSettings={siteSettings} />
 
 <script>
   function initHeader() {
     const header = document.getElementById("site-header");
     if (!header) return;
 
-    let lastScroll = 0;
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      const isMobile = window.innerWidth < 1024;
 
-    window.addEventListener(
-      "scroll",
-      () => {
-        const currentScroll = window.scrollY;
+      // Logic:
+      // Desktop: Transparent at top, White on scroll.
+      // Mobile: ALWAYS White (because of stacked layout), or transparent if we want that look (but stacked layout implies white header usually).
+      // Erie Home Mobile Header is typically solid white or dark.
+      // Let's go with Solid White on Mobile to match the "Stacked" look (white content below image).
+      
+      if (isMobile || currentScroll > 50) {
+        // Scrolled State OR Mobile State (Always Solid)
+        header.style.setProperty('--nav-text', 'var(--color-text-primary)');
+        header.classList.add("bg-white", "shadow-sm", "border-border");
+        header.classList.remove("bg-transparent", "border-transparent");
+        header.style.paddingTop = '0.75rem';
+        header.style.paddingBottom = '0.75rem';
+      } else {
+        // Desktop Top State (Transparent Overlay)
+        header.style.setProperty('--nav-text', 'var(--color-text-on-dark)');
+        header.classList.remove("bg-white", "shadow-sm", "border-border");
+        header.classList.add("bg-transparent", "border-transparent");
+        header.style.paddingTop = '1rem';
+        header.style.paddingBottom = '1rem';
+      }
+    };
 
-        if (currentScroll > 50) {
-          header.classList.add("bg-bg-darker", "border-border", "shadow-lg");
-          header.classList.remove("bg-bg-darker/80", "border-transparent");
-        } else {
-          header.classList.remove("bg-bg-darker", "border-border", "shadow-lg");
-          header.classList.add("bg-bg-darker/80", "border-transparent");
-        }
-
-        lastScroll = currentScroll;
-      },
-      { passive: true }
-    );
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll, { passive: true });
+    
+    // Initial check
+    handleScroll();
   }
 
   initHeader();

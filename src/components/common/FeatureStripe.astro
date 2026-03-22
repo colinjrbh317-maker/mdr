@@ -1,0 +1,20 @@
+---
+interface Props {
+  text: string;
+  icon?: string;
+  class?: string;
+}
+
+const { text, icon, class: className = "" } = Astro.props;
+---
+
+<div class={`bg-warm py-3 ${className}`}>
+  <div class="mx-auto max-w-[1200px] px-4 md:px-6 flex items-center justify-center gap-3 text-white">
+    {icon && (
+      <span class="text-xl">{icon}</span>
+    )}
+    <p class="text-sm md:text-base font-semibold tracking-wide uppercase">
+      {text}
+    </p>
+  </div>
+</div>

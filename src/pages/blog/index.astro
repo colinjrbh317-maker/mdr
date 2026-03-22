@@ -1,0 +1,212 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Card from "@/components/ui/Card.astro";
+import Badge from "@/components/ui/Badge.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+import BlogSearch from "@/components/blog/BlogSearch";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import { loadQuery } from "@/sanity/lib/load-query";
+import { BLOG_POSTS_QUERY, BLOG_CATEGORIES_QUERY } from "@/sanity/lib/queries";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+import ScrollReveal from "@/components/common/ScrollReveal.astro";
+
+export const prerender = true;
+
+const [posts, categories] = await Promise.all([
+  loadQuery<any[]>(BLOG_POSTS_QUERY).catch(() => []),
+  loadQuery<any[]>(BLOG_CATEGORIES_QUERY).catch(() => []),
+]);
+
+function formatDate(dateStr: string | undefined): string {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+const featuredPost = posts.length > 0 ? posts[0] : null;
+const mediumPosts = posts.slice(1, 3);
+const remainingPosts = posts.slice(3);
+---
+
+<Layout
+  title="Roofing Blog & Education Hub | Modern Day Roofing"
+  description="Expert roofing advice, maintenance tips, and industry insights from Modern Day Roofing. Learn about roof repair, replacement, materials, and more."
+>
+  <SectionContainer background="warm" padding="lg">
+    <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
+    <div class="text-center mb-8 mt-6">
+      <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-3">
+        Education Hub
+      </p>
+      <h1 class="text-4xl md:text-5xl font-bold text-text-primary">
+        Roofing Insights & Tips
+      </h1>
+      <p class="mt-4 text-text-muted max-w-2xl mx-auto">
+        Expert advice on roof maintenance, repair, and replacement from the Modern Day Roofing team.
+      </p>
+    </div>
+
+    {/* Search */}
+    <div class="mb-8">
+      <BlogSearch client:load posts={posts} />
+    </div>
+
+    {/* Category Links */}
+    {categories.length > 0 && (
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <span class="px-4 py-2 rounded-full text-sm font-medium bg-accent text-white border border-accent">
+          All Posts
+        </span>
+        {categories.map((cat: any) => (
+          <a
+            href={`/blog/category/${cat.slug}`}
+            class="px-4 py-2 rounded-full text-sm font-medium border border-border text-text-muted hover:text-accent hover:border-accent transition-colors no-underline"
+          >
+            {cat.title}
+          </a>
+        ))}
+      </div>
+    )}
+  </SectionContainer>
+
+  <SectionContainer background="white" padding="md">
+    {posts.length > 0 ? (
+      <div>
+        {/* Featured post: full-width */}
+        {featuredPost && (
+          <ScrollReveal>
+            <a href={`/blog/${featuredPost.slug}`} class="block no-underline mb-10">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
+                <div class="aspect-[16/9] md:aspect-auto overflow-hidden">
+                  {featuredPost.featuredImage ? (
+                    <img
+                      src={urlForImage(featuredPost.featuredImage).width(800).height(500).url()}
+                      alt={featuredPost.title}
+                      class="w-full h-full object-cover"
+                      loading="eager"
+                    />
+                  ) : (
+                    <ImagePlaceholder
+                      description={`${featuredPost.title} featured image`}
+                      class="w-full h-full"
+                    />
+                  )}
+                </div>
+                <div class="p-6 md:p-8 flex flex-col justify-center">
+                  <div class="flex items-center gap-2 mb-3">
+                    {featuredPost.category?.title && (
+                      <Badge variant="certification" text={featuredPost.category.title} />
+                    )}
+                    {featuredPost.publishedAt && (
+                      <span class="text-xs text-text-dim">
+                        {formatDate(featuredPost.publishedAt)}
+                      </span>
+                    )}
+                  </div>
+                  <h2 class="text-2xl md:text-3xl font-bold text-text-primary mb-3">
+                    {featuredPost.title}
+                  </h2>
+                  {featuredPost.excerpt && (
+                    <p class="text-text-muted leading-relaxed">{featuredPost.excerpt}</p>
+                  )}
+                </div>
+              </div>
+            </a>
+          </ScrollReveal>
+        )}
+
+        {/* Medium posts: 2-column */}
+        {mediumPosts.length > 0 && (
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            {mediumPosts.map((post: any, i: number) => (
+              <ScrollReveal delay={i * 100}>
+                <Card variant="default" href={`/blog/${post.slug}`}>
+                  <div class="mb-4">
+                    {post.featuredImage ? (
+                      <img
+                        src={urlForImage(post.featuredImage).width(600).height(340).url()}
+                        alt={post.title}
+                        class="w-full rounded-lg object-cover"
+                        style="aspect-ratio: 16/9;"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <ImagePlaceholder
+                        description={`${post.title} featured image`}
+                        aspectRatio="16/9"
+                        class="w-full"
+                      />
+                    )}
+                  </div>
+                  <div class="flex items-center gap-2 mb-3">
+                    {post.category?.title && (
+                      <Badge variant="certification" text={post.category.title} />
+                    )}
+                    {post.publishedAt && (
+                      <span class="text-xs text-text-dim">
+                        {formatDate(post.publishedAt)}
+                      </span>
+                    )}
+                  </div>
+                  <h2 class="text-lg font-semibold text-text-primary mb-2">
+                    {post.title}
+                  </h2>
+                </Card>
+              </ScrollReveal>
+            ))}
+          </div>
+        )}
+
+        {/* Remaining posts: 3-column */}
+        {remainingPosts.length > 0 && (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {remainingPosts.map((post: any, i: number) => (
+              <ScrollReveal delay={i * 80}>
+                <Card variant="default" href={`/blog/${post.slug}`}>
+                  <div class="mb-4">
+                    {post.featuredImage ? (
+                      <img
+                        src={urlForImage(post.featuredImage).width(600).height(340).url()}
+                        alt={post.title}
+                        class="w-full rounded-lg object-cover"
+                        style="aspect-ratio: 16/9;"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <ImagePlaceholder
+                        description={`${post.title} featured image`}
+                        aspectRatio="16/9"
+                        class="w-full"
+                      />
+                    )}
+                  </div>
+                  <div class="flex items-center gap-2 mb-3">
+                    {post.category?.title && (
+                      <Badge variant="certification" text={post.category.title} />
+                    )}
+                    {post.publishedAt && (
+                      <span class="text-xs text-text-dim">
+                        {formatDate(post.publishedAt)}
+                      </span>
+                    )}
+                  </div>
+                  <h2 class="text-lg font-semibold text-text-primary mb-2">
+                    {post.title}
+                  </h2>
+                </Card>
+              </ScrollReveal>
+            ))}
+          </div>
+        )}
+      </div>
+    ) : (
+      <div class="text-center py-16">
+        <p class="text-text-muted">No blog posts yet. Check back soon!</p>
+      </div>
+    )}
+  </SectionContainer>
+</Layout>

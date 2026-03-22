@@ -1,0 +1,19 @@
+---
+interface Props {
+  direction?: "up" | "down";
+  color?: string;
+  class?: string;
+}
+
+const { direction = "down", color = "var(--color-bg-light)", class: className = "" } = Astro.props;
+
+const points = direction === "down"
+  ? "0,0 1440,80 0,80"
+  : "0,0 1440,0 1440,80";
+---
+
+<div class={`relative -mt-1 -mb-1 h-16 md:h-24 ${className}`} aria-hidden="true" style={`color: ${color}`}>
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" class="absolute inset-0 w-full h-full">
+    <polygon points={points} fill="currentColor" />
+  </svg>
+</div>

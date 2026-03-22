@@ -1,0 +1,245 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import Button from "@/components/ui/Button.astro";
+import BeforeAfterSlider from "@/components/cro/BeforeAfterSlider";
+import { loadQuery } from "@/sanity/lib/load-query";
+import { BEFORE_AFTER_PROJECTS_QUERY } from "@/sanity/lib/queries";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+
+export const prerender = true;
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Gallery" },
+];
+
+const categories = [
+  { label: "All", value: "all" },
+  { label: "Shingle", value: "shingle" },
+  { label: "Metal", value: "metal" },
+  { label: "Repair", value: "repair" },
+  { label: "Storm Damage", value: "storm-damage" },
+  { label: "Gutters", value: "gutters" },
+];
+
+const projects = await loadQuery<any[]>(BEFORE_AFTER_PROJECTS_QUERY).catch(() => []);
+
+// Build image URLs server-side
+const projectsWithUrls = (projects || []).map((p: any) => ({
+  ...p,
+  beforeUrl: p.beforeImage ? urlForImage(p.beforeImage).width(800).height(600).url() : null,
+  afterUrl: p.afterImage ? urlForImage(p.afterImage).width(800).height(600).url() : null,
+  thumbUrl: p.afterImage ? urlForImage(p.afterImage).width(400).height(300).url() : null,
+}));
+---
+
+<Layout
+  title="Project Gallery | Before & After Roofing Projects"
+  description="See the results of our roofing work. Browse before and after photos of roof replacements, repairs, metal roofing, and storm damage restoration in the New River Valley."
+>
+  <SectionContainer background="warm" padding="lg">
+    <Breadcrumb items={breadcrumbItems} />
+    <div class="mt-6 text-center max-w-3xl mx-auto">
+      <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-3">
+        Our Work
+      </p>
+      <h1 class="text-4xl md:text-5xl font-bold text-text-primary">
+        Before & After Gallery
+      </h1>
+      <p class="mt-4 text-lg text-text-muted max-w-2xl mx-auto">
+        See the transformation. Browse our completed roofing projects from across the New River Valley and Roanoke area.
+      </p>
+    </div>
+  </SectionContainer>
+
+  <SectionContainer background="light" padding="md">
+    <!-- Category Filter -->
+    <div class="flex flex-wrap justify-center gap-2 mb-10" id="gallery-filters">
+      {categories.map((cat) => (
+        <button
+          data-category={cat.value}
+          class:list={[
+            "gallery-filter px-4 py-2 rounded-full text-sm font-medium border transition-colors",
+            cat.value === "all"
+              ? "bg-accent text-white border-accent"
+              : "bg-bg-card text-text-muted border-border hover:border-accent hover:text-text-primary",
+          ]}
+        >
+          {cat.label}
+        </button>
+      ))}
+    </div>
+
+    {/* Static gallery photos — will be replaced with CMS content when Sanity is connected */}
+    <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6" id="gallery-grid">
+      {[
+        { src: "/assets/web/Untitled-1800-x-1440-px.jpg", title: "Premium Shingle Roof — Stone Estate", location: "New River Valley, VA" },
+        { src: "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.jpg", title: "Standing Seam Metal Roof", location: "Christiansburg, VA" },
+        { src: "/assets/web/gallery-dji_fly_20251105_160154_425_1762438973026_photo.jpg", title: "Architectural Shingle Replacement", location: "Roanoke, VA" },
+        { src: "/assets/web/Untitled-1800-x-1440-px-1.jpg", title: "Full Roof Replacement — Aerial View", location: "Blacksburg, VA" },
+        { src: "/assets/web/gallery-dji_fly_20250630_135332_722_1751306023542_photo.jpg", title: "New Roof — Residential Home", location: "Salem, VA" },
+        { src: "/assets/web/Untitled-1800-x-1440-px-2.jpg", title: "GAF Timberline HDZ Installation", location: "Christiansburg, VA" },
+        { src: "/assets/web/gallery-dji_fly_20250721_123356_135_1753115663863_photo.jpg", title: "Complete Roof System — Drone View", location: "Radford, VA" },
+        { src: "/assets/web/Untitled-1800-x-1440-px-3.jpg", title: "Premium Roof Replacement", location: "Roanoke, VA" },
+        { src: "/assets/web/gallery-dji_fly_20250711_160918_986_1752264568015_photo.jpg", title: "Metal Roofing — Farmhouse Style", location: "Floyd, VA" },
+        { src: "/assets/web/gallery-img_5561-1.jpg", title: "Roof Detail — Ridge Cap", location: "Christiansburg, VA" },
+        { src: "/assets/web/gallery-dji_fly_20251105_160244_430_1762438961614_photo.jpg", title: "Completed Shingle Roof — Aerial", location: "Blacksburg, VA" },
+        { src: "/assets/web/gallery-img_5558-1.jpg", title: "Installation In Progress", location: "New River Valley, VA" },
+      ].map((photo) => (
+        <div class="gallery-item group break-inside-avoid">
+          <div class="bg-bg-card border border-border rounded-xl overflow-hidden transition-all hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5">
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src={photo.src}
+                alt={photo.title}
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+            <div class="p-4">
+              <h3 class="font-semibold text-text-primary text-sm">{photo.title}</h3>
+              <p class="text-xs text-text-muted mt-1">{photo.location}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </SectionContainer>
+
+  <!-- Lightbox Modal (hidden by default) -->
+  <div id="gallery-lightbox" class="fixed inset-0 z-[60] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="lightbox-backdrop"></div>
+    <div class="relative w-full max-w-3xl mx-4 bg-white border border-border rounded-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto shadow-2xl">
+      <button
+        id="lightbox-close"
+        class="absolute top-4 right-4 text-text-dim hover:text-text-primary transition-colors p-1 z-10"
+        aria-label="Close"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+      <div id="lightbox-slider" class="mb-4">
+        <!-- BeforeAfterSlider renders here -->
+      </div>
+      <h3 id="lightbox-title" class="text-xl font-bold text-text-primary"></h3>
+      <div class="flex items-center gap-2 mt-1 mb-2">
+        <span id="lightbox-category" class="text-sm text-accent font-medium"></span>
+        <span id="lightbox-location" class="text-sm text-text-dim"></span>
+      </div>
+      <p id="lightbox-description" class="text-text-muted text-sm"></p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <SectionContainer background="accent" padding="md">
+    <div class="text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white">
+        Ready for Your Roof Transformation?
+      </h2>
+      <p class="mt-4 text-white/90 max-w-2xl mx-auto text-lg">
+        Join hundreds of satisfied homeowners. Get a free inspection and estimate today.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <Button href="/contact" variant="secondary" size="lg">
+          Get Free Estimate
+        </Button>
+        <Button href="tel:5405536007" variant="ghost" size="lg" class="text-white border-white/30 hover:bg-white/10">
+          Call (540) 553-6007
+        </Button>
+      </div>
+    </div>
+  </SectionContainer>
+</Layout>
+
+<script>
+  function initGallery() {
+    // Category filtering
+    const filters = document.querySelectorAll<HTMLButtonElement>(".gallery-filter");
+    const items = document.querySelectorAll<HTMLElement>(".gallery-item");
+
+    filters.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const category = btn.dataset.category;
+
+        // Update active state
+        filters.forEach((f) => {
+          f.classList.remove("bg-accent", "text-white", "border-accent");
+          f.classList.add("bg-bg-card", "text-text-muted", "border-border");
+        });
+        btn.classList.remove("bg-bg-card", "text-text-muted", "border-border");
+        btn.classList.add("bg-accent", "text-white", "border-accent");
+
+        // Filter items
+        items.forEach((item) => {
+          if (category === "all" || item.dataset.category === category) {
+            item.style.display = "";
+          } else {
+            item.style.display = "none";
+          }
+        });
+      });
+    });
+
+    // Lightbox
+    const lightbox = document.getElementById("gallery-lightbox");
+    const lightboxClose = document.getElementById("lightbox-close");
+    const lightboxBackdrop = document.getElementById("lightbox-backdrop");
+    const lightboxTitle = document.getElementById("lightbox-title");
+    const lightboxCategory = document.getElementById("lightbox-category");
+    const lightboxLocation = document.getElementById("lightbox-location");
+    const lightboxDescription = document.getElementById("lightbox-description");
+    const lightboxSlider = document.getElementById("lightbox-slider");
+
+    function closeLightbox() {
+      if (lightbox) {
+        lightbox.classList.add("hidden");
+        lightbox.classList.remove("flex");
+        document.body.style.overflow = "";
+      }
+    }
+
+    items.forEach((item) => {
+      item.addEventListener("click", () => {
+        const { before, after, title, description, location, category } = item.dataset;
+        if (!before || !after || !lightbox) return;
+
+        if (lightboxTitle) lightboxTitle.textContent = title || "";
+        if (lightboxCategory) lightboxCategory.textContent = (category || "").replace("-", " ").toUpperCase();
+        if (lightboxLocation) lightboxLocation.textContent = location ? `· ${location}` : "";
+        if (lightboxDescription) lightboxDescription.textContent = description || "";
+
+        // Render slider as simple comparison (React hydration not available in lightbox)
+        if (lightboxSlider) {
+          lightboxSlider.innerHTML = `
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <span class="block text-xs font-semibold text-text-dim mb-2 uppercase">Before</span>
+                <img src="${before}" alt="Before" class="w-full rounded-lg aspect-[4/3] object-cover" />
+              </div>
+              <div>
+                <span class="block text-xs font-semibold text-text-dim mb-2 uppercase">After</span>
+                <img src="${after}" alt="After" class="w-full rounded-lg aspect-[4/3] object-cover" />
+              </div>
+            </div>
+          `;
+        }
+
+        lightbox.classList.remove("hidden");
+        lightbox.classList.add("flex");
+        document.body.style.overflow = "hidden";
+      });
+    });
+
+    lightboxClose?.addEventListener("click", closeLightbox);
+    lightboxBackdrop?.addEventListener("click", closeLightbox);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+  }
+
+  initGallery();
+  document.addEventListener("astro:after-swap", initGallery);
+</script>

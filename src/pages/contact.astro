@@ -1,0 +1,143 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Button from "@/components/ui/Button.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
+import { loadQuery } from "@/sanity/lib/load-query";
+import { SITE_SETTINGS_QUERY } from "@/sanity/lib/queries";
+
+export const prerender = true;
+
+const settings = await loadQuery<any>(SITE_SETTINGS_QUERY).catch(() => null);
+
+const phone = settings?.phone || "(540) 553-6007";
+const email = settings?.email || "sales@moderndayroof.com";
+const address = settings?.address || "Christiansburg, VA 24073";
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Contact" },
+];
+
+const siteUrl = Astro.site?.href || "https://moderndayroofing.com";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "RoofingContractor",
+  name: "Modern Day Roofing",
+  url: siteUrl,
+  telephone: phone,
+  email: email,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "80 College St. STE R",
+    addressLocality: "Christiansburg",
+    addressRegion: "VA",
+    postalCode: "24073",
+    addressCountry: "US",
+  },
+  areaServed: [
+    { "@type": "City", name: "Christiansburg, VA" },
+    { "@type": "City", name: "Roanoke, VA" },
+    { "@type": "City", name: "Blacksburg, VA" },
+    { "@type": "City", name: "Salem, VA" },
+    { "@type": "City", name: "Radford, VA" },
+  ],
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      opens: "08:30",
+      closes: "17:00",
+    },
+  ],
+};
+---
+
+<Layout
+  title="Get Your Free Estimate | Modern Day Roofing"
+  description="Get a free, no-obligation roof inspection and estimate. 24-hour response time."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <section class="min-h-screen bg-bg-light flex flex-col justify-center py-12 md:py-20 relative overflow-hidden">
+    
+    {/* Background Texture/Blob for visual interest */}
+    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-bg-warm rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+    <div class="relative z-10 mx-auto max-w-[1000px] px-4 md:px-6 w-full">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        
+        {/* Left: Value Prop & Trust */}
+        <div class="md:pr-8">
+           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent font-semibold text-xs uppercase tracking-wider mb-6">
+             <span class="relative flex h-2 w-2">
+               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+               <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+             </span>
+             Fast Response Guaranteed
+           </div>
+           
+           <h1 class="text-4xl md:text-5xl font-display font-bold text-text-primary mb-6 leading-tight">
+             Get Your <span class="text-accent underline decoration-4 underline-offset-4 decoration-accent/20">Free Estimate</span> Today.
+           </h1>
+           
+           <p class="text-lg text-text-body mb-8 leading-relaxed">
+             Stop the guessing game. Get a detailed, honest inspection report and a transparent quote for your home.
+           </p>
+
+           <div class="space-y-6">
+             {/* Benefit 1 */}
+             <div class="flex gap-4">
+               <div class="flex-shrink-0 w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-accent">
+                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+               </div>
+               <div>
+                 <h3 class="font-bold text-text-primary">No-Obligation Inspection</h3>
+                 <p class="text-sm text-text-muted">We check everything: shingles, flashing, gutters, and attic ventilation.</p>
+               </div>
+             </div>
+             
+             {/* Benefit 2 */}
+             <div class="flex gap-4">
+               <div class="flex-shrink-0 w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-accent">
+                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+               </div>
+               <div>
+                 <h3 class="font-bold text-text-primary">Transparent Pricing</h3>
+                 <p class="text-sm text-text-muted">A penny-perfect quote that stays locked in for 30 days.</p>
+               </div>
+             </div>
+
+             {/* Benefit 3 */}
+             <div class="flex gap-4">
+               <div class="flex-shrink-0 w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-accent">
+                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+               </div>
+               <div>
+                 <h3 class="font-bold text-text-primary">Lifetime Warranty</h3>
+                 <p class="text-sm text-text-muted">GAF Master Elite® certified installation means you are covered for life.</p>
+               </div>
+             </div>
+           </div>
+
+        </div>
+
+        {/* Right: The Focus Form */}
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-2xl border-t-4 border-accent">
+          <h2 class="text-2xl font-bold text-center mb-6 text-text-primary">
+            Start Your Project
+          </h2>
+          <LeadCaptureForm client:load source="contact-page" />
+          <p class="text-xs text-center text-text-dim mt-4">
+            Your information is secure. We never sell your data to 3rd parties.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</Layout>

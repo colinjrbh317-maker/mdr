@@ -6,36 +6,18 @@ interface Props {
 
 const { class: className = "", size = "md" } = Astro.props;
 
-const sizes: Record<string, { w: number; h: number; text: string }> = {
-  sm: { w: 120, h: 36, text: "text-sm" },
-  md: { w: 160, h: 44, text: "text-base" },
-  lg: { w: 200, h: 56, text: "text-lg" },
+const heights: Record<string, string> = {
+  sm: "h-8",
+  md: "h-10",
+  lg: "h-14",
 };
-
-const s = sizes[size];
 ---
 
-<div class={`flex items-center gap-2 ${className}`}>
-  <svg
-    width={s.w * 0.35}
-    height={s.h}
-    viewBox="0 0 56 44"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-  >
-    <!-- Mountain/roof shape -->
-    <path d="M28 4L4 38h48L28 4z" fill="#C0392B" opacity="0.9" />
-    <path d="M28 4L16 26h24L28 4z" fill="#E74C3C" opacity="0.6" />
-    <!-- Roof ridge line -->
-    <path d="M12 32h32" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
-  </svg>
-  <div>
-    <p class={`font-bold leading-none text-text-primary ${s.text}`}>
-      Modern Day
-    </p>
-    <p class={`font-semibold leading-none text-accent ${s.text}`} style="font-size: 0.75em;">
-      ROOFING
-    </p>
-  </div>
+<div class={`flex items-center ${className}`}>
+  <img
+    src="/assets/web/logo-horizontal.png"
+    alt="Modern Day Roofing"
+    class={`${heights[size]} w-auto`}
+    loading="eager"
+  />
 </div>

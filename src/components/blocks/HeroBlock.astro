@@ -1,0 +1,67 @@
+---
+import Button from "@/components/ui/Button.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+
+interface Props {
+  heading: string;
+  subheading?: string;
+  primaryCta?: { text?: string; link?: string };
+  secondaryCta?: { text?: string; link?: string };
+  backgroundImage?: any;
+  backgroundVideo?: string;
+}
+
+const { heading, subheading, primaryCta, secondaryCta, backgroundImage, backgroundVideo } = Astro.props;
+
+const bgImageUrl = backgroundImage
+  ? urlForImage(backgroundImage).width(1920).quality(80).url()
+  : null;
+---
+
+<section class="relative min-h-[85vh] flex items-center dark-section">
+  <!-- Background -->
+  <div class="absolute inset-0 z-0">
+    {bgImageUrl ? (
+      <img
+        src={bgImageUrl}
+        alt=""
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+    ) : (
+      <ImagePlaceholder
+        description="Hero background image"
+        class="w-full h-full rounded-none border-none"
+      />
+    )}
+    <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/80 to-bg-darker/50"></div>
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-20 md:py-32">
+    <div class="max-w-2xl">
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white">
+        {heading}
+      </h1>
+      {subheading && (
+        <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-xl leading-relaxed">
+          {subheading}
+        </p>
+      )}
+      {(primaryCta?.text || secondaryCta?.text) && (
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          {primaryCta?.text && (
+            <Button href={primaryCta.link || "/contact"} size="lg">
+              {primaryCta.text}
+            </Button>
+          )}
+          {secondaryCta?.text && (
+            <Button href={secondaryCta.link || "#"} variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
+              {secondaryCta.text}
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  </div>
+</section>

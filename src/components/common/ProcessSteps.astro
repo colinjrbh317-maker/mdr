@@ -1,0 +1,62 @@
+---
+interface Step {
+  number: number;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  heading?: string;
+  steps?: Step[];
+  class?: string;
+}
+
+const {
+  heading = "Our 4-Step Process",
+  steps = [
+    { number: 1, title: "Free Inspection", description: "We assess your roof's condition with a thorough, no-obligation inspection and provide detailed findings." },
+    { number: 2, title: "Custom Proposal", description: "Receive a transparent quote with material options, timeline, and financing details tailored to your needs." },
+    { number: 3, title: "Expert Installation", description: "Our certified crews install your new roof using premium GAF materials with meticulous attention to detail." },
+    { number: 4, title: "Final Walkthrough", description: "We inspect every detail together, clean up completely, and activate your warranty protection." },
+  ],
+  class: className = "",
+} = Astro.props;
+---
+
+<div class={className}>
+  {heading && (
+    <div class="text-center mb-12">
+      <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-3">
+        How It Works
+      </p>
+      <h2 class="text-3xl md:text-4xl font-bold text-text-primary">
+        {heading}
+      </h2>
+    </div>
+  )}
+
+  <div class="relative max-w-3xl mx-auto">
+    <!-- Vertical timeline line -->
+    <div class="absolute left-6 md:left-8 top-0 bottom-0 w-px bg-border" aria-hidden="true"></div>
+
+    <div class="flex flex-col gap-10">
+      {steps.map((step) => (
+        <div class="relative flex gap-6 md:gap-8 items-start">
+          <!-- Step number circle -->
+          <div class="relative z-10 flex-shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-full bg-warm text-white flex items-center justify-center font-bold text-lg md:text-xl shadow-md">
+            {step.number}
+          </div>
+          <!-- Step content -->
+          <div class="pt-1 md:pt-3">
+            <h3 class="text-xl md:text-2xl font-bold text-text-primary mb-2">
+              {step.title}
+            </h3>
+            <p class="text-text-muted leading-relaxed">
+              {step.description}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>

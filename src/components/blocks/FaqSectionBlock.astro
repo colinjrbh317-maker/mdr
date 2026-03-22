@@ -1,0 +1,66 @@
+---
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+
+interface FaqItem {
+  _key?: string;
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  heading?: string;
+  faqs?: FaqItem[];
+}
+
+const { heading, faqs = [] } = Astro.props;
+---
+
+<SectionContainer background="warm" padding="md">
+  {heading && (
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-text-primary">
+        {heading}
+      </h2>
+    </div>
+  )}
+
+  <div class="max-w-3xl mx-auto flex flex-col gap-3">
+    {faqs.map((faq) => (
+      <details class="group bg-bg-card border border-border rounded-xl overflow-hidden">
+        <summary class="flex items-center justify-between cursor-pointer px-6 py-4 text-text-primary font-medium hover:bg-bg-card-hover transition-colors">
+          <span>{faq.question}</span>
+          <svg
+            class="w-5 h-5 text-text-dim transition-transform group-open:rotate-180 flex-shrink-0 ml-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-text-muted leading-relaxed">
+          {faq.answer}
+        </div>
+      </details>
+    ))}
+  </div>
+
+  {/* FAQ Schema Markup */}
+  {faqs.length > 0 && (
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        })),
+      })}
+    />
+  )}
+</SectionContainer>
