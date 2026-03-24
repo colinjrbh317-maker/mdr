@@ -11,7 +11,7 @@ export default defineConfig({
   integrations: [
     sitemap(),
     sanity({
-      projectId: "cy8sc3xd",
+      projectId: "2rj2jdb4",
       dataset: "production",
       useCdn: false,
       studioBasePath: "/studio",

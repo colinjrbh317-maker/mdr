@@ -8,7 +8,7 @@ import { resolve } from "./src/sanity/resolve";
 export default defineConfig({
   name: "modern-day-roofing",
   title: "Modern Day Roofing",
-  projectId: "cy8sc3xd",
+  projectId: "2rj2jdb4",
   dataset: "production",
   plugins: [
     structureTool({ structure }),
