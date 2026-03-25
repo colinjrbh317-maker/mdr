@@ -7,15 +7,15 @@ interface Props {
 const { class: className = "", size = "md" } = Astro.props;
 
 const heights: Record<string, string> = {
-  sm: "h-8",
-  md: "h-10",
-  lg: "h-14",
+  sm: "h-10",
+  md: "h-14",
+  lg: "h-16",
 };
 ---
 
 <div class={`flex items-center ${className}`}>
   <img
-    src="/assets/web/logo-horizontal.png"
+    src="/assets/web/logo-full.png"
     alt="Modern Day Roofing"
     class={`${heights[size]} w-auto header-logo transition-all duration-300`}
     loading="eager"
@@ -23,7 +23,7 @@ const heights: Record<string, string> = {
 </div>
 
 <style>
-  /* When header is transparent (dark hero), invert logo to white */
+  /* On transparent header (dark hero), make logo white */
   :global(#site-header[data-scrolled="false"]) .header-logo {
     filter: brightness(0) invert(1);
   }

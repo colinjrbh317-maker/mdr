@@ -115,11 +115,15 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display);
-  color: var(--color-text-primary);
   font-weight: 700;
   line-height: 1.1;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+}
+
+/* Default heading color — scoped so Tailwind utilities can override */
+:where(h1, h2, h3, h4, h5, h6) {
+  color: var(--color-text-primary);
 }
 
 h1 {
@@ -149,6 +153,55 @@ h1 {
 }
 .dark-section .text-text-primary {
   color: #FFFFFF;
+}
+
+/* ── Enhanced Prose / Body Content ──
+   Better spacing, readability, and visual rhythm for CMS content */
+.prose h2 {
+  margin-top: 2.5em;
+  margin-bottom: 0.75em;
+  padding-bottom: 0.4em;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.prose h3 {
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+}
+
+.prose p {
+  margin-bottom: 1.4em;
+  line-height: 1.8;
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 1.4em;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin-bottom: 0.5em;
+  line-height: 1.7;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.prose blockquote {
+  border-left: 4px solid var(--color-accent);
+  padding: 1em 1.5em;
+  margin: 2em 0;
+  background: var(--color-bg-light);
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-style: italic;
+}
+
+.prose img {
+  border-radius: 0.75rem;
+  margin: 2em 0;
 }
 
 /* Focus States - High Visibility */

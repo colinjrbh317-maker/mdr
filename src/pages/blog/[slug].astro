@@ -137,7 +137,7 @@ function formatDate(dateStr: string | undefined): string {
     {/* Body */}
     <SectionContainer background="white" padding="md" maxWidth="narrow">
       {post.body ? (
-        <div class="prose max-w-none text-text-body prose-headings:text-text-primary prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl">
+        <div class="prose prose-lg max-w-none text-text-body prose-headings:text-text-primary prose-headings:mt-10 prose-headings:mb-4 prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl prose-p:leading-relaxed prose-li:leading-relaxed">
           <PortableText value={post.body} />
         </div>
       ) : (
