@@ -17,7 +17,14 @@ const heights: Record<string, string> = {
   <img
     src="/assets/web/logo-horizontal.png"
     alt="Modern Day Roofing"
-    class={`${heights[size]} w-auto`}
+    class={`${heights[size]} w-auto header-logo transition-all duration-300`}
     loading="eager"
   />
 </div>
+
+<style>
+  /* When header is transparent (dark hero), invert logo to white */
+  :global(#site-header[data-scrolled="false"]) .header-logo {
+    filter: brightness(0) invert(1);
+  }
+</style>

@@ -34,25 +34,52 @@ const childServices = services.filter((s) => !s.isParent);
 function getChildren(parentId: string) {
   return childServices.filter((c) => c.parentService?._id === parentId);
 }
+
+// Fallback images for services without CMS photos
+const fallbackImages: Record<string, string> = {
+  "roof-replacement": "/assets/web/Untitled-1800-x-1440-px.jpg",
+  "shingle-roofing": "/assets/web/Untitled-1800-x-1440-px-1.jpg",
+  "metal-roofing": "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.jpg",
+  "timber-seal": "/assets/web/Untitled-1800-x-1440-px-4.jpg",
+  "roof-repair": "/assets/web/Untitled-1800-x-1440-px-2.jpg",
+  "roof-maintenance": "/assets/web/dji_fly_20250630_135554_733_1751306170083_photo.jpg",
+  "gutters": "/assets/web/dji_fly_20250630_140410_766_1751306661861_photo.jpg",
+  "storm-damage": "/assets/web/Untitled-1800-x-1440-px-3.jpg",
+};
+
+function getServiceImage(service: Service): string | null {
+  if (service.featuredImage) return urlForImage(service.featuredImage).width(600).height(400).url();
+  return fallbackImages[service.slug] || "/assets/web/dji_fly_20251105_160244_430_1762438961614_photo.jpg";
+}
 ---
 
 <Layout
-  title="Roofing Services | Modern Day Roofing"
+  title="Roofing Services"
   description="Complete roofing services in Christiansburg & Roanoke VA. Roof replacement, shingle roofing, metal roofing, repairs, maintenance, gutters, and storm damage restoration."
 >
-  <SectionContainer background="warm" padding="lg">
-    <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Services" }]} />
-    <div class="mt-6 max-w-3xl">
-      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary">
+  {/* Dark Hero with Project Photo */}
+  <section class="relative min-h-[40vh] flex items-center dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src="/assets/web/dji_fly_20251105_160154_425_1762438973026_photo.jpg"
+        alt="Aerial view of a completed Modern Day Roofing project"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/80 to-bg-darker/50"></div>
+    </div>
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Services" }]} />
+      <h1 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold text-white">
         Our Roofing Services
       </h1>
-      <p class="mt-4 text-lg text-text-muted">
+      <p class="mt-6 text-lg text-white/85 max-w-2xl leading-relaxed">
         From full roof replacements to emergency storm damage repairs, Modern Day Roofing
         delivers expert craftsmanship backed by manufacturer warranties across Christiansburg,
         Roanoke, and the New River Valley.
       </p>
     </div>
-  </SectionContainer>
+  </section>
 
   <SectionContainer background="white" padding="md">
     {parentServices.length === 0 && (
@@ -70,19 +97,11 @@ function getChildren(parentId: string) {
               class="group grid grid-cols-1 md:grid-cols-5 gap-6 bg-bg-card border border-border rounded-xl overflow-hidden hover:border-accent/30 transition-colors"
             >
               <div class="md:col-span-2 aspect-video md:aspect-auto">
-                {parent.featuredImage ? (
-                  <img
-                    src={urlForImage(parent.featuredImage).width(600).height(400).url()}
-                    alt={parent.name}
-                    class="w-full h-full object-cover"
-                  />
-                ) : (
-                  <ImagePlaceholder
-                    description={`${parent.name} service photo`}
-                    aspectRatio="3/2"
-                    class="w-full h-full rounded-none border-none"
-                  />
-                )}
+                <img
+                  src={getServiceImage(parent)}
+                  alt={parent.name}
+                  class="w-full h-full object-cover"
+                />
               </div>
               <div class="md:col-span-3 p-6 md:py-8 flex flex-col justify-center">
                 <h2 class="text-2xl md:text-3xl font-bold text-text-primary group-hover:text-accent transition-colors">
@@ -108,20 +127,12 @@ function getChildren(parentId: string) {
                   {children.map((child) => (
                     <Card variant="service" href={`/services/${child.slug}`}>
                       <div class="mb-4">
-                        {child.featuredImage ? (
-                          <img
-                            src={urlForImage(child.featuredImage).width(400).height(225).url()}
-                            alt={child.name}
-                            class="w-full rounded-lg object-cover"
-                            style="aspect-ratio: 16/9;"
-                          />
-                        ) : (
-                          <ImagePlaceholder
-                            description={`${child.name} service photo`}
-                            aspectRatio="16/9"
-                            class="w-full"
-                          />
-                        )}
+                        <img
+                          src={getServiceImage(child)}
+                          alt={child.name}
+                          class="w-full rounded-lg object-cover"
+                          style="aspect-ratio: 16/9;"
+                        />
                       </div>
                       <h3 class="text-lg font-semibold text-text-primary mb-2">
                         {child.name}

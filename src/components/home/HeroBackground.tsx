@@ -30,7 +30,7 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
         ) : posterUrl ? (
           <img
             src={posterUrl}
-            alt=""
+            alt="Aerial view of a completed Modern Day Roofing project"
             className="absolute inset-0 w-full h-full object-cover"
             loading="eager"
           />

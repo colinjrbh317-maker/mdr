@@ -32,7 +32,23 @@ if (!service) {
   return Astro.redirect("/404");
 }
 
-const seoTitle = service.seo?.metaTitle || `${service.name} | Modern Day Roofing`;
+// Fallback images for services without CMS photos
+const fallbackImages: Record<string, string> = {
+  "roof-replacement": "/assets/web/Untitled-1800-x-1440-px.jpg",
+  "shingle-roofing": "/assets/web/Untitled-1800-x-1440-px-1.jpg",
+  "metal-roofing": "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.jpg",
+  "timber-seal": "/assets/web/Untitled-1800-x-1440-px-4.jpg",
+  "roof-repair": "/assets/web/Untitled-1800-x-1440-px-2.jpg",
+  "roof-maintenance": "/assets/web/dji_fly_20250630_135554_733_1751306170083_photo.jpg",
+  "gutters": "/assets/web/dji_fly_20250630_140410_766_1751306661861_photo.jpg",
+  "storm-damage": "/assets/web/Untitled-1800-x-1440-px-3.jpg",
+};
+
+const heroImage = service.featuredImage
+  ? urlForImage(service.featuredImage).width(1600).height(800).url()
+  : fallbackImages[slug as string] || "/assets/web/dji_fly_20251105_160154_425_1762438973026_photo.jpg";
+
+const seoTitle = service.seo?.metaTitle || service.name;
 const seoDescription =
   service.seo?.metaDescription || service.description || `Professional ${service.name.toLowerCase()} services in Christiansburg & Roanoke VA.`;
 
@@ -89,21 +105,14 @@ const serviceJsonLd = {
   <script type="application/ld+json" set:html={JSON.stringify(serviceJsonLd)} />
 
   {/* Hero (stays dark) */}
-  <section class="relative min-h-[50vh] flex items-center dark-section">
+  <section class="relative min-h-[50vh] flex items-center dark-section" data-transparent-header>
     <div class="absolute inset-0 z-0">
-      {service.featuredImage ? (
-        <img
-          src={urlForImage(service.featuredImage).width(1600).height(800).url()}
-          alt={service.name}
-          class="w-full h-full object-cover"
-          loading="eager"
-        />
-      ) : (
-        <ImagePlaceholder
-          description={`${service.name} hero background`}
-          class="w-full h-full rounded-none border-none"
-        />
-      )}
+      <img
+        src={heroImage}
+        alt={service.name}
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
       <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/60"></div>
     </div>
 
@@ -133,7 +142,7 @@ const serviceJsonLd = {
       <div class="lg:col-span-2">
         {service.body && (
           <ScrollReveal>
-            <div class="prose max-w-none text-text-body prose-headings:text-text-primary prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl">
+            <div class="prose prose-lg max-w-none text-text-body prose-headings:text-text-primary prose-headings:mt-10 prose-headings:mb-4 prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl prose-p:leading-relaxed prose-li:leading-relaxed">
               <PortableText value={service.body} />
             </div>
           </ScrollReveal>
@@ -149,20 +158,12 @@ const serviceJsonLd = {
               {childServices.map((child: any) => (
                 <Card variant="service" href={`/services/${child.slug}`}>
                   <div class="mb-4">
-                    {child.featuredImage ? (
-                      <img
-                        src={urlForImage(child.featuredImage).width(400).height(225).url()}
-                        alt={child.name}
-                        class="w-full rounded-lg object-cover"
-                        style="aspect-ratio: 16/9;"
-                      />
-                    ) : (
-                      <ImagePlaceholder
-                        description={`${child.name} service photo`}
-                        aspectRatio="16/9"
-                        class="w-full"
-                      />
-                    )}
+                    <img
+                      src={child.featuredImage ? urlForImage(child.featuredImage).width(400).height(225).url() : (fallbackImages[child.slug] || "/assets/web/dji_fly_20251105_160244_430_1762438961614_photo.jpg")}
+                      alt={child.name}
+                      class="w-full rounded-lg object-cover"
+                      style="aspect-ratio: 16/9;"
+                    />
                   </div>
                   <h3 class="text-lg font-semibold text-text-primary mb-2">
                     {child.name}

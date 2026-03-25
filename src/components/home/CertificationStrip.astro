@@ -20,19 +20,19 @@ const certifications = [
   },
   {
     name: "NAHB Member",
-    image: "/assets/logos/nahb-logo-color-1153x808.png",
+    image: "/assets/logos/nahb-logo-color-1153x808.webp",
   },
 ];
 ---
 
 <SectionContainer background="light" padding="sm">
-  <div class="flex flex-wrap items-center justify-center gap-8 md:gap-14 py-4">
+  <div class="flex flex-wrap items-center justify-center gap-8 md:gap-14 py-6">
     {certifications.map((cert) => (
-      <div class="flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity">
+      <div class="flex items-center justify-center hover:scale-105 transition-transform">
         <img
           src={cert.image}
           alt={cert.name}
-          class="h-16 md:h-20 w-auto object-contain"
+          class="h-20 md:h-24 w-auto object-contain"
           loading="lazy"
         />
       </div>

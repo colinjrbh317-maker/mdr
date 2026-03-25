@@ -60,18 +60,18 @@ const ServiceGrid = () => {
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/30 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-black/75 to-black/20 transition-opacity duration-300" />
                     </div>
 
                     {/* Content Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.5)' }}>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 border-l-4 border-[#C0392B]" style={{ textShadow: '0 2px 16px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,0.8)' }}>
                         <h3 className="text-2xl md:text-3xl font-display font-extrabold text-white mb-2 drop-shadow-lg">
                             {service.title}
                         </h3>
-                        <p className="text-white font-sans text-sm md:text-base mb-4 line-clamp-2 drop-shadow-md">
+                        <p className="text-white/95 font-sans text-sm md:text-base mb-4 line-clamp-2 drop-shadow-md">
                             {service.description}
                         </p>
-                        <span className="inline-flex items-center text-sm font-semibold text-white uppercase tracking-wider border-b border-transparent group-hover:border-accent transition-all">
+                        <span className="inline-flex items-center text-sm font-semibold text-white uppercase tracking-wider border-b-2 border-transparent group-hover:border-[#C0392B] transition-all">
                             Learn More
                             <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                         </span>

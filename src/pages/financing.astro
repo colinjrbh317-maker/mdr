@@ -64,30 +64,41 @@ const faqs = [
 ---
 
 <Layout
-  title="Roof Financing Options | Modern Day Roofing"
+  title="Roof Financing Options"
   description="Affordable roofing financing with $0 down, low monthly payments, and quick approval. Modern Day Roofing partners with top lenders to make your new roof affordable."
 >
-  {/* Hero */}
-  <SectionContainer background="warm" padding="lg">
-    <Breadcrumb items={breadcrumbItems} />
-    <div class="mt-6 text-center max-w-3xl mx-auto">
-      <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-3">
-        Make It Affordable
-      </p>
-      <h1 class="text-4xl md:text-5xl font-bold text-text-primary">
-        Flexible Financing Options
-      </h1>
-      <p class="mt-4 text-lg text-text-muted max-w-2xl mx-auto">
-        Don't let budget concerns delay protecting your home. We offer financing options to make your new roof affordable with low monthly payments.
-      </p>
-      <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-        <Button href="#apply" size="lg">Check Your Rate</Button>
-        <Button href="tel:5405536007" variant="outline" size="lg">
-          Call (540) 553-6007
-        </Button>
+  {/* Hero with Photo Background */}
+  <section class="relative min-h-[40vh] flex items-center dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src="/assets/web/dji_fly_20250630_140410_766_1751306661861_photo.jpg"
+        alt="Completed roofing project"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/50"></div>
+    </div>
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <Breadcrumb items={breadcrumbItems} />
+      <div class="mt-6 max-w-3xl">
+        <p class="text-accent-light font-semibold text-sm uppercase tracking-wider mb-3">
+          Make It Affordable
+        </p>
+        <h1 class="text-4xl md:text-5xl font-bold text-white">
+          Flexible Financing Options
+        </h1>
+        <p class="mt-4 text-lg text-white/85 max-w-2xl leading-relaxed">
+          Don't let budget concerns delay protecting your home. We offer financing options to make your new roof affordable with low monthly payments.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          <Button href="#apply" size="lg">Check Your Rate</Button>
+          <Button href="tel:5405536007" variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
+            Call (540) 553-6007
+          </Button>
+        </div>
       </div>
     </div>
-  </SectionContainer>
+  </section>
 
   {/* Benefits Grid */}
   <SectionContainer background="white" padding="md">

@@ -30,7 +30,7 @@ const [siteSettings, navigation] = await Promise.all([
 
 const companyName = siteSettings?.companyName || "Modern Day Roofing";
 const phone = siteSettings?.phone || "5405536007";
-const siteTitle = `${title} | ${companyName}`;
+const siteTitle = title.includes(companyName) ? title : `${title} | ${companyName}`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://moderndayroof.com");
 ---
 

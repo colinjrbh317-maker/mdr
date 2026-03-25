@@ -2,49 +2,49 @@
 import SectionContainer from "@/components/ui/SectionContainer.astro";
 import ScrollReveal from "@/components/common/ScrollReveal.astro";
 
-// Hardcoded reviews — replace with Sanity testimonials or Google Places API later
+// Real customer reviews from Modern Day Roofing
 const reviews = [
   {
-    name: "Jake S.",
+    name: "Dawn M.",
     city: "Christiansburg, VA",
     service: "Roof Replacement",
     rating: 5,
-    quote: "From the initial inspection to the final walkthrough, Modern Day Roofing was professional, thorough, and on time. Our new GAF shingle roof looks incredible. Highly recommend!",
+    quote: "The crew was on time, actually a few minutes early and they immediately started working. The roof replacement and the gutter cleaning, resealing and screen installation was completed in a day! We are beyond happy with the results and highly recommend Modern Day Roofing!",
   },
   {
-    name: "Megan T.",
-    city: "Blacksburg, VA",
-    service: "Storm Damage",
+    name: "John G.",
+    city: "Christiansburg, VA",
+    service: "Roof Replacement",
     rating: 5,
-    quote: "After a bad storm took shingles off our roof, MDR was out the next morning with a tarp and a plan. They handled the entire insurance claim process and our new roof was done in two days.",
+    quote: "Modern Day Roofing did an excellent job on my roof. They were here only 3 hours and 17 minutes and it was done. Chris came to our house before and after to inspect their work and it looks great. Would highly recommend them.",
   },
   {
-    name: "David R.",
-    city: "Salem, VA",
-    service: "Metal Roofing",
+    name: "Bonnie D.",
+    city: "Christiansburg, VA",
+    service: "Roof Replacement",
     rating: 5,
-    quote: "We went with standing seam metal and couldn't be happier. The crew was respectful of our property, cleaned up every day, and the finished product is stunning. Worth every penny.",
+    quote: "Working with MDR was fantastic, they were professional and on time. Our roof looks great and now I no longer have to worry about future roofing projects due to the warranty they were able to offer. Thanks a lot Modern Day Roofing!",
   },
   {
-    name: "Lisa M.",
-    city: "Roanoke, VA",
+    name: "Amory L.",
+    city: "Christiansburg, VA",
+    service: "Roof Replacement",
+    rating: 5,
+    quote: "Working with MDR made this process a breeze. They were very professional and explained everything to me. I am a first time client and they really made it easy to understand. The clean up was great, the crew was very respectful. 10/10 recommend.",
+  },
+  {
+    name: "Linda S.",
+    city: "Christiansburg, VA",
     service: "Roof Repair",
     rating: 5,
-    quote: "Quick response, fair pricing, and honest about what needed to be fixed vs. what could wait. They patched a tricky valley leak that two other companies couldn't figure out.",
+    quote: "Modern Day Roofing was very professional and straightforward with what needed to be done on our roof. We ran into a snag with our chimney we weren't expecting and they found someone to address the problem and got it all done very well.",
   },
   {
-    name: "Chris H.",
-    city: "Radford, VA",
-    service: "Gutters",
-    rating: 5,
-    quote: "New seamless gutters and leaf guards installed in a single day. No more ice dams or overflow. The team was friendly and left the property cleaner than they found it.",
-  },
-  {
-    name: "Amanda B.",
+    name: "Katelin N.",
     city: "Christiansburg, VA",
-    service: "Roof Replacement",
+    service: "Roof Repair",
     rating: 5,
-    quote: "As a first-time homeowner, I had a lot of questions. The team at MDR took the time to explain every option and helped me choose the best system for my budget. Golden Pledge warranty gives me total peace of mind.",
+    quote: "Austin was very professional and extremely kind when he came out to check a spot on our roof that had been leaking. It was a quick, easy fix which was a huge relief! Don't hesitate to check them out when you need something done.",
   },
 ];
 ---
@@ -69,7 +69,7 @@ const reviews = [
         </div>
       </div>
       <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-2">
-        4.9 Stars from 150+ Google Reviews
+        4.9 Stars from 200+ Google Reviews
       </h2>
       <p class="text-white/85 text-lg">
         Real feedback from Virginia homeowners we've served.
@@ -119,7 +119,7 @@ const reviews = [
     {/* Read All Reviews link */}
     <div class="text-center mt-8">
       <a
-        href="https://www.google.com/maps/place/Modern+Day+Roofing"
+        href="https://www.google.com/maps?q=place_id:ChIJF1B6XsCTTYgRhBfUE2iAeoI"
         target="_blank"
         rel="noopener noreferrer"
         class="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm font-medium transition-colors"

@@ -39,7 +39,7 @@ const relatedPosts = post.category?._id
     }).catch(() => [])
   : [];
 
-const seoTitle = post.seo?.metaTitle || `${post.title} | Modern Day Roofing`;
+const seoTitle = post.seo?.metaTitle || post.title;
 const seoDescription = post.seo?.metaDescription;
 
 const breadcrumbItems = [

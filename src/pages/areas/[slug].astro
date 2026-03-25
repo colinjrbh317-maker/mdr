@@ -37,7 +37,7 @@ const childAreas = area.childAreas || [];
 const siblingAreas = area.siblingAreas || [];
 const servicesOffered = area.servicesOffered || [];
 
-const seoTitle = area.seo?.metaTitle || `Roofing Services in ${area.name}, VA | Modern Day Roofing`;
+const seoTitle = area.seo?.metaTitle || `Roofing Contractor in ${area.name}, VA`;
 const seoDescription =
   area.seo?.metaDescription || area.description || `Professional roofing services in ${area.name}, Virginia. Roof replacement, repair, maintenance, gutters, and storm damage restoration.`;
 
@@ -87,7 +87,7 @@ const localBusinessJsonLd = {
   <script type="application/ld+json" set:html={JSON.stringify(localBusinessJsonLd)} />
 
   {/* Split Hero: Content + Map */}
-  <section class="relative dark-section bg-bg-darker">
+  <section class="relative dark-section bg-bg-darker" data-transparent-header>
     <div class="mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         {/* Left: Content */}

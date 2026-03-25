@@ -30,10 +30,25 @@ function formatDate(dateStr: string | undefined): string {
 const featuredPost = posts.length > 0 ? posts[0] : null;
 const mediumPosts = posts.slice(1, 3);
 const remainingPosts = posts.slice(3);
+
+// Fallback images for blog posts without CMS photos — cycle through real project images
+const blogFallbackImages = [
+  "/assets/web/dji_fly_20251105_160154_425_1762438973026_photo.jpg",
+  "/assets/web/Untitled-1800-x-1440-px.jpg",
+  "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.jpg",
+  "/assets/web/Untitled-1800-x-1440-px-2.jpg",
+  "/assets/web/dji_fly_20250630_140410_766_1751306661861_photo.jpg",
+  "/assets/web/Untitled-1800-x-1440-px-3.jpg",
+];
+
+function getPostImage(post: any, index: number): string {
+  if (post.featuredImage) return urlForImage(post.featuredImage).width(800).height(500).url();
+  return blogFallbackImages[index % blogFallbackImages.length];
+}
 ---
 
 <Layout
-  title="Roofing Blog & Education Hub | Modern Day Roofing"
+  title="Roofing Blog & Education Hub"
   description="Expert roofing advice, maintenance tips, and industry insights from Modern Day Roofing. Learn about roof repair, replacement, materials, and more."
 >
   <SectionContainer background="warm" padding="lg">
@@ -82,19 +97,12 @@ const remainingPosts = posts.slice(3);
             <a href={`/blog/${featuredPost.slug}`} class="block no-underline mb-10">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
                 <div class="aspect-[16/9] md:aspect-auto overflow-hidden">
-                  {featuredPost.featuredImage ? (
-                    <img
-                      src={urlForImage(featuredPost.featuredImage).width(800).height(500).url()}
-                      alt={featuredPost.title}
-                      class="w-full h-full object-cover"
-                      loading="eager"
-                    />
-                  ) : (
-                    <ImagePlaceholder
-                      description={`${featuredPost.title} featured image`}
-                      class="w-full h-full"
-                    />
-                  )}
+                  <img
+                    src={getPostImage(featuredPost, 0)}
+                    alt={featuredPost.title}
+                    class="w-full h-full object-cover"
+                    loading="eager"
+                  />
                 </div>
                 <div class="p-6 md:p-8 flex flex-col justify-center">
                   <div class="flex items-center gap-2 mb-3">
@@ -126,21 +134,13 @@ const remainingPosts = posts.slice(3);
               <ScrollReveal delay={i * 100}>
                 <Card variant="default" href={`/blog/${post.slug}`}>
                   <div class="mb-4">
-                    {post.featuredImage ? (
-                      <img
-                        src={urlForImage(post.featuredImage).width(600).height(340).url()}
-                        alt={post.title}
-                        class="w-full rounded-lg object-cover"
-                        style="aspect-ratio: 16/9;"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <ImagePlaceholder
-                        description={`${post.title} featured image`}
-                        aspectRatio="16/9"
-                        class="w-full"
-                      />
-                    )}
+                    <img
+                      src={getPostImage(post, i + 1)}
+                      alt={post.title}
+                      class="w-full rounded-lg object-cover"
+                      style="aspect-ratio: 16/9;"
+                      loading="lazy"
+                    />
                   </div>
                   <div class="flex items-center gap-2 mb-3">
                     {post.category?.title && (
@@ -168,21 +168,13 @@ const remainingPosts = posts.slice(3);
               <ScrollReveal delay={i * 80}>
                 <Card variant="default" href={`/blog/${post.slug}`}>
                   <div class="mb-4">
-                    {post.featuredImage ? (
-                      <img
-                        src={urlForImage(post.featuredImage).width(600).height(340).url()}
-                        alt={post.title}
-                        class="w-full rounded-lg object-cover"
-                        style="aspect-ratio: 16/9;"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <ImagePlaceholder
-                        description={`${post.title} featured image`}
-                        aspectRatio="16/9"
-                        class="w-full"
-                      />
-                    )}
+                    <img
+                      src={getPostImage(post, i + 3)}
+                      alt={post.title}
+                      class="w-full rounded-lg object-cover"
+                      style="aspect-ratio: 16/9;"
+                      loading="lazy"
+                    />
                   </div>
                   <div class="flex items-center gap-2 mb-3">
                     {post.category?.title && (
