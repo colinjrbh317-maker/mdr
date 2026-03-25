@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
+import React, { useState, useRef, useCallback } from 'react';
 
 interface BeforeAfterProps {
     beforeImage: string;
@@ -15,38 +14,44 @@ const BeforeAfter: React.FC<BeforeAfterProps> = ({
     afterLabel = "After"
 }) => {
     const [sliderPosition, setSliderPosition] = useState(50);
-    const [isDragging, setIsDragging] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const isDragging = useRef(false);
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    const updatePosition = useCallback((clientX: number) => {
         if (!containerRef.current) return;
-
-        // Calculate position
         const rect = containerRef.current.getBoundingClientRect();
-        const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-        const width = rect.width;
-        const position = Math.max(0, Math.min(100, (x / width) * 100));
-
+        const x = clientX - rect.left;
+        const position = Math.max(0, Math.min(100, (x / rect.width) * 100));
         setSliderPosition(position);
-    };
+    }, []);
 
-    const handleMouseDown = () => setIsDragging(true);
-    const handleMouseUp = () => setIsDragging(false);
+    const handlePointerDown = useCallback((e: React.PointerEvent) => {
+        isDragging.current = true;
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        updatePosition(e.clientX);
+    }, [updatePosition]);
 
-    // Allow interaction on hover/move without click for ease of use on desktop? 
-    // Refined plan says "Handle slider to reveal... intuitive". 
-    // Let's stick to drag or click-move. simpler is strictly "move on hover" but that can be annoying. 
-    // Drag is standard.
+    const handlePointerMove = useCallback((e: React.PointerEvent) => {
+        if (!isDragging.current) return;
+        e.preventDefault();
+        updatePosition(e.clientX);
+    }, [updatePosition]);
+
+    const handlePointerUp = useCallback(() => {
+        isDragging.current = false;
+    }, []);
 
     return (
         <div
             ref={containerRef}
-            className="relative w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden rounded-2xl cursor-col-resize select-none bg-bg-warm"
-            onMouseMove={handleMouseMove}
-            onTouchMove={(e) => { e.preventDefault(); handleMouseMove(e); }}
-            onTouchStart={(e) => { e.preventDefault(); handleMouseMove(e); }}
+            className="relative w-full h-full overflow-hidden select-none"
+            style={{ touchAction: 'pan-y' }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
         >
-            {/* After Image (Background - Full Width) */}
+            {/* After Image (Background) */}
             <img
                 src={afterImage}
                 alt="After"
@@ -59,7 +64,7 @@ const BeforeAfter: React.FC<BeforeAfterProps> = ({
                 {afterLabel}
             </div>
 
-            {/* Before Image (Foreground - Clipped) */}
+            {/* Before Image (Clipped) */}
             <div
                 className="absolute inset-0 overflow-hidden w-full h-full"
                 style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
@@ -70,20 +75,18 @@ const BeforeAfter: React.FC<BeforeAfterProps> = ({
                     className="absolute inset-0 w-full h-full object-cover"
                     draggable="false"
                 />
-
-                {/* Before Label */}
                 <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-sm font-bold z-10 shadow-lg">
                     {beforeLabel}
                 </div>
             </div>
 
-            {/* Handle */}
+            {/* Slider Handle */}
             <div
-                className="absolute top-0 bottom-0 w-1 bg-white cursor-col-resize z-20 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
-                style={{ left: `${sliderPosition}%` }}
+                className="absolute top-0 bottom-0 w-1 bg-white z-20 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
+                style={{ left: `${sliderPosition}%`, cursor: 'col-resize' }}
             >
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg text-accent">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-accent">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#C0392B' }}>
                         <path d="M21 12H3m18 0l-4 4m4-4l-4-4M3 12l4 4m-4-4l4-4" />
                     </svg>
                 </div>

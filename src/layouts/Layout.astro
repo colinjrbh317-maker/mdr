@@ -7,7 +7,6 @@ import { SITE_SETTINGS_QUERY, NAVIGATION_QUERY } from "@/sanity/lib/queries";
 import GclidCapture from "@/components/common/GclidCapture.astro";
 import ExitIntentPopup from "@/components/cro/ExitIntentPopup";
 import ScrollPopup from "@/components/cro/ScrollPopup";
-import StickyMobileCTA from "@/components/forms/StickyMobileCTA";
 import "@/styles/global.css";
 
 interface Props {
@@ -125,7 +124,6 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
 
     <ExitIntentPopup client:idle />
     <ScrollPopup client:idle />
-    <StickyMobileCTA client:idle phone={phone} />
 
     <GclidCapture />
   </body>

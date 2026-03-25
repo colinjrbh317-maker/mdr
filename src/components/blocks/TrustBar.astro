@@ -9,13 +9,13 @@ const { class: className = "" } = Astro.props;
 ---
 
 <div
-  class={`grid grid-cols-2 md:grid-cols-4 gap-6 py-4 ${className}`}
+  class={`grid grid-cols-2 md:grid-cols-4 gap-4 py-2 ${className}`}
   role="list"
   aria-label="Trust indicators"
 >
   <!-- GAF President's Club Badge -->
   <div class="bg-bg-card rounded-xl p-5 shadow-sm border border-border text-center" role="listitem">
-    <div class="w-20 h-20 mx-auto mb-3 flex items-center justify-center">
+    <div class="w-20 h-20 mx-auto flex items-center justify-center">
       <img
         src="/assets/logos/Presidents-Club_3-Star_Residential-with-Year_2026.png"
         alt="GAF President's Club 2026"
@@ -23,8 +23,6 @@ const { class: className = "" } = Astro.props;
         loading="eager"
       />
     </div>
-    <Badge variant="certification" text="GAF President's Club" />
-    <p class="text-xs text-text-muted mt-2">Top 1% of contractors</p>
   </div>
 
   <!-- Google Rating -->

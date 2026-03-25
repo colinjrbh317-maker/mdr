@@ -5,7 +5,7 @@ interface Stat {
   value: number;
   suffix?: string;
   label: string;
-  ringPercent?: number;
+  icon: string;
 }
 
 interface Props {
@@ -15,90 +15,34 @@ interface Props {
 
 const {
   stats = [
-    { value: 1200, suffix: "+", label: "Roofs Completed", ringPercent: 95 },
-    { value: 15, suffix: "+", label: "Years Serving Virginia", ringPercent: 75 },
-    { value: 4.9, suffix: "★", label: "Avg. Google Rating", ringPercent: 98 },
-    { value: 3, suffix: "x", label: "President's Club Winner", ringPercent: 98 },
+    { value: 1200, suffix: "+", label: "Roofs Completed", icon: "home" },
+    { value: 15, suffix: "+", label: "Years Serving Virginia", icon: "calendar" },
+    { value: 4.9, suffix: "★", label: "Avg. Google Rating", icon: "star" },
+    { value: 3, suffix: "x", label: "President's Club Winner", icon: "trophy" },
   ],
   class: className = "",
 } = Astro.props;
-
-const RING_SIZE = 120;
-const RING_STROKE = 4;
-const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
-const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 ---
 
-<SectionContainer background="warm" padding="sm" class={className}>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<SectionContainer background="darker" padding="md" class={className}>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
     {
-      stats.map((stat) => {
-        const percent = stat.ringPercent ?? Math.min(stat.value, 100);
-        return (
-          <div
-            class="stat-item flex flex-col items-center"
-            data-target={stat.value}
-            data-suffix={stat.suffix || ""}
-            data-ring-percent={percent}
-          >
-            <div class="relative" style={`width: ${RING_SIZE}px; height: ${RING_SIZE}px;`}>
-              {/* Background ring */}
-              <svg
-                class="absolute inset-0"
-                width={RING_SIZE}
-                height={RING_SIZE}
-                viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}
-              >
-                <circle
-                  cx={RING_SIZE / 2}
-                  cy={RING_SIZE / 2}
-                  r={RING_RADIUS}
-                  fill="none"
-                  stroke="var(--color-border)"
-                  stroke-width={RING_STROKE}
-                />
-              </svg>
-              {/* Animated progress ring */}
-              <svg
-                class="absolute inset-0 -rotate-90"
-                width={RING_SIZE}
-                height={RING_SIZE}
-                viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}
-              >
-                <circle
-                  class="stat-ring"
-                  cx={RING_SIZE / 2}
-                  cy={RING_SIZE / 2}
-                  r={RING_RADIUS}
-                  fill="none"
-                  stroke="var(--color-warm)"
-                  stroke-width={RING_STROKE}
-                  stroke-linecap="round"
-                  stroke-dasharray={RING_CIRCUMFERENCE}
-                  stroke-dashoffset={RING_CIRCUMFERENCE}
-                  data-circumference={RING_CIRCUMFERENCE}
-                />
-              </svg>
-              {/* Number centered in ring */}
-              <div class="absolute inset-0 flex items-center justify-center">
-                <p class="text-2xl md:text-3xl font-bold text-accent stat-value">
-                  0{stat.suffix || ""}
-                </p>
-              </div>
-            </div>
-            <p class="text-sm text-text-body font-medium mt-3 text-center">{stat.label}</p>
-          </div>
-        );
-      })
+      stats.map((stat) => (
+        <div
+          class="stat-item text-center"
+          data-target={stat.value}
+          data-suffix={stat.suffix || ""}
+        >
+          <p class="text-4xl md:text-5xl font-display font-extrabold text-white stat-value">
+            0{stat.suffix || ""}
+          </p>
+          <div class="mt-2 w-12 h-1 bg-accent mx-auto rounded-full"></div>
+          <p class="text-sm md:text-base text-white/70 font-medium mt-3">{stat.label}</p>
+        </div>
+      ))
     }
   </div>
 </SectionContainer>
-
-<style>
-  .stat-ring {
-    transition: stroke-dashoffset 2s ease-out;
-  }
-</style>
 
 <script>
   function initCounters() {
@@ -111,21 +55,8 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
             const el = entry.target as HTMLElement;
             const target = parseFloat(el.dataset.target || "0");
             const suffix = el.dataset.suffix || "";
-            const ringPercent = parseInt(el.dataset.ringPercent || "0", 10);
             const valueEl = el.querySelector(".stat-value");
-            const ringEl = el.querySelector<SVGCircleElement>(".stat-ring");
 
-            // Animate the ring
-            if (ringEl) {
-              const circumference = parseFloat(
-                ringEl.dataset.circumference || "0"
-              );
-              const offset =
-                circumference - (ringPercent / 100) * circumference;
-              ringEl.style.strokeDashoffset = `${offset}`;
-            }
-
-            // Animate the number
             if (!valueEl) return;
             let current = 0;
             const duration = 2000;
