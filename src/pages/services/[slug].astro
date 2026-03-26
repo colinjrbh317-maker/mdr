@@ -79,6 +79,60 @@ for (const s of [...manualRelated, ...childServices]) {
   if (allRelated.length >= 4) break;
 }
 
+// Service-specific FAQ data (hardcoded until CMS write access available)
+const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
+  "roof-replacement": [
+    {q: "How do I know if I need a full roof replacement?", a: "If your roof is 20+ years old, has widespread shingle damage (curling, cracking, missing granules), or you're seeing multiple leaks, it's likely time. We offer free inspections and will give you an honest assessment — if repairs can extend your roof's life, we'll tell you."},
+    {q: "What does the replacement process look like?", a: "We tear off the old roof down to the decking, inspect and repair any wood damage, then install the full GAF roofing system — ice and water shield, underlayment, starter strips, shingles, ridge caps, and ventilation. Most residential roofs are completed in 1-2 days."},
+    {q: "What warranty do I get with a new roof?", a: "As a GAF Master Elite contractor, we offer the Golden Pledge warranty — 50-year material coverage and 25-year workmanship coverage, backed by GAF, not just our company. It's one of the strongest warranties in the industry."},
+    {q: "Will my insurance cover a roof replacement?", a: "If your roof was damaged by a covered event like hail or wind, insurance typically covers replacement minus your deductible. We work with insurance companies regularly and can guide you through the claims process."},
+    {q: "How long does a new roof last?", a: "GAF Timberline HDZ shingles last 25-30 years. Metal roofs can last 50+ years. The key is proper installation of the complete roofing system — not just shingles, but underlayment, ventilation, and flashing."},
+  ],
+  "roof-repair": [
+    {q: "How do I know if I need repair vs. replacement?", a: "If the damage is isolated — a few missing shingles, a small leak, damaged flashing around a chimney — repair is usually the right call. If you're seeing widespread issues or the roof is over 20 years old, replacement may be more cost-effective."},
+    {q: "Can you fix a leak without replacing the whole roof?", a: "In most cases, yes. Leaks are often caused by damaged flashing, cracked pipe boots, nail pops, or a few missing shingles. We locate the source, fix it, and test to confirm the repair holds."},
+    {q: "How quickly can you respond to an emergency?", a: "We offer 24/7 emergency service for storm damage and active leaks. We prioritize getting a tarp or temporary repair in place to stop water intrusion, then schedule the full repair when conditions allow."},
+    {q: "How much does a typical repair cost?", a: "Minor repairs like replacing a few shingles or sealing a small leak typically range from $400-$1,000. More involved repairs vary by scope. We provide a detailed, itemized quote after inspection — no surprises."},
+  ],
+  "shingle-roofing": [
+    {q: "What type of shingles do you install?", a: "We install GAF Timberline HDZ — the number one selling shingle in North America. They offer wind resistance up to 130 mph, algae resistance, and enhanced curb appeal. We also offer GAF's premium designer lines."},
+    {q: "How long do asphalt shingles last in Virginia?", a: "Quality architectural shingles last 25-30 years in Virginia's climate. Our region's heat, humidity, and freeze-thaw cycles are tough on roofs — which is why proper installation of the full system matters as much as the shingle itself."},
+    {q: "What's the difference between 3-tab and architectural shingles?", a: "3-tab shingles are flat, thinner, and less wind-resistant — we don't recommend them. Architectural shingles are thicker, more durable, better wind-rated, and give your roof a richer appearance. The price difference is modest for a much better product."},
+    {q: "How do I know if my shingles need replacing?", a: "Look for curling or buckling, dark streaks (algae), excessive granules in your gutters, or visible bald spots. If your roof is 20+ years old and showing these signs, it's time for a professional inspection."},
+  ],
+  "metal-roofing": [
+    {q: "Is metal roofing worth the higher upfront cost?", a: "For many homeowners, yes. Metal roofs last 50+ years — roughly double the lifespan of shingles. They're more energy-efficient, reflect heat, and require less maintenance. The cost per year is often lower than shingles when you factor in longevity."},
+    {q: "Are metal roofs noisy when it rains?", a: "Not with modern installation. Metal roofing installed over solid decking with underlayment is no louder than shingles during rain. The old 'tin barn' reputation comes from metal installed directly over open rafters — not how residential metal roofs are done."},
+    {q: "Can you install metal over my existing shingles?", a: "In some cases — but we generally recommend a full tear-off. Installing over old shingles can trap moisture, hide decking damage, and void certain warranties. We inspect and advise on the best approach for your home."},
+    {q: "What styles of metal roofing do you offer?", a: "We install standing seam metal — the gold standard for residential applications. Clean lines, excellent weather resistance, and a modern look that works with everything from farmhouses to contemporary homes. Multiple colors available."},
+  ],
+  "gutters": [
+    {q: "How often should gutters be cleaned?", a: "At minimum twice a year — spring and fall. If you have overhanging trees, quarterly cleaning prevents clogs that cause water to back up under your roof edge, leading to fascia rot and foundation damage."},
+    {q: "How do I know if my gutters need replacing?", a: "Look for visible sagging, rust, separation at seams, water pooling near your foundation, or paint peeling on fascia boards. If your gutters are pulling away from the house or you see standing water inside them, it's time."},
+    {q: "What type of gutters do you install?", a: "We install seamless aluminum gutters — custom-formed on-site to fit your home precisely. Seamless means fewer joints, fewer leak points, and a cleaner look. We also install gutter guards to reduce maintenance."},
+    {q: "Do gutters really affect my roof?", a: "Absolutely. Clogged or damaged gutters cause water to back up under your roof edge, damaging fascia, soffit, and eventually the roof decking itself. Proper gutter function is part of the complete roofing system."},
+  ],
+  "storm-damage": [
+    {q: "What should I do right after storm damage?", a: "Document the damage with photos, contact your insurance company to file a claim, and call us. We offer 24/7 emergency response to tarp damaged areas and prevent further water intrusion while we plan the full repair."},
+    {q: "Will my insurance cover storm damage repairs?", a: "Most homeowner's policies cover storm damage from wind, hail, and fallen debris. We work with insurance adjusters regularly and can help document damage to support your claim. You're typically responsible only for your deductible."},
+    {q: "How can I tell if my roof has storm damage?", a: "After a storm, look for missing or lifted shingles, dented gutters, granules washed into downspouts, or dents in metal flashing. Some damage isn't visible from the ground — that's why we offer free post-storm inspections."},
+    {q: "Do I need to replace the whole roof after a storm?", a: "Not always. If damage is limited to one section, targeted repair may be sufficient. But if a significant portion is compromised, full replacement ensures consistent protection and may be covered by insurance."},
+  ],
+  "roof-maintenance": [
+    {q: "How often should my roof be inspected?", a: "At least once a year, and after any major storm. Regular inspections catch small issues — a lifted shingle, a cracked pipe boot — before they become expensive repairs. We offer annual maintenance plans."},
+    {q: "What does a roof maintenance visit include?", a: "We inspect shingles, flashing, ridge caps, valleys, pipe boots, ventilation, gutters, and attic ventilation. We check for moss or algae growth, clear debris, and provide a detailed report with photos of any concerns."},
+    {q: "Can regular maintenance extend my roof's life?", a: "Significantly. A well-maintained roof can last 5-10 years longer than a neglected one. Catching a $200 flashing repair early prevents a $5,000 water damage problem later."},
+    {q: "Do you offer maintenance plans?", a: "Yes. Our annual maintenance plans include a thorough inspection, minor repairs, gutter cleaning, and a written report. It's the easiest way to protect your investment and catch issues early."},
+  ],
+  "timber-seal": [
+    {q: "What is Timber Seal?", a: "Timber Seal is GAF's premium wood-look roofing option — it gives you the aesthetic of natural wood shakes with the durability and fire resistance of modern roofing materials. Beautiful appearance with none of the maintenance headaches."},
+    {q: "How does Timber Seal compare to real wood shakes?", a: "Timber Seal looks like wood but lasts longer, resists fire, won't rot or split, and requires far less maintenance. Real wood shakes need regular treatment and can be a fire hazard — Timber Seal eliminates those concerns."},
+    {q: "Is Timber Seal more expensive than standard shingles?", a: "Yes, it's a premium product. But for homeowners who want the wood-shake look, it's significantly less expensive and more durable than real wood. We can walk you through the cost comparison during your free estimate."},
+  ],
+};
+
+const currentFaqs = serviceFaqs[slug as string] || [];
+
 // JSON-LD structured data
 const siteUrl = Astro.site?.href || "https://moderndayroofing.com";
 const serviceJsonLd = {
@@ -103,6 +157,17 @@ const serviceJsonLd = {
 
 <Layout title={seoTitle} description={seoDescription} ogImage={service.featuredImage ? urlForImage(service.featuredImage).width(1200).height(630).url() : undefined}>
   <script type="application/ld+json" set:html={JSON.stringify(serviceJsonLd)} />
+  {currentFaqs.length > 0 && (
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: currentFaqs.map(faq => ({
+        "@type": "Question",
+        name: faq.q,
+        acceptedAnswer: { "@type": "Answer", text: faq.a }
+      }))
+    })} />
+  )}
 
   {/* Hero (stays dark) */}
   <section class="relative min-h-[50vh] flex items-center dark-section" data-transparent-header>
@@ -237,6 +302,32 @@ const serviceJsonLd = {
   {/* Page Builder Blocks */}
   {service.pageBuilder && service.pageBuilder.length > 0 && (
     <BlockRenderer blocks={service.pageBuilder} />
+  )}
+
+  {/* Service FAQs */}
+  {currentFaqs.length > 0 && (
+    <SectionContainer background="light" padding="md">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary text-center mb-8">
+          {service.name} FAQs
+        </h2>
+        <div class="space-y-4">
+          {currentFaqs.map((faq, i) => (
+            <details class="group bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+              <summary class="flex items-center justify-between gap-4 p-5 cursor-pointer list-none font-semibold text-text-primary hover:bg-bg-light/50 transition-colors">
+                <span>{faq.q}</span>
+                <svg class="w-5 h-5 flex-shrink-0 text-text-muted transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div class="px-5 pb-5 text-text-body leading-relaxed">
+                {faq.a}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </SectionContainer>
   )}
 
   {/* Lead Capture Form (mobile/fallback) */}

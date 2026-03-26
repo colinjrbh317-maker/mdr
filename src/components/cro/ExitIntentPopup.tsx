@@ -99,7 +99,7 @@ export default function ExitIntentPopup() {
           onClick={() => setShowPromo(false)}
           className="mt-3 text-sm text-text-dim hover:text-text-muted transition-colors"
         >
-          No thanks, I'll pay full price
+          Not right now
         </button>
       </div>
     </div>

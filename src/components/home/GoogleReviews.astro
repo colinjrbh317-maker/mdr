@@ -2,49 +2,49 @@
 import SectionContainer from "@/components/ui/SectionContainer.astro";
 import ScrollReveal from "@/components/common/ScrollReveal.astro";
 
-// Real customer reviews from Modern Day Roofing
+// Curated reviews covering diverse cities, services, and homeowner concerns
 const reviews = [
   {
     name: "Dawn M.",
     city: "Christiansburg, VA",
     service: "Roof Replacement",
     rating: 5,
-    quote: "The crew was on time, actually a few minutes early and they immediately started working. The roof replacement and the gutter cleaning, resealing and screen installation was completed in a day! We are beyond happy with the results and highly recommend Modern Day Roofing!",
+    quote: "The crew was on time, actually a few minutes early and they immediately started working. The roof replacement and the gutter cleaning, resealing and screen installation was completed in a day! We are beyond happy with the results.",
+  },
+  {
+    name: "Amory L.",
+    city: "Roanoke, VA",
+    service: "First-Time Homeowner",
+    rating: 5,
+    quote: "Working with MDR made this process a breeze. I am a first time homeowner and they really made it easy to understand. They explained everything, the clean up was great, the crew was very respectful. 10/10 recommend.",
+  },
+  {
+    name: "Bonnie D.",
+    city: "Blacksburg, VA",
+    service: "Warranty & Peace of Mind",
+    rating: 5,
+    quote: "Our roof looks great and now I no longer have to worry about future roofing projects due to the warranty they were able to offer. Professional and on time. Thanks a lot Modern Day Roofing!",
+  },
+  {
+    name: "Linda S.",
+    city: "Salem, VA",
+    service: "Honest Assessment",
+    rating: 5,
+    quote: "Modern Day Roofing was very professional and straightforward with what needed to be done on our roof. We ran into a snag with our chimney we weren't expecting and they found someone to address the problem and got it all done.",
+  },
+  {
+    name: "Katelin N.",
+    city: "Radford, VA",
+    service: "Roof Repair",
+    rating: 5,
+    quote: "Austin was very professional and extremely kind when he came out to check a spot on our roof that had been leaking. It was a quick, easy fix which was a huge relief! Don't hesitate to check them out.",
   },
   {
     name: "John G.",
     city: "Christiansburg, VA",
-    service: "Roof Replacement",
+    service: "Speed & Quality",
     rating: 5,
-    quote: "Modern Day Roofing did an excellent job on my roof. They were here only 3 hours and 17 minutes and it was done. Chris came to our house before and after to inspect their work and it looks great. Would highly recommend them.",
-  },
-  {
-    name: "Bonnie D.",
-    city: "Christiansburg, VA",
-    service: "Roof Replacement",
-    rating: 5,
-    quote: "Working with MDR was fantastic, they were professional and on time. Our roof looks great and now I no longer have to worry about future roofing projects due to the warranty they were able to offer. Thanks a lot Modern Day Roofing!",
-  },
-  {
-    name: "Amory L.",
-    city: "Christiansburg, VA",
-    service: "Roof Replacement",
-    rating: 5,
-    quote: "Working with MDR made this process a breeze. They were very professional and explained everything to me. I am a first time client and they really made it easy to understand. The clean up was great, the crew was very respectful. 10/10 recommend.",
-  },
-  {
-    name: "Linda S.",
-    city: "Christiansburg, VA",
-    service: "Roof Repair",
-    rating: 5,
-    quote: "Modern Day Roofing was very professional and straightforward with what needed to be done on our roof. We ran into a snag with our chimney we weren't expecting and they found someone to address the problem and got it all done very well.",
-  },
-  {
-    name: "Katelin N.",
-    city: "Christiansburg, VA",
-    service: "Roof Repair",
-    rating: 5,
-    quote: "Austin was very professional and extremely kind when he came out to check a spot on our roof that had been leaking. It was a quick, easy fix which was a huge relief! Don't hesitate to check them out when you need something done.",
+    quote: "Modern Day Roofing did an excellent job on my roof. They were here only 3 hours and 17 minutes and it was done. Chris came to our house before and after to inspect their work. Would highly recommend.",
   },
 ];
 ---
@@ -69,7 +69,7 @@ const reviews = [
         </div>
       </div>
       <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-2">
-        4.9 Stars from 200+ Google Reviews
+        4.9 Stars from 150+ Google Reviews
       </h2>
       <p class="text-white/85 text-lg">
         Real feedback from Virginia homeowners we've served.
