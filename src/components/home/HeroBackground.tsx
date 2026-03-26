@@ -33,6 +33,8 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
             alt="Aerial view of a completed Modern Day Roofing project"
             className="absolute inset-0 w-full h-full object-cover"
             loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-[#2c2a26] to-[#1c1917] w-full h-full" />

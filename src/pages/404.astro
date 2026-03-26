@@ -1,0 +1,39 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Button from "@/components/ui/Button.astro";
+---
+
+<Layout title="Page Not Found" description="The page you're looking for doesn't exist. Let us help you find what you need.">
+  <SectionContainer background="white" padding="lg">
+    <div class="max-w-2xl mx-auto text-center py-12">
+      <p class="text-8xl font-display font-bold text-accent/20 mb-4">404</p>
+      <h1 class="text-3xl md:text-4xl font-display font-bold text-text-primary mb-4">
+        Page Not Found
+      </h1>
+      <p class="text-lg text-text-body mb-8">
+        Sorry, we couldn't find that page. It may have been moved or no longer exists.
+        Let us help you get back on track.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+        <Button href="/" size="lg">Back to Home</Button>
+        <Button href="/contact" variant="outline" size="lg">Get a Free Estimate</Button>
+      </div>
+
+      <div class="border-t border-border pt-8">
+        <p class="text-sm text-text-muted mb-4">Looking for something specific?</p>
+        <div class="flex flex-wrap justify-center gap-3">
+          <a href="/services" class="text-sm text-accent hover:underline">Our Services</a>
+          <span class="text-text-dim">|</span>
+          <a href="/areas" class="text-sm text-accent hover:underline">Service Areas</a>
+          <span class="text-text-dim">|</span>
+          <a href="/blog" class="text-sm text-accent hover:underline">Blog</a>
+          <span class="text-text-dim">|</span>
+          <a href="/financing" class="text-sm text-accent hover:underline">Financing</a>
+          <span class="text-text-dim">|</span>
+          <a href="/about" class="text-sm text-accent hover:underline">About Us</a>
+        </div>
+      </div>
+    </div>
+  </SectionContainer>
+</Layout>

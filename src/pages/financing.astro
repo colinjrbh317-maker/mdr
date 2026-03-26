@@ -67,6 +67,18 @@ const faqs = [
   title="Roof Financing Options"
   description="Affordable roofing financing with $0 down, low monthly payments, and quick approval. Modern Day Roofing partners with top lenders to make your new roof affordable."
 >
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(faq => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  })} />
   {/* Hero with Photo Background */}
   <section class="relative min-h-[40vh] flex items-center dark-section" data-transparent-header>
     <div class="absolute inset-0 z-0">
