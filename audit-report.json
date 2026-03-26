@@ -1,0 +1,620 @@
+{
+  "timestamp": "2026-03-24T16:55:30.924Z",
+  "findings": [
+    {
+      "type": "PASS",
+      "page": "homepage",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "homepage",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "homepage",
+      "message": "Title: \"Roofing Contractor in Christiansburg & Roanoke VA | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "homepage",
+      "message": "Meta description present (149 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "homepage",
+      "message": "Multiple H1 tags found (4): Virginia's Premier Roofing Contractor, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "WARNING",
+      "page": "homepage",
+      "message": "1/16 images missing alt text"
+    },
+    {
+      "type": "ERROR",
+      "page": "homepage",
+      "message": "4 broken images (0 dimensions): ts/logos/gallery_Triple-Excellence-Award-1-_1693320411-1.png, http://localhost:4321/assets/logos/4.png, http://localhost:4321/assets/logos/bbb-button.png, p://localhost:4321/assets/logos/nahb-logo-color-1153x808.png"
+    },
+    {
+      "type": "PASS",
+      "page": "homepage",
+      "message": "84 internal links, 20 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "homepage",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "homepage",
+      "message": "JSON-LD schema: Organization,RoofingContractor"
+    },
+    {
+      "type": "PASS",
+      "page": "about",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "about",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "about",
+      "message": "Title: \"About Us | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "about",
+      "message": "Meta description present (126 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "about",
+      "message": "Multiple H1 tags found (4): Built on Integrity,Driven by Excellence, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "about",
+      "message": "All 14 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "about",
+      "message": "75 internal links, 19 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "about",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "about",
+      "message": "JSON-LD schema: BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "contact",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "contact",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "contact",
+      "message": "Title: \"Get Your Free Estimate | Modern Day Roofing | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "contact",
+      "message": "Meta description present (78 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "contact",
+      "message": "Multiple H1 tags found (4): Get Your Free Estimate Today., Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "contact",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "contact",
+      "message": "72 internal links, 18 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "contact",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "contact",
+      "message": "JSON-LD schema: RoofingContractor"
+    },
+    {
+      "type": "PASS",
+      "page": "financing",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "financing",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "financing",
+      "message": "Title: \"Roof Financing Options | Modern Day Roofing | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "financing",
+      "message": "Meta description present (163 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "financing",
+      "message": "Multiple H1 tags found (4): Flexible Financing Options, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "financing",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "financing",
+      "message": "73 internal links, 21 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "financing",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "financing",
+      "message": "JSON-LD schema: BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "gallery",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "gallery",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "gallery",
+      "message": "Title: \"Project Gallery | Before & After Roofing Projects | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "gallery",
+      "message": "Meta description present (167 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "gallery",
+      "message": "Multiple H1 tags found (4): Before & After Gallery, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "gallery",
+      "message": "All 14 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "gallery",
+      "message": "74 internal links, 19 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "gallery",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "gallery",
+      "message": "JSON-LD schema: BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "privacy",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "privacy",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "privacy",
+      "message": "Title: \"Privacy Policy | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "privacy",
+      "message": "Meta description present (100 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "privacy",
+      "message": "Multiple H1 tags found (4): Privacy Policy, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "privacy",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "privacy",
+      "message": "73 internal links, 20 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "privacy",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "privacy",
+      "message": "JSON-LD schema: BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "terms",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "terms",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "terms",
+      "message": "Title: \"Terms of Service | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "terms",
+      "message": "Meta description present (111 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "terms",
+      "message": "Multiple H1 tags found (4): Terms of Service, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "terms",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "terms",
+      "message": "73 internal links, 20 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "terms",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "terms",
+      "message": "JSON-LD schema: BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "services-listing",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "services-listing",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "services-listing",
+      "message": "Title: \"Roofing Services | Modern Day Roofing | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "services-listing",
+      "message": "Meta description present (168 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "services-listing",
+      "message": "Multiple H1 tags found (4): Our Roofing Services, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "services-listing",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "services-listing",
+      "message": "82 internal links, 18 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "services-listing",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "services-listing",
+      "message": "JSON-LD schema: BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-replacement",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-replacement",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-replacement",
+      "message": "Title: \"Roof Replacement | GAF Master Elite | Modern Day Roofing | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-replacement",
+      "message": "Meta description present (164 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "service-roof-replacement",
+      "message": "Multiple H1 tags found (4): Roof Replacement, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-replacement",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-replacement",
+      "message": "81 internal links, 21 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "service-roof-replacement",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-replacement",
+      "message": "JSON-LD schema: Service, BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-repair",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-repair",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-repair",
+      "message": "Title: \"Roof Repair | Emergency & Leak Repair | Modern Day Roofing | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-repair",
+      "message": "Meta description present (157 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "service-roof-repair",
+      "message": "Multiple H1 tags found (4): Roof Repair, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-repair",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-repair",
+      "message": "77 internal links, 21 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "service-roof-repair",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "service-roof-repair",
+      "message": "JSON-LD schema: Service, BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "areas-listing",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "areas-listing",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "areas-listing",
+      "message": "Title: \"Service Areas | Modern Day Roofing | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "areas-listing",
+      "message": "Meta description present (187 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "areas-listing",
+      "message": "Multiple H1 tags found (4): Our Service Areas, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "areas-listing",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "areas-listing",
+      "message": "91 internal links, 18 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "areas-listing",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "areas-listing",
+      "message": "JSON-LD schema: BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "area-roanoke",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "area-roanoke",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "area-roanoke",
+      "message": "Title: \"Roofing Contractor in Roanoke, VA | Modern Day Roofing | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "area-roanoke",
+      "message": "Meta description present (154 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "area-roanoke",
+      "message": "Multiple H1 tags found (4): Roofing Services in Roanoke, VA, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "area-roanoke",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "area-roanoke",
+      "message": "93 internal links, 20 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "area-roanoke",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "area-roanoke",
+      "message": "JSON-LD schema: LocalBusiness,RoofingContractor, BreadcrumbList"
+    },
+    {
+      "type": "PASS",
+      "page": "blog-listing",
+      "message": "HTTP 200 OK"
+    },
+    {
+      "type": "PASS",
+      "page": "blog-listing",
+      "message": "Screenshots captured (desktop + mobile)"
+    },
+    {
+      "type": "PASS",
+      "page": "blog-listing",
+      "message": "Title: \"Roofing Blog & Education Hub | Modern Day Roofing | Modern Day Roofing\""
+    },
+    {
+      "type": "PASS",
+      "page": "blog-listing",
+      "message": "Meta description present (146 chars)"
+    },
+    {
+      "type": "WARNING",
+      "page": "blog-listing",
+      "message": "Multiple H1 tags found (4): Roofing Insights & Tips, Audit, No accessibility or performance issues detected., Settings"
+    },
+    {
+      "type": "PASS",
+      "page": "blog-listing",
+      "message": "All 2 images have alt text"
+    },
+    {
+      "type": "PASS",
+      "page": "blog-listing",
+      "message": "96 internal links, 18 external links"
+    },
+    {
+      "type": "WARNING",
+      "page": "blog-listing",
+      "message": "7 links with no visible text (accessibility issue)"
+    },
+    {
+      "type": "PASS",
+      "page": "blog-listing",
+      "message": "JSON-LD schema: BreadcrumbList"
+    },
+    {
+      "type": "ERROR",
+      "page": "links",
+      "message": "Broken link: /sitemap-index.xml → HTTP 404"
+    },
+    {
+      "type": "ERROR",
+      "page": "links",
+      "message": "1/25 broken internal links found"
+    },
+    {
+      "type": "PASS",
+      "page": "contact-form",
+      "message": "Form has 5 fields: website, name, phone, email, message"
+    },
+    {
+      "type": "PASS",
+      "page": "contact-form",
+      "message": "Submit button present"
+    }
+  ],
+  "summary": {
+    "passes": 92,
+    "warnings": 27,
+    "errors": 3
+  }
+}
