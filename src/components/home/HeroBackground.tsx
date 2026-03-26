@@ -39,10 +39,13 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
         )}
         
         {/* Dark Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-black/40" />
-        
-        {/* Subtle Gradient Overlay from bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-bg-darker via-transparent to-transparent opacity-80" />
+        <div className="absolute inset-0 bg-black/55" />
+
+        {/* Left-side gradient for headline contrast */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
+
+        {/* Bottom gradient for depth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-darker via-transparent to-transparent opacity-70" />
       </motion.div>
     </div>
   );
