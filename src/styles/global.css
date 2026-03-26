@@ -76,7 +76,7 @@
   /* 72px */
 
   /* Font Families */
-  --font-display: 'Barlow Condensed', system-ui, sans-serif;
+  --font-display: 'Archivo Black', system-ui, sans-serif;
   --font-sans: 'DM Sans', system-ui, sans-serif;
 
   /* Spacing */
@@ -115,10 +115,10 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.1;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 /* Inside prose/body content, headings should NOT be uppercase — use sentence case */
