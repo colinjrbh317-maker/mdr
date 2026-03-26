@@ -19,6 +19,8 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
     const name = data.get("name") as string;
     const phone = data.get("phone") as string;
     const email = data.get("email") as string;
+    const service = data.get("service") as string;
+    const address = data.get("address") as string;
     const message = data.get("message") as string;
     const website = data.get("website") as string; // honeypot
 
@@ -35,6 +37,8 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
           name: name.trim(),
           phone: phone.trim(),
           email: email.trim(),
+          service: service?.trim() || "",
+          address: address?.trim() || "",
           message: message?.trim() || "",
           website,
           source,
@@ -135,18 +139,53 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
       </div>
 
       {!compact && (
-        <div>
-          <label htmlFor={`message-${source}`} className="block text-sm font-medium text-text-muted mb-1">
-            Tell us about your project
-          </label>
-          <textarea
-            id={`message-${source}`}
-            name="message"
-            rows={3}
-            className={`${inputClass} resize-y`}
-            placeholder="Describe your roofing needs..."
-          />
-        </div>
+        <>
+          <div>
+            <label htmlFor={`service-${source}`} className="block text-sm font-medium text-text-muted mb-1">
+              Service Needed
+            </label>
+            <select
+              id={`service-${source}`}
+              name="service"
+              className={inputClass}
+            >
+              <option value="">Select a service...</option>
+              <option value="Roof Replacement">Roof Replacement</option>
+              <option value="Roof Repair">Roof Repair</option>
+              <option value="Storm Damage">Storm Damage</option>
+              <option value="Metal Roofing">Metal Roofing</option>
+              <option value="Gutters">Gutters</option>
+              <option value="Roof Inspection">Roof Inspection</option>
+              <option value="Other">Other / Not Sure</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor={`address-${source}`} className="block text-sm font-medium text-text-muted mb-1">
+              Property Address
+            </label>
+            <input
+              type="text"
+              id={`address-${source}`}
+              name="address"
+              className={inputClass}
+              placeholder="123 Main St, Christiansburg, VA"
+            />
+          </div>
+
+          <div>
+            <label htmlFor={`message-${source}`} className="block text-sm font-medium text-text-muted mb-1">
+              Additional Details
+            </label>
+            <textarea
+              id={`message-${source}`}
+              name="message"
+              rows={3}
+              className={`${inputClass} resize-y`}
+              placeholder="Anything else we should know?"
+            />
+          </div>
+        </>
       )}
 
       {state === "error" && (

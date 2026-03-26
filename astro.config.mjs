@@ -7,7 +7,11 @@ import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
   site: "https://moderndayroof.com",
-  adapter: vercel(),
+  adapter: vercel({
+    isr: {
+      expiration: 60,
+    },
+  }),
   integrations: [
     sitemap(),
     sanity({
