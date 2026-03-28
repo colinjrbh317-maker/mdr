@@ -12,11 +12,11 @@ const { navigation, siteSettings } = Astro.props;
 
 <header
   id="site-header"
-  class="fixed top-0 left-0 right-0 z-40 border-b"
-  style="background:#fff; box-shadow:0 1px 2px 0 rgb(0 0 0/0.05); border-bottom-color:var(--color-border); --nav-text:var(--color-text-primary);"
+  class="fixed top-0 left-0 right-0 z-40 bg-white border-b border-border shadow-sm"
+  style="--nav-text: var(--color-text-primary);"
   data-scrolled="true"
 >
-  <!-- Announcement Bar (inside fixed header) -->
+  <!-- Announcement Bar -->
   <div id="announcement-bar" class="bg-accent text-white text-center text-xs py-2 px-4 hidden lg:block">
     <span>GAF Master Elite® Contractor — Virginia's most certified roofing team. </span>
     <a href="/financing" class="underline font-semibold hover:text-white/80 transition-colors">Explore Financing Options →</a>
@@ -29,67 +29,3 @@ const { navigation, siteSettings } = Astro.props;
 </header>
 
 <MobileMenu navigation={navigation} siteSettings={siteSettings} />
-
-<script>
-  function initHeader() {
-    const header = document.getElementById("site-header");
-    const spacer = document.getElementById("header-spacer");
-    const announcementBar = document.getElementById("announcement-bar");
-    if (!header) return;
-
-    const hasTransparentHero = document.querySelector('[data-transparent-header]') !== null;
-
-    // On transparent-header pages, hide the spacer so hero goes edge-to-edge
-    if (hasTransparentHero && spacer) {
-      spacer.style.display = 'none';
-    }
-
-    function setTransparent() {
-      header.style.background = 'transparent';
-      header.style.boxShadow = 'none';
-      header.style.borderBottomColor = 'transparent';
-      header.style.setProperty('--nav-text', '#FFFFFF');
-      header.dataset.scrolled = "false";
-      if (announcementBar) announcementBar.style.display = 'none';
-    }
-
-    function setSolid() {
-      header.style.background = '#fff';
-      header.style.boxShadow = '0 1px 2px 0 rgb(0 0 0/0.05)';
-      header.style.borderBottomColor = '';
-      header.style.setProperty('--nav-text', 'var(--color-text-primary)');
-      header.dataset.scrolled = "true";
-      // Show announcement bar when scrolled on transparent-hero pages, or always on others
-      if (announcementBar && window.innerWidth >= 1024) {
-        announcementBar.style.display = '';
-      }
-    }
-
-    function handleScroll() {
-      const scrolled = window.scrollY;
-      const isMobile = window.innerWidth < 1024;
-
-      if (hasTransparentHero && !isMobile && scrolled <= 50) {
-        setTransparent();
-      } else {
-        setSolid();
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
-
-    // Apply immediately with no transition
-    handleScroll();
-
-    // Enable transition after paint
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        header.style.transition = 'background 0.3s, box-shadow 0.3s, border-bottom-color 0.3s';
-      });
-    });
-  }
-
-  initHeader();
-  document.addEventListener("astro:after-swap", initHeader);
-</script>

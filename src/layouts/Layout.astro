@@ -117,8 +117,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
 
     <Header navigation={navigation} siteSettings={siteSettings} />
 
-    <!-- Spacer for fixed header (hidden on transparent-header pages via JS) -->
-    <div id="header-spacer" class="h-[68px]" aria-hidden="true"></div>
+    <!-- Spacer for fixed header -->
+    <div id="header-spacer" class="h-[100px]" aria-hidden="true"></div>
 
     <main id="main-content" class="flex-1">
       <slot />
