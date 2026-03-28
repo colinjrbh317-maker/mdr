@@ -1,57 +1,68 @@
 ---
-// Sticky mobile CTA bar — appears after hero scrolls out of view
-// Hidden on desktop via md:hidden
+// Sticky mobile CTA bar — appears after scrolling 300px on ALL pages
+// Split layout: Call (primary) | Free Quote (secondary)
+// Hidden on desktop via lg:hidden
 ---
 
 <div
   id="sticky-mobile-cta"
-  class="fixed bottom-0 left-0 right-0 z-50 md:hidden translate-y-full transition-transform duration-300 bg-white border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.1)] px-4 py-3 safe-bottom"
+  class="fixed bottom-0 left-0 right-0 z-50 lg:hidden translate-y-full transition-transform duration-300 bg-white border-t border-border shadow-[0_-4px_16px_rgba(0,0,0,0.12)] safe-bottom"
 >
-  <div class="flex gap-3">
+  <div class="flex gap-2 px-3 py-2.5">
+    {/* Call — PRIMARY action, larger */}
     <a
       href="tel:5405536007"
-      class="flex-1 flex items-center justify-center gap-2 bg-bg-dark text-white font-bold py-3 rounded-lg text-sm"
+      class="flex-[1.2] flex items-center justify-center gap-2 bg-bg-dark text-white font-bold py-3.5 rounded-lg text-sm min-h-[48px]"
     >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
       </svg>
-      Call Now
+      <span class="flex flex-col items-start leading-tight">
+        <span class="text-[10px] font-normal text-white/70 -mb-0.5">Tap to Call</span>
+        <span>(540) 553-6007</span>
+      </span>
     </a>
+    {/* Free Quote — secondary */}
     <a
       href="/contact"
-      class="flex-1 flex items-center justify-center gap-2 bg-accent text-white font-bold py-3 rounded-lg text-sm"
+      class="flex-1 flex items-center justify-center gap-2 bg-accent text-white font-bold py-3.5 rounded-lg text-sm min-h-[48px]"
     >
-      Free Estimate
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      Free Quote
     </a>
   </div>
 </div>
 
 <style>
   .safe-bottom {
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
   }
 </style>
 
 <script>
   function initStickyBar() {
     const bar = document.getElementById('sticky-mobile-cta');
-    const hero = document.querySelector('[data-transparent-header]');
-    if (!bar || !hero) return;
+    if (!bar) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          bar.classList.add('translate-y-full');
-          bar.classList.remove('translate-y-0');
-        } else {
-          bar.classList.remove('translate-y-full');
-          bar.classList.add('translate-y-0');
-        }
-      },
-      { threshold: 0 }
-    );
+    let shown = false;
 
-    observer.observe(hero);
+    function checkScroll() {
+      const shouldShow = window.scrollY > 300;
+      if (shouldShow && !shown) {
+        bar.classList.remove('translate-y-full');
+        bar.classList.add('translate-y-0');
+        shown = true;
+      } else if (!shouldShow && shown) {
+        bar.classList.add('translate-y-full');
+        bar.classList.remove('translate-y-0');
+        shown = false;
+      }
+    }
+
+    window.addEventListener('scroll', checkScroll, { passive: true });
+    checkScroll();
   }
 
   initStickyBar();

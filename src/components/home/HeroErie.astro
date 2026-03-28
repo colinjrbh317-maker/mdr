@@ -87,6 +87,16 @@ const heroPosterUrl = "/assets/hero/hero-main.jpg";
 
         {/* Right Column — Form Card */}
         <div class="md:col-span-6 lg:col-span-5">
+          {/* Mobile: Call CTA — PRIMARY action, shown BEFORE form */}
+          <div class="md:hidden mb-4">
+            <a href="tel:5405536007" class="flex items-center justify-center gap-3 bg-bg-dark text-white font-bold py-4 rounded-xl text-base shadow-sm w-full min-h-[56px]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              Tap to Call — (540) 553-6007
+            </a>
+          </div>
+
           <div class="bg-white rounded-none md:rounded-2xl md:shadow-2xl md:shadow-black/20 p-6 pt-8 pb-8 md:p-8 md:border md:border-white/20 animate-fade-in relative overflow-hidden">
 
             {/* Accent top stripe (desktop only) */}
@@ -139,18 +149,7 @@ const heroPosterUrl = "/assets/hero/hero-main.jpg";
             </div>
           </div>
 
-          {/* Mobile: phone CTA — prominent */}
-          <div class="mt-5 md:hidden">
-            <a href="tel:5405536007" class="flex items-center justify-center gap-3 bg-bg-light border border-border rounded-xl px-5 py-3 transition-all hover:border-accent/30 hover:shadow-sm">
-              <span class="flex items-center justify-center w-9 h-9 rounded-full bg-accent text-white flex-shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-              </span>
-              <span class="text-left">
-                <span class="block text-xs text-text-muted">Prefer to talk?</span>
-                <span class="block text-base font-bold text-text-primary">(540) 553-6007</span>
-              </span>
-            </a>
-          </div>
+          {/* Mobile phone CTA moved above the form */}
         </div>
 
       </div>
