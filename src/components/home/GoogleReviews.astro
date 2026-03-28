@@ -225,10 +225,10 @@ const cities = ["All", "Christiansburg", "Roanoke", "Blacksburg", "Salem", "Radf
       </a>
     </div>
 
-    {/* Review Cards Grid */}
+    {/* Review Cards Grid — first 6 visible, rest hidden until "Show More" */}
     <div id="reviews-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      {reviews.map((review) => (
-        <div class="review-card bg-white rounded-xl p-5 shadow-sm border border-border flex flex-col" data-review-city={review.city}>
+      {reviews.map((review, i) => (
+        <div class:list={["review-card bg-white rounded-xl p-5 shadow-sm border border-border flex flex-col", i >= 6 && "hidden review-extra"]} data-review-city={review.city}>
           {/* Reviewer Header */}
           <div class="flex items-center gap-3 mb-3">
             <div class={`w-9 h-9 rounded-full ${review.color} flex items-center justify-center text-white font-semibold text-xs flex-shrink-0`}>
@@ -264,8 +264,19 @@ const cities = ["All", "Christiansburg", "Roanoke", "Blacksburg", "Salem", "Radf
       ))}
     </div>
 
+    {/* Show More / Less Toggle */}
+    <div class="text-center mt-8">
+      <button
+        id="reviews-toggle"
+        class="inline-flex items-center gap-2 px-6 py-2.5 bg-white border-2 border-border text-text-primary font-semibold text-sm rounded-full hover:border-accent hover:text-accent transition-all cursor-pointer"
+      >
+        <span id="toggle-text">Show More Reviews</span>
+        <svg id="toggle-icon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+      </button>
+    </div>
+
     {/* Read All Reviews */}
-    <div class="text-center mt-10">
+    <div class="text-center mt-6">
       <a
         href="https://www.google.com/maps?q=place_id:ChIJF1B6XsCTTYgRhBfUE2iAeoI"
         target="_blank"
@@ -285,14 +296,30 @@ const cities = ["All", "Christiansburg", "Roanoke", "Blacksburg", "Salem", "Radf
 <script>
   const filters = document.getElementById('city-filters');
   const cards = document.querySelectorAll('.review-card');
+  const toggleBtn = document.getElementById('reviews-toggle');
+  const toggleText = document.getElementById('toggle-text');
+  const toggleIcon = document.getElementById('toggle-icon');
+  let expanded = false;
 
+  // Show More / Less toggle
+  toggleBtn?.addEventListener('click', () => {
+    expanded = !expanded;
+    const extras = document.querySelectorAll('.review-extra');
+    extras.forEach(el => {
+      (el as HTMLElement).classList.toggle('hidden', !expanded);
+    });
+    if (toggleText) toggleText.textContent = expanded ? 'Show Less' : 'Show More Reviews';
+    if (toggleIcon) toggleIcon.style.transform = expanded ? 'rotate(180deg)' : '';
+  });
+
+  // City filter
   filters?.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('button');
     if (!btn) return;
 
     const city = btn.dataset.city;
 
-    // Update active tab styling
+    // Update active tab
     filters.querySelectorAll('button').forEach(b => {
       b.classList.remove('bg-accent', 'text-white', 'border-accent', 'city-tab-active');
       b.classList.add('bg-white', 'text-text-muted', 'border-border');
@@ -300,14 +327,30 @@ const cities = ["All", "Christiansburg", "Roanoke", "Blacksburg", "Salem", "Radf
     btn.classList.remove('bg-white', 'text-text-muted', 'border-border');
     btn.classList.add('bg-accent', 'text-white', 'border-accent', 'city-tab-active');
 
-    // Filter cards with animation
-    cards.forEach(card => {
+    // When filtering by city, show all matching (no "show more" limit)
+    // When "All" is selected, respect the expanded state
+    cards.forEach((card, i) => {
       const el = card as HTMLElement;
-      if (city === 'All' || el.dataset.reviewCity === city) {
-        el.style.display = '';
+      if (city === 'All') {
+        if (i < 6 || expanded) {
+          el.style.display = '';
+          el.classList.remove('hidden');
+        } else {
+          el.style.display = 'none';
+        }
       } else {
-        el.style.display = 'none';
+        if (el.dataset.reviewCity === city) {
+          el.style.display = '';
+          el.classList.remove('hidden');
+        } else {
+          el.style.display = 'none';
+        }
       }
     });
+
+    // Hide toggle when filtering by specific city, show for "All"
+    if (toggleBtn) {
+      toggleBtn.style.display = city === 'All' ? '' : 'none';
+    }
   });
 </script>
