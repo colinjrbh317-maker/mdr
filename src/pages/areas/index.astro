@@ -33,25 +33,66 @@ const children = areas.filter((a) => !a.isHubPage);
 function getChildren(hubId: string) {
   return children.filter((c) => c.parentHub?._id === hubId);
 }
+
+// AI-generated area images (fallbacks when no CMS image)
+const areaImages: Record<string, string> = {
+  "roanoke": "/assets/areas/roanoke-hero.png",
+  "christiansburg": "/assets/areas/christiansburg-hero.png",
+  "blacksburg": "/assets/areas/blacksburg-hero.png",
+  "salem": "/assets/areas/salem-hero.png",
+  "radford": "/assets/areas/radford-hero.png",
+  "bedford": "/assets/areas/bedford-hero.png",
+  "pulaski": "/assets/areas/pulaski-hero.png",
+  "dublin": "/assets/areas/dublin-hero.png",
+  "floyd": "/assets/areas/floyd-hero.png",
+  "wytheville": "/assets/areas/wytheville-hero.png",
+  "vinton": "/assets/areas/vinton-hero.png",
+  "troutville": "/assets/areas/troutville-hero.png",
+  "lexington": "/assets/areas/lexington-hero.png",
+  "covington": "/assets/areas/covington-hero.png",
+  "smith-mountain-lake": "/assets/areas/smith-mountain-lake-hero.png",
+  "new-river-valley": "/assets/areas/new-river-valley-hero.png",
+  "roanoke-area": "/assets/areas/roanoke-area-hero.png",
+};
+
+function getAreaImage(area: ServiceArea): string {
+  if (area.featuredImage) return urlForImage(area.featuredImage).width(600).height(400).url();
+  return areaImages[area.slug] || "/assets/branding/crew-working-harness-1.png";
+}
+
+function getAreaThumb(area: ServiceArea): string {
+  if (area.featuredImage) return urlForImage(area.featuredImage).width(400).height(225).url();
+  return areaImages[area.slug] || "/assets/branding/crew-working-harness-1.png";
+}
 ---
 
 <Layout
   title="Service Areas"
   description="Professional roofing in the New River Valley and Roanoke Area. Serving Christiansburg, Blacksburg, Radford, Salem, and surrounding Virginia communities."
 >
-  <SectionContainer background="warm" padding="lg">
-    <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Service Areas" }]} />
-    <div class="mt-6 max-w-3xl">
-      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary">
+  {/* Hero */}
+  <section class="relative min-h-[40vh] flex items-center dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src="/assets/branding/crew-working-harness-1.png"
+        alt="Modern Day Roofing crew working across Southwest Virginia"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/60"></div>
+    </div>
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Service Areas" }]} />
+      <h1 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold text-white">
         Our Service Areas
       </h1>
-      <p class="mt-4 text-lg text-text-muted">
+      <p class="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed">
         Modern Day Roofing proudly serves homeowners across the New River Valley
-        and Roanoke Area. From our headquarters in Christiansburg, we deliver
+        and Roanoke Area. From our offices in Christiansburg and Roanoke, we deliver
         expert roofing services throughout Southwest Virginia.
       </p>
     </div>
-  </SectionContainer>
+  </section>
 
   <SectionContainer background="white" padding="md">
     {hubs.length === 0 && (
@@ -69,19 +110,11 @@ function getChildren(hubId: string) {
               class="group grid grid-cols-1 md:grid-cols-5 gap-6 bg-bg-card border border-border rounded-xl overflow-hidden hover:border-accent/30 transition-colors"
             >
               <div class="md:col-span-2 aspect-video md:aspect-auto">
-                {hub.featuredImage ? (
-                  <img
-                    src={urlForImage(hub.featuredImage).width(600).height(400).url()}
-                    alt={hub.name}
-                    class="w-full h-full object-cover"
-                  />
-                ) : (
-                  <ImagePlaceholder
-                    description={`${hub.name} area photo`}
-                    aspectRatio="3/2"
-                    class="w-full h-full rounded-none border-none"
-                  />
-                )}
+                <img
+                  src={getAreaImage(hub)}
+                  alt={`Roofing services in ${hub.name}, Virginia`}
+                  class="w-full h-full object-cover"
+                />
               </div>
               <div class="md:col-span-3 p-6 md:py-8 flex flex-col justify-center">
                 <h2 class="text-2xl md:text-3xl font-bold text-text-primary group-hover:text-accent transition-colors">
@@ -107,20 +140,12 @@ function getChildren(hubId: string) {
                   {hubChildren.map((child) => (
                     <Card variant="service" href={`/areas/${child.slug}`}>
                       <div class="mb-4">
-                        {child.featuredImage ? (
-                          <img
-                            src={urlForImage(child.featuredImage).width(400).height(225).url()}
-                            alt={child.name}
-                            class="w-full rounded-lg object-cover"
-                            style="aspect-ratio: 16/9;"
-                          />
-                        ) : (
-                          <ImagePlaceholder
-                            description={`${child.name} area photo`}
-                            aspectRatio="16/9"
-                            class="w-full"
-                          />
-                        )}
+                        <img
+                          src={getAreaThumb(child)}
+                          alt={`Roofing services in ${child.name}, Virginia`}
+                          class="w-full rounded-lg object-cover"
+                          style="aspect-ratio: 16/9;"
+                        />
                       </div>
                       <h3 class="text-lg font-semibold text-text-primary mb-2">
                         {child.name}
