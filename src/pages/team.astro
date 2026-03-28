@@ -1,0 +1,226 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Button from "@/components/ui/Button.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import ScrollReveal from "@/components/common/ScrollReveal.astro";
+import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
+
+export const prerender = true;
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Our Team" },
+];
+
+const leadership = [
+  {
+    name: "Alicia, Owner",
+    role: "Owner & Founder",
+    description: "Founded Modern Day Roofing with a vision to bring honest, high-quality roofing to southwest Virginia. Leads the company with a focus on customer satisfaction and community involvement.",
+  },
+  {
+    name: "Operations Manager",
+    role: "Operations Manager",
+    description: "Oversees day-to-day operations, crew scheduling, and material logistics. Ensures every project runs on time and meets our quality standards.",
+  },
+  {
+    name: "Sales Manager",
+    role: "Sales Manager",
+    description: "Leads our sales team with a consultative approach. Helps homeowners understand their options without pressure, ensuring they get the right solution for their home.",
+  },
+  {
+    name: "Lead Foreman",
+    role: "Lead Foreman",
+    description: "Our most experienced installer with over a decade in the field. Trains new crew members and sets the standard for quality workmanship on every job.",
+  },
+];
+
+const values = [
+  {
+    icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+    title: "Quality Craftsmanship",
+    description: "Every nail, every shingle, every detail matters. We install to GAF specifications because cutting corners costs homeowners down the road.",
+  },
+  {
+    icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
+    title: "Honest Communication",
+    description: "We tell you what your roof actually needs — not what makes us the most money. If it can be repaired, we'll say so. No upselling, no scare tactics.",
+  },
+  {
+    icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z",
+    title: "Community First",
+    description: "We live and work in the New River Valley and Roanoke Valley. When storms hit, we're already here. This is our home, and these are our neighbors.",
+  },
+  {
+    icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6",
+    title: "Continuous Improvement",
+    description: "We stay current on the latest roofing technology, attend GAF training seminars, and constantly refine our process to deliver better results.",
+  },
+];
+
+const certifications = [
+  {
+    title: "GAF Master Elite Contractor",
+    description: "Top 3% of roofing contractors nationwide. This designation requires proven reliability, proper licensing and insurance, and a commitment to ongoing training.",
+  },
+  {
+    title: "Ongoing Safety Training",
+    description: "Every crew member completes OSHA safety training and regular refresher courses. Safety isn't optional — it's how we protect our team and your property.",
+  },
+  {
+    title: "Factory-Certified Installers",
+    description: "Our installers are factory-trained on GAF roofing systems. This means better installations, fewer callbacks, and stronger warranty coverage for you.",
+  },
+  {
+    title: "Fully Licensed & Insured",
+    description: "Class A contractor's license, general liability insurance, and workers' compensation coverage. Full protection for every project we take on.",
+  },
+];
+---
+
+<Layout
+  title="Our Team | Modern Day Roofing"
+  description="Meet the experienced roofing professionals at Modern Day Roofing. GAF Master Elite certified team serving Christiansburg, Roanoke, and the New River Valley."
+>
+  {/* Hero */}
+  <section class="relative min-h-[40vh] flex items-center dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src="/assets/web/dji_fly_20250630_140410_766_1751306661861_photo.jpg"
+        alt="The Modern Day Roofing team"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/50"></div>
+    </div>
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <Breadcrumb items={breadcrumbItems} />
+      <div class="mt-6 max-w-3xl">
+        <p class="text-accent-light font-semibold text-sm uppercase tracking-wider mb-3">
+          The People Behind the Work
+        </p>
+        <h1 class="text-4xl md:text-5xl font-bold text-white">
+          Meet Our Team
+        </h1>
+        <p class="mt-4 text-lg text-white/85 max-w-2xl leading-relaxed">
+          Experienced, certified, and committed to doing right by every homeowner we serve.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          <Button href="/contact" size="lg">Get a Free Estimate</Button>
+          <Button href="tel:5405536007" variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
+            Call (540) 553-6007
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Our Leadership */}
+  <SectionContainer background="white" padding="lg">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
+        Our Leadership
+      </h2>
+      <p class="mt-3 text-text-muted max-w-xl mx-auto">
+        The people who set the standard for quality and accountability on every project.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+      {leadership.map((member) => (
+        <ScrollReveal>
+          <div class="bg-bg-card border border-border rounded-xl overflow-hidden text-center">
+            <ImagePlaceholder
+              description="Photo Coming Soon"
+              aspectRatio="1/1"
+              class="w-full"
+            />
+            <div class="p-5">
+              <h3 class="font-display font-bold text-text-primary">{member.name}</h3>
+              <p class="text-xs text-accent font-semibold uppercase tracking-wider mt-1 mb-3">{member.role}</p>
+              <p class="text-sm text-text-muted leading-relaxed">{member.description}</p>
+            </div>
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+  </SectionContainer>
+
+  {/* Our Values */}
+  <SectionContainer background="light" padding="md">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
+        Our Values
+      </h2>
+      <p class="mt-3 text-text-muted max-w-xl mx-auto">
+        These aren't just words on a wall. They're how we run every job, every day.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      {values.map((value) => (
+        <ScrollReveal>
+          <div class="bg-bg-card border border-border rounded-xl p-6">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d={value.icon} />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-display font-bold text-text-primary mb-2">{value.title}</h3>
+                <p class="text-sm text-text-muted leading-relaxed">{value.description}</p>
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+  </SectionContainer>
+
+  {/* Certifications & Training */}
+  <SectionContainer background="warm" padding="md">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
+        Certifications & Training
+      </h2>
+      <p class="mt-3 text-text-muted max-w-xl mx-auto">
+        Our credentials aren't just badges — they translate directly to better roofs and stronger warranties for you.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      {certifications.map((cert) => (
+        <ScrollReveal>
+          <div class="bg-bg-card border border-border rounded-xl p-6">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-bold text-text-primary mb-1">{cert.title}</h3>
+                <p class="text-sm text-text-muted">{cert.description}</p>
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+  </SectionContainer>
+
+  {/* CTA: Join Our Team */}
+  <SectionContainer background="white" padding="md">
+    <div class="max-w-2xl mx-auto text-center">
+      <h2 class="text-2xl md:text-3xl font-bold text-text-primary mb-4">
+        Want to Join Our Team?
+      </h2>
+      <p class="text-text-muted mb-8 max-w-xl mx-auto">
+        We're always looking for skilled, motivated people who take pride in their work. Check out our open positions and apply today.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <Button href="/careers" size="lg">View Careers</Button>
+        <Button href="/contact" variant="outline" size="lg">Contact Us</Button>
+      </div>
+    </div>
+  </SectionContainer>
+</Layout>

@@ -255,6 +255,35 @@ const localBusinessJsonLd = {
     <BlockRenderer blocks={area.pageBuilder} />
   )}
 
+  {/* Location + Service Pages */}
+  {servicesOffered.length > 0 && (
+    <SectionContainer background="white" padding="md">
+      <h2 class="text-2xl md:text-3xl font-bold text-text-primary mb-4">
+        {area.name} Roofing Services
+      </h2>
+      <p class="text-text-muted mb-8">
+        Explore our specific services available in {area.name}, Virginia.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {servicesOffered.map((service: any) => (
+          <a
+            href={`/areas/${slug}/${service.slug}`}
+            class="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-accent/30 hover:shadow-md transition-all bg-bg-card no-underline group"
+          >
+            <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-text-primary group-hover:text-accent transition-colors">{service.name} in {area.name}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </SectionContainer>
+  )}
+
   {/* Lead Capture Form */}
   <SectionContainer background="warm" padding="md" id="get-estimate">
     <div class="max-w-2xl mx-auto">

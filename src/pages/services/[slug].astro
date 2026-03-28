@@ -8,6 +8,7 @@ import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
 import BlockRenderer from "@/components/blocks/BlockRenderer.astro";
 import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
 import { PortableText } from "astro-portabletext";
+import groq from "groq";
 import { loadQuery } from "@/sanity/lib/load-query";
 import {
   SERVICE_BY_SLUG_QUERY,
@@ -132,6 +133,9 @@ const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
 };
 
 const currentFaqs = serviceFaqs[slug as string] || [];
+
+// Fetch all non-hub service areas for internal linking
+const allAreas = await loadQuery<any[]>(groq`*[_type == "serviceArea" && !isHubPage] | order(name asc) { name, "slug": slug.current }`);
 
 // JSON-LD structured data
 const siteUrl = Astro.site?.href || "https://moderndayroofing.com";
@@ -309,6 +313,30 @@ const serviceJsonLd = {
   {/* Page Builder Blocks */}
   {service.pageBuilder && service.pageBuilder.length > 0 && (
     <BlockRenderer blocks={service.pageBuilder} />
+  )}
+
+  {/* Service Available In These Areas */}
+  {allAreas && allAreas.length > 0 && (
+    <SectionContainer background="warm" padding="md">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold text-text-primary text-center mb-4">
+          {service.name} Across Our Service Areas
+        </h2>
+        <p class="text-text-muted text-center mb-8">
+          We provide {service.name.toLowerCase()} services throughout the New River Valley and Roanoke area.
+        </p>
+        <div class="flex flex-wrap justify-center gap-3">
+          {allAreas.map((area: any) => (
+            <a
+              href={`/areas/${area.slug}/${slug}`}
+              class="inline-flex items-center px-4 py-2 rounded-full border border-border bg-white text-sm font-medium text-text-primary hover:border-accent/30 hover:text-accent hover:shadow-sm transition-all no-underline"
+            >
+              {area.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    </SectionContainer>
   )}
 
   {/* Service FAQs */}
