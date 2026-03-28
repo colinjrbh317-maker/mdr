@@ -4,12 +4,37 @@ import SectionContainer from "@/components/ui/SectionContainer.astro";
 import Button from "@/components/ui/Button.astro";
 import TrustBar from "@/components/blocks/TrustBar.astro";
 import StatsCounter from "@/components/blocks/StatsCounter.astro";
+import FaqSectionBlock from "@/components/blocks/FaqSectionBlock.astro";
 import ScrollReveal from "@/components/common/ScrollReveal.astro";
 import AngleDivider from "@/components/common/AngleDivider.astro";
 import ServicesAndGallery from "@/components/home/ServicesAndGallery.astro";
 import HeroErie from "@/components/home/HeroErie.astro";
 import GoogleReviews from "@/components/home/GoogleReviews.astro";
-import CertificationStrip from "@/components/home/CertificationStrip.astro";
+import WhyMDR from "@/components/home/WhyMDR.astro";
+import StickyMobileCTA from "@/components/home/StickyMobileCTA.astro";
+
+const homepageFaqs = [
+  {
+    question: "How much does a new roof cost in Virginia?",
+    answer: "Most roof replacements in the New River Valley and Roanoke range from $8,000 to $25,000 depending on size, materials, and complexity. We provide free inspections and detailed estimates so you know exactly what to expect — no surprises.",
+  },
+  {
+    question: "What is a GAF Master Elite contractor?",
+    answer: "Only the top 1% of roofing contractors in the country earn GAF Master Elite certification. It means we've met rigorous standards for training, insurance, and customer satisfaction — and it qualifies us to offer GAF's strongest warranty, the Golden Pledge.",
+  },
+  {
+    question: "Do you offer financing for roof replacement?",
+    answer: "Yes. We offer $0-down financing with flexible monthly payments. Most homeowners qualify, and we'll walk you through the options during your free estimate.",
+  },
+  {
+    question: "How long does a roof replacement take?",
+    answer: "Most residential roof replacements are completed in 1-2 days. We'll confirm timing during your inspection and keep you updated throughout the project.",
+  },
+  {
+    question: "Do you help with insurance claims for storm damage?",
+    answer: "Absolutely. We work directly with your insurance company from inspection through final payment. Our team documents the damage, meets with adjusters on-site, and handles the paperwork so you don't have to.",
+  },
+];
 ---
 
 <Layout title="Roofing Contractor in Christiansburg & Roanoke VA">
@@ -70,20 +95,21 @@ import CertificationStrip from "@/components/home/CertificationStrip.astro";
   <AngleDivider direction="up" color="var(--color-bg-white)" />
   <ServicesAndGallery />
 
-  {/* 4. GOOGLE REVIEWS (Erie's most powerful section) */}
+  {/* 4. WHY MDR — value proposition cards */}
+  <WhyMDR />
+
+  {/* 5. GOOGLE REVIEWS */}
   <GoogleReviews />
 
-  {/* 5. STATS COUNTER */}
+  {/* 6. STATS COUNTER */}
   <StatsCounter />
-
-  {/* 6. PROCESS STEPS - removed per Colin's request */}
 
   {/* 7. FINANCING CTA */}
   <SectionContainer background="white" padding="md">
     <ScrollReveal>
       <div class="max-w-4xl mx-auto text-center">
         <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-2">
-          Affordable Options
+          $0 Down. Seriously.
         </p>
         <h2 class="text-3xl md:text-4xl font-display font-bold text-text-primary mb-4">
           Get Your Roof Now. Pay Over Time.
@@ -104,10 +130,10 @@ import CertificationStrip from "@/components/home/CertificationStrip.astro";
     </ScrollReveal>
   </SectionContainer>
 
-  {/* 8. CERTIFICATION STRIP */}
-  <CertificationStrip />
+  {/* 8. FAQ */}
+  <FaqSectionBlock heading="Common Questions About Roofing in Virginia" faqs={homepageFaqs} />
 
-  {/* 9. FINAL CTA */}
+  {/* 9. FINAL CTA — DO NOT CHANGE */}
   <AngleDivider direction="down" color="var(--color-accent)" />
   <SectionContainer background="accent" padding="md">
     <ScrollReveal>
@@ -131,6 +157,9 @@ import CertificationStrip from "@/components/home/CertificationStrip.astro";
       </div>
     </ScrollReveal>
   </SectionContainer>
+
+  {/* 10. STICKY MOBILE CTA BAR */}
+  <StickyMobileCTA />
 </Layout>
 
 <style>

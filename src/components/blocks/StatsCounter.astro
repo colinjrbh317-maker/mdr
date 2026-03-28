@@ -3,6 +3,7 @@ import SectionContainer from "@/components/ui/SectionContainer.astro";
 
 interface Stat {
   value: number;
+  prefix?: string;
   suffix?: string;
   label: string;
   icon: string;
@@ -16,9 +17,9 @@ interface Props {
 const {
   stats = [
     { value: 600, suffix: "+", label: "Roofs Completed", icon: "home" },
-    { value: 7, suffix: "+", label: "Years Serving Virginia", icon: "calendar" },
-    { value: 4.9, suffix: "★", label: "Avg. Google Rating", icon: "star" },
-    { value: 150, suffix: "+", label: "5-Star Google Reviews", icon: "trophy" },
+    { value: 1, suffix: "%", label: "Top of All Roofers Nationwide", icon: "trophy" },
+    { value: 0, prefix: "$", suffix: "", label: "Down Financing Available", icon: "dollar" },
+    { value: 24, suffix: "/7", label: "Storm Response", icon: "clock" },
   ],
   class: className = "",
 } = Astro.props;
@@ -31,10 +32,11 @@ const {
         <div
           class="stat-item text-center"
           data-target={stat.value}
+          data-prefix={stat.prefix || ""}
           data-suffix={stat.suffix || ""}
         >
           <p class="text-4xl md:text-5xl font-display font-extrabold text-white stat-value">
-            0{stat.suffix || ""}
+            {stat.prefix || ""}0{stat.suffix || ""}
           </p>
           <div class="mt-2 w-12 h-1 bg-accent mx-auto rounded-full"></div>
           <p class="text-sm md:text-base text-white/70 font-medium mt-4 md:mt-5">{stat.label}</p>
@@ -54,6 +56,7 @@ const {
           if (entry.isIntersecting) {
             const el = entry.target as HTMLElement;
             const target = parseFloat(el.dataset.target || "0");
+            const prefix = el.dataset.prefix || "";
             const suffix = el.dataset.suffix || "";
             const valueEl = el.querySelector(".stat-value");
 
@@ -62,14 +65,21 @@ const {
             const duration = 2000;
             const increment = target / (duration / 16);
 
+            // If target is 0, just display immediately
+            if (target === 0) {
+              valueEl.textContent = `${prefix}0${suffix}`;
+              observer.unobserve(el);
+              return;
+            }
+
             function step() {
               current += increment;
               if (current >= target) {
                 current = target;
-                valueEl!.textContent = `${target}${suffix}`;
+                valueEl!.textContent = `${prefix}${target}${suffix}`;
               } else {
                 const displayVal = target % 1 !== 0 ? current.toFixed(1) : Math.floor(current).toString();
-                valueEl!.textContent = `${displayVal}${suffix}`;
+                valueEl!.textContent = `${prefix}${displayVal}${suffix}`;
                 requestAnimationFrame(step);
               }
             }
