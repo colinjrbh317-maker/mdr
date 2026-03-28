@@ -1,82 +1,85 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 const services = [
     {
         title: "Roof Replacement",
-        description: "Complete tear-off and replacement with premium GAF roofing systems. Lifetime warranty available.",
+        review: "\"They did a wonderful job replacing all the roof shingles with new shingles on my house and my garage, all in one day! They had to remove two layers of shingles before they even started putting new shingles on my roof!\"",
+        reviewer: "— Dawn M., Christiansburg",
         image: "/assets/web/Untitled-1800-x-1440-px.jpg",
         href: "/services/roof-replacement",
-        colSpan: "md:col-span-2"
     },
     {
         title: "Metal Roofing",
-        description: "Durable standing seam and metal panel systems built to last 50+ years.",
+        review: "\"Modern Day Roofing was the most professional team I've worked with. The metal roof looks incredible and they finished ahead of schedule. Highly recommend for any metal project.\"",
+        reviewer: "— John G., Roanoke",
         image: "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.jpg",
         href: "/services/metal-roofing",
-        colSpan: "md:col-span-1"
     },
     {
         title: "Roof Repair",
-        description: "Fast emergency repairs and storm damage restoration. Same-day assessment available.",
+        review: "\"Austin was very professional and extremely kind when he came out to check a spot on our roof that had been leaking. It was a quick, easy fix which was a huge relief! Don't hesitate to check them out.\"",
+        reviewer: "— Katelin N., Radford",
         image: "/assets/web/Untitled-1800-x-1440-px-2.jpg",
         href: "/services/roof-repair",
-        colSpan: "md:col-span-1"
     },
     {
         title: "Storm Damage",
-        description: "Insurance claim assistance and emergency tarping. We work directly with your insurer.",
+        review: "\"Modern Day Roofing was very professional and straightforward with what needed to be done on our roof after the storm. They worked directly with our insurance company and got everything sorted quickly.\"",
+        reviewer: "— Linda S., Salem",
         image: "/assets/web/Untitled-1800-x-1440-px-3.jpg",
         href: "/services/storm-damage",
-        colSpan: "md:col-span-1"
     },
     {
         title: "Gutters & Guards",
-        description: "Seamless aluminum gutter installation with leaf protection options.",
+        review: "\"The crew completed the gutter cleaning, resealing and screen installation in a day! We are beyond happy with the results. Professional, efficient, and cleaned up everything after.\"",
+        reviewer: "— Bonnie D., Blacksburg",
         image: "/assets/web/dji_fly_20250630_140410_766_1751306661861_photo.jpg",
         href: "/services/gutters",
-        colSpan: "md:col-span-1"
+    },
+    {
+        title: "Shingle Roofing",
+        review: "\"Working with MDR made this process a breeze. They explained everything clearly, the clean up was great, the crew was very respectful. The shingles look beautiful. 10/10 recommend.\"",
+        reviewer: "— Amory L., Roanoke",
+        image: "/assets/web/Untitled-1800-x-1440-px.jpg",
+        href: "/services/shingle-roofing",
     }
 ];
 
 const ServiceGrid = () => {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {services.map((service, index) => (
-                <motion.a
-                    key={index}
-                    href={service.href}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className={`relative group overflow-hidden rounded-2xl bg-bg-light shadow-sm hover:shadow-xl transition-all duration-500 ${service.colSpan || ''}`}
-                >
-                    {/* Real Project Photo Background */}
-                    <div className="aspect-[4/3] md:aspect-auto md:h-80 overflow-hidden">
+                <div key={index} className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300">
+                    {/* Photo on Top */}
+                    <div className="overflow-hidden h-56">
                         <img
                             src={service.image}
                             alt={service.title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                             loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-black/75 to-black/20 transition-opacity duration-300" />
                     </div>
 
-                    {/* Content Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 border-l-4 border-[#C0392B]" style={{ textShadow: '0 2px 16px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,0.8)' }}>
-                        <h3 className="text-2xl md:text-3xl font-display font-extrabold mb-2 drop-shadow-lg" style={{ color: '#FFFFFF' }}>
+                    {/* Text Below */}
+                    <div className="flex flex-col flex-1 p-6">
+                        <h3 className="text-xl font-display font-bold text-text-primary mb-3 uppercase tracking-wide">
                             {service.title}
                         </h3>
-                        <p className="font-sans text-sm md:text-base mb-4 line-clamp-2 drop-shadow-md" style={{ color: 'rgba(255,255,255,0.95)' }}>
-                            {service.description}
+                        <p className="text-text-muted text-sm leading-relaxed flex-1 italic mb-4">
+                            {service.review}
                         </p>
-                        <span className="inline-flex items-center text-sm font-semibold uppercase tracking-wider border-b-2 border-transparent group-hover:border-[#C0392B] transition-all" style={{ color: '#FFFFFF' }}>
+                        <p className="text-xs text-text-dim mb-4 not-italic">{service.reviewer}</p>
+                        <a
+                            href={service.href}
+                            className="inline-flex items-center text-sm font-semibold text-accent hover:text-accent-dark transition-colors group"
+                        >
                             Learn More
-                            <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                        </span>
+                            <svg className="w-4 h-4 ml-1.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
                     </div>
-                </motion.a>
+                </div>
             ))}
         </div>
     );
