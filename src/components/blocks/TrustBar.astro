@@ -4,65 +4,90 @@ interface Props {
 }
 
 const { class: className = "" } = Astro.props;
+
+const trustPoints = [
+  {
+    icon: "star",
+    stat: "4.9 Rating",
+    detail: "150+ five-star Google reviews",
+  },
+  {
+    icon: "dollar",
+    stat: "$0 Down",
+    detail: "Financing with flexible payments",
+  },
+  {
+    icon: "clipboard",
+    stat: "Free Inspections",
+    detail: "No obligation, no pressure — ever",
+  },
+  {
+    icon: "home",
+    stat: "600+ Roofs",
+    detail: "Across the NRV and Roanoke",
+  },
+  {
+    icon: "bolt",
+    stat: "24/7 Storm Response",
+    detail: "Emergency tarping available",
+  },
+];
 ---
 
 <div
-  class={`flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:gap-x-10 py-4 ${className}`}
+  class={`py-6 md:py-8 ${className}`}
   role="list"
   aria-label="Trust indicators"
 >
-  {/* GAF President's Club Badge */}
-  <div class="flex items-center gap-2" role="listitem">
-    <img
-      src="/assets/logos/Presidents-Club_3-Star_Residential-with-Year_2026.png"
-      alt="GAF President's Club 2026"
-      class="h-12 w-auto object-contain"
-      loading="eager"
-    />
-  </div>
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-0">
+    {trustPoints.map((point, i) => (
+      <div
+        class:list={[
+          "flex flex-col items-center text-center px-3 md:px-4 py-2",
+          i < trustPoints.length - 1 && "md:border-r md:border-border",
+          i === trustPoints.length - 1 && "col-span-2 md:col-span-1",
+        ]}
+        role="listitem"
+      >
+        {/* Icon */}
+        <div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mb-2">
+          {point.icon === "star" && (
+            <svg class="w-5 h-5 text-accent" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          )}
+          {point.icon === "dollar" && (
+            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
+          {point.icon === "clipboard" && (
+            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+          )}
+          {point.icon === "home" && (
+            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          )}
+          {point.icon === "bolt" && (
+            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          )}
+        </div>
 
-  <div class="hidden md:block w-px h-8 bg-border" aria-hidden="true"></div>
+        {/* Stat */}
+        <p class="text-sm md:text-base font-semibold text-text-primary leading-tight">
+          {point.stat}
+        </p>
 
-  {/* Google Rating */}
-  <div class="flex items-center gap-2" role="listitem">
-    <div class="flex gap-0.5" aria-label="5 star rating">
-      {
-        Array.from({ length: 5 }).map(() => (
-          <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-        ))
-      }
-    </div>
-    <span class="text-lg font-bold text-text-primary">4.9</span>
-    <span class="text-xs text-text-muted">150+ Reviews</span>
-  </div>
-
-  <div class="hidden md:block w-px h-8 bg-border" aria-hidden="true"></div>
-
-  {/* $0 Down */}
-  <div class="flex items-center gap-1.5" role="listitem">
-    <span class="text-lg font-bold text-accent">$0 Down</span>
-    <span class="text-xs text-text-muted">Financing</span>
-  </div>
-
-  <div class="hidden md:block w-px h-8 bg-border" aria-hidden="true"></div>
-
-  {/* 600+ Roofs */}
-  <div class="flex items-center gap-1.5" role="listitem">
-    <span class="text-lg font-bold text-text-primary">600+</span>
-    <span class="text-xs text-text-muted">Roofs Completed</span>
-  </div>
-
-  <div class="hidden md:block w-px h-8 bg-border" aria-hidden="true"></div>
-
-  {/* BBB A+ */}
-  <div class="flex items-center gap-2" role="listitem">
-    <img
-      src="/assets/logos/bbb-button.png"
-      alt="BBB A+ Accredited"
-      class="h-8 w-auto object-contain"
-      loading="eager"
-    />
+        {/* Detail */}
+        <p class="text-xs text-text-muted mt-0.5 leading-snug">
+          {point.detail}
+        </p>
+      </div>
+    ))}
   </div>
 </div>
