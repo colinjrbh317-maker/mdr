@@ -11,9 +11,9 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
     <div className="absolute inset-0 z-0 overflow-hidden bg-bg-darker">
       {/* Video Background */}
       <motion.div
-        initial={{ opacity: 0, scale: 1.1 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
+        initial={{ scale: 1.05 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 2.0, ease: "easeOut" }}
         className="relative w-full h-full"
       >
         {videoUrl ? (
@@ -41,7 +41,10 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
         )}
         
         {/* Dark Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 bg-black/50" />
+
+        {/* Top gradient — prevents light-wash behind transparent header */}
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/70 to-transparent" />
 
         {/* Left-side gradient for headline contrast */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />

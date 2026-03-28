@@ -5,7 +5,7 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, phone, email, message, website, source, gclid, fclid, landing_page } = body;
+    const { name, phone, email, address, service, message, website, source, gclid, fclid, landing_page } = body;
 
     // Honeypot check — return fake success to avoid tipping off bots
     if (website) {
@@ -34,6 +34,8 @@ export const POST: APIRoute = async ({ request }) => {
           name: name.trim(),
           phone: phone.trim(),
           email: email?.trim() || "",
+          address: address?.trim() || "",
+          service: service?.trim() || "",
           message: message?.trim() || "",
           source: source || "",
           gclid: gclid || "",

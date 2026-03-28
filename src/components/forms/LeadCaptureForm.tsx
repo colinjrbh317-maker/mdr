@@ -17,10 +17,10 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
     const data = new FormData(form);
 
     const name = data.get("name") as string;
-    const phone = data.get("phone") as string;
     const email = data.get("email") as string;
-    const service = data.get("service") as string;
+    const phone = data.get("phone") as string;
     const address = data.get("address") as string;
+    const service = data.get("service") as string;
     const message = data.get("message") as string;
     const website = data.get("website") as string; // honeypot
 
@@ -35,10 +35,10 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          phone: phone.trim(),
           email: email.trim(),
-          service: service?.trim() || "",
+          phone: phone.trim(),
           address: address?.trim() || "",
+          service: service?.trim() || "",
           message: message?.trim() || "",
           website,
           source,
@@ -86,129 +86,122 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
   }
 
   const inputClass =
-    "w-full px-4 py-3 bg-bg-card border border-border rounded-lg text-text-primary placeholder:text-text-dim focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent";
+    "w-full px-4 py-3 bg-bg-card border border-border rounded-lg text-text-primary placeholder:text-text-dim focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-sm";
 
   return (
-    <form onSubmit={handleSubmit} className={`flex flex-col ${compact ? "gap-3" : "gap-4"}`}>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       {/* Honeypot — hidden from real users */}
       <div className="absolute -left-[9999px]" aria-hidden="true">
         <label htmlFor={`website-${source}`}>Website</label>
         <input type="text" id={`website-${source}`} name="website" tabIndex={-1} autoComplete="off" />
       </div>
 
-      <div className={compact ? "flex flex-col gap-3" : "grid grid-cols-1 sm:grid-cols-2 gap-4"}>
-        <div>
-          <label htmlFor={`name-${source}`} className="block text-sm font-medium text-text-muted mb-1">
-            Name *
-          </label>
-          <input
-            type="text"
-            id={`name-${source}`}
-            name="name"
-            required
-            className={inputClass}
-            placeholder="Your name"
-          />
-        </div>
-        <div>
-          <label htmlFor={`phone-${source}`} className="block text-sm font-medium text-text-muted mb-1">
-            Phone *
-          </label>
-          <input
-            type="tel"
-            id={`phone-${source}`}
-            name="phone"
-            required
-            className={inputClass}
-            placeholder="(540) 555-0123"
-          />
-        </div>
+      {/* Full Name */}
+      <div>
+        <input
+          type="text"
+          id={`name-${source}`}
+          name="name"
+          required
+          className={inputClass}
+          placeholder="Full Name"
+        />
       </div>
 
+      {/* Email Address */}
       <div>
-        <label htmlFor={`email-${source}`} className="block text-sm font-medium text-text-muted mb-1">
-          Email
-        </label>
         <input
           type="email"
           id={`email-${source}`}
           name="email"
+          required
           className={inputClass}
-          placeholder="you@example.com"
+          placeholder="Email Address"
         />
       </div>
 
-      {!compact && (
-        <>
-          <div>
-            <label htmlFor={`service-${source}`} className="block text-sm font-medium text-text-muted mb-1">
-              Service Needed
-            </label>
-            <select
-              id={`service-${source}`}
-              name="service"
-              className={inputClass}
-            >
-              <option value="">Select a service...</option>
-              <option value="Roof Replacement">Roof Replacement</option>
-              <option value="Roof Repair">Roof Repair</option>
-              <option value="Storm Damage">Storm Damage</option>
-              <option value="Metal Roofing">Metal Roofing</option>
-              <option value="Gutters">Gutters</option>
-              <option value="Roof Inspection">Roof Inspection</option>
-              <option value="Other">Other / Not Sure</option>
-            </select>
-          </div>
+      {/* Phone Number */}
+      <div>
+        <input
+          type="tel"
+          id={`phone-${source}`}
+          name="phone"
+          required
+          className={inputClass}
+          placeholder="Phone Number"
+        />
+      </div>
 
-          <div>
-            <label htmlFor={`address-${source}`} className="block text-sm font-medium text-text-muted mb-1">
-              Property Address
-            </label>
-            <input
-              type="text"
-              id={`address-${source}`}
-              name="address"
-              className={inputClass}
-              placeholder="123 Main St, Christiansburg, VA"
-            />
-          </div>
+      {/* Full Address */}
+      <div>
+        <input
+          type="text"
+          id={`address-${source}`}
+          name="address"
+          className={inputClass}
+          placeholder="Full Address"
+        />
+      </div>
 
-          <div>
-            <label htmlFor={`message-${source}`} className="block text-sm font-medium text-text-muted mb-1">
-              Additional Details
-            </label>
-            <textarea
-              id={`message-${source}`}
-              name="message"
-              rows={3}
-              className={`${inputClass} resize-y`}
-              placeholder="Anything else we should know?"
-            />
-          </div>
-        </>
-      )}
+      {/* Project Type */}
+      <div>
+        <select
+          id={`service-${source}`}
+          name="service"
+          className={inputClass}
+        >
+          <option value="">Project Type</option>
+          <option value="Roof Replacement">Roof Replacement</option>
+          <option value="Roof Repair">Roof Repair</option>
+          <option value="Storm Damage">Storm Damage</option>
+          <option value="Metal Roofing">Metal Roofing</option>
+          <option value="Gutters">Gutters</option>
+          <option value="Roof Inspection">Roof Inspection</option>
+          <option value="Other">Other / Not Sure</option>
+        </select>
+      </div>
+
+      {/* Project Description */}
+      <div>
+        <textarea
+          id={`message-${source}`}
+          name="message"
+          rows={3}
+          className={`${inputClass} resize-y`}
+          placeholder="Project Description"
+        />
+      </div>
 
       {state === "error" && (
         <p className="text-accent-light text-sm">{errorMsg}</p>
       )}
 
+      {/* Submit Button */}
       <button
         type="submit"
         disabled={state === "submitting"}
-        className="w-full px-6 py-3 bg-accent hover:bg-accent-dark text-white font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full px-6 py-3.5 bg-accent hover:bg-accent-dark text-white font-bold text-sm uppercase tracking-wide rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {state === "submitting" ? (
           <span className="flex items-center justify-center gap-2">
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
             Sending...
           </span>
         ) : (
-          "Get Your Free Estimate"
+          "Get A Free Quote"
         )}
       </button>
+
+      {/* Consent Text */}
+      <p className="text-[10px] text-text-dim leading-relaxed">
+        By submitting this form, I authorize Modern Day Roofing to contact me via phone calls and text messages at the number provided above, including by using an autodialer or a prerecorded message. I understand that I am not required to give this consent as a condition of purchasing with Modern Day Roofing. I am also agreeing to Modern Day Roofing's{" "}
+        <a href="/terms" className="underline hover:text-text-muted transition-colors">Terms of Use</a>
+        {" "}and{" "}
+        <a href="/privacy" className="underline hover:text-text-muted transition-colors">Privacy Policy</a>.
+      </p>
     </form>
   );
 }
