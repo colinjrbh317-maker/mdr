@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import BlockRenderer from "@/components/blocks/BlockRenderer.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
 import { loadQuery } from "@/sanity/lib/load-query";
 import { PAGE_BY_SLUG_QUERY, ALL_PAGES_QUERY } from "@/sanity/lib/queries";
 
@@ -23,6 +24,21 @@ if (!page) {
 const seoTitle = page.seo?.metaTitle || page.title;
 const seoDescription = page.seo?.metaDescription;
 const ogImage = page.seo?.ogImage;
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: page.title },
+];
+
+const siteUrl = Astro.site?.href || "https://moderndayroof.com/";
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+    { "@type": "ListItem", position: 2, name: page.title },
+  ],
+};
 ---
 
 <Layout
@@ -30,5 +46,6 @@ const ogImage = page.seo?.ogImage;
   description={seoDescription}
   ogImage={ogImage}
 >
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
   <BlockRenderer blocks={page.pageBuilder || []} />
 </Layout>

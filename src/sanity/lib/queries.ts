@@ -398,7 +398,7 @@ export const AREA_SERVICE_COMBO_QUERY = groq`{
     _id, name, "slug": slug.current, description, featuredImage, icon,
     parentService->{ _id, name, "slug": slug.current }
   },
-  "otherServicesInArea": *[_type == "service" && !defined(parentService) && slug.current != $serviceSlug] | order(sortOrder asc, name asc) [0...6] {
+  "otherServicesInArea": *[_type == "service" && slug.current != $serviceSlug] | order(sortOrder asc, name asc) [0...6] {
     _id, name, "slug": slug.current, description, featuredImage
   },
   "otherAreasForService": *[_type == "serviceArea" && !isHubPage && slug.current != $areaSlug] | order(sortOrder asc, name asc) {
@@ -409,7 +409,7 @@ export const AREA_SERVICE_COMBO_QUERY = groq`{
 
 export const ALL_AREA_SERVICE_COMBOS_QUERY = groq`{
   "areas": *[_type == "serviceArea" && !isHubPage]{ "slug": slug.current },
-  "services": *[_type == "service" && !defined(parentService)]{ "slug": slug.current }
+  "services": *[_type == "service"]{ "slug": slug.current }
 }`;
 
 // ─── Before & After Gallery ─────────────────────────────────

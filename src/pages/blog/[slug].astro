@@ -100,9 +100,9 @@ function formatDate(dateStr: string | undefined): string {
               </a>
             )}
             {post.publishedAt && (
-              <span class="text-sm text-text-dim">
+              <time datetime={post.publishedAt} class="text-sm text-text-dim">
                 {formatDate(post.publishedAt)}
-              </span>
+              </time>
             )}
           </div>
           <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary leading-tight">

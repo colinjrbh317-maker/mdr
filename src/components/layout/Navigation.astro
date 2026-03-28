@@ -152,7 +152,7 @@ const ctaLink = navigation?.ctaLink || "/contact";
   </div>
 
   <!-- Mobile: Configured to look like Erie Home (Logo | Actions | Hamburger) -->
-  <div class="flex lg:hidden items-center gap-3">
+  <div class="flex lg:hidden items-center gap-2 flex-shrink-0">
     
     {/* 1. Phone Icon (Icon Only to save space) */}
     <a
@@ -168,7 +168,7 @@ const ctaLink = navigation?.ctaLink || "/contact";
     {/* 2. Primary CTA "Get Estimate" - Always visible on sticky header */}
     <a
       href={ctaLink}
-      class="bg-accent text-white hover:bg-accent-dark px-4 py-2.5 min-h-[44px] flex items-center justify-center rounded-md text-xs font-bold uppercase tracking-wide shadow-sm transition-colors"
+      class="bg-accent text-white hover:bg-accent-dark px-3 py-2 min-h-[44px] flex items-center justify-center rounded-md text-xs font-bold uppercase tracking-wide shadow-sm transition-colors whitespace-nowrap"
     >
       Get Estimate
     </a>
