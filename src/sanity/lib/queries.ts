@@ -388,6 +388,30 @@ export const ALL_SERVICE_AREA_SLUGS_QUERY = groq`
   }
 `;
 
+// ─── Area + Service Combo Pages ─────────────────────────────
+export const AREA_SERVICE_COMBO_QUERY = groq`{
+  "area": *[_type == "serviceArea" && slug.current == $areaSlug][0]{
+    _id, name, "slug": slug.current, isHubPage, description, mapEmbedUrl, featuredImage,
+    parentHub->{ _id, name, "slug": slug.current }
+  },
+  "service": *[_type == "service" && slug.current == $serviceSlug][0]{
+    _id, name, "slug": slug.current, description, featuredImage, icon,
+    parentService->{ _id, name, "slug": slug.current }
+  },
+  "otherServicesInArea": *[_type == "service" && !defined(parentService) && slug.current != $serviceSlug] | order(sortOrder asc, name asc) [0...6] {
+    _id, name, "slug": slug.current, description, featuredImage
+  },
+  "otherAreasForService": *[_type == "serviceArea" && !isHubPage && slug.current != $areaSlug] | order(sortOrder asc, name asc) {
+    _id, name, "slug": slug.current,
+    parentHub->{ name, "slug": slug.current }
+  }
+}`;
+
+export const ALL_AREA_SERVICE_COMBOS_QUERY = groq`{
+  "areas": *[_type == "serviceArea" && !isHubPage]{ "slug": slug.current },
+  "services": *[_type == "service" && !defined(parentService)]{ "slug": slug.current }
+}`;
+
 // ─── Before & After Gallery ─────────────────────────────────
 export const BEFORE_AFTER_PROJECTS_QUERY = groq`
   *[_type == "beforeAfterProject"] | order(_createdAt desc) {

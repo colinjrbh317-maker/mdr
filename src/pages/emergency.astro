@@ -1,0 +1,217 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Button from "@/components/ui/Button.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
+
+export const prerender = true;
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Emergency Roofing" },
+];
+
+const emergencyTypes = [
+  {
+    title: "Active Roof Leak",
+    description: "Water coming through your ceiling or walls during rain. We'll stop the leak and prevent further interior damage.",
+    icon: "water",
+  },
+  {
+    title: "Storm Damage",
+    description: "High winds, hail, or severe weather has damaged shingles, flashing, or exposed your decking.",
+    icon: "storm",
+  },
+  {
+    title: "Tree or Debris Impact",
+    description: "A fallen tree or large debris has punctured or damaged your roof structure.",
+    icon: "tree",
+  },
+  {
+    title: "Structural Compromise",
+    description: "Sagging, cracking, or visible structural damage that threatens your home's integrity.",
+    icon: "structure",
+  },
+];
+
+const responseSteps = [
+  { title: "Same-Day Assessment", description: "We dispatch a crew to inspect the damage and assess the situation — often within hours of your call." },
+  { title: "Emergency Tarping", description: "We tarp exposed areas immediately to stop water intrusion and prevent further damage to your home." },
+  { title: "Temporary Repair", description: "If a permanent fix isn't possible same-day, we secure your roof with a temporary repair that lasts." },
+  { title: "Full Repair or Replacement", description: "We schedule the permanent repair or replacement and handle your insurance claim paperwork." },
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "24/7 Emergency Roof Repair",
+  provider: {
+    "@type": "RoofingContractor",
+    name: "Modern Day Roofing",
+    telephone: "(540) 553-6007",
+    areaServed: {
+      "@type": "State",
+      name: "Virginia",
+    },
+  },
+  description: "24/7 emergency roofing services including same-day assessment, emergency tarping, temporary repairs, and full roof repair or replacement.",
+  availableChannel: {
+    "@type": "ServiceChannel",
+    servicePhone: "(540) 553-6007",
+    availableLanguage: "English",
+  },
+  hoursAvailable: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    opens: "00:00",
+    closes: "23:59",
+  },
+};
+---
+
+<Layout
+  title="24/7 Emergency Roof Repair | Modern Day Roofing"
+  description="Emergency roofing services available 24/7. Active leak, storm damage, or tree impact — call Modern Day Roofing at (540) 553-6007 for same-day response."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  {/* Hero */}
+  <section class="relative min-h-[45vh] flex items-center dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src="/assets/web/dji_fly_20250630_140410_766_1751306661861_photo.jpg"
+        alt="Emergency roof repair services"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/50"></div>
+    </div>
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <Breadcrumb items={breadcrumbItems} />
+      <div class="mt-6 max-w-3xl">
+        <p class="text-accent-light font-semibold text-sm uppercase tracking-wider mb-3">
+          Available 24/7
+        </p>
+        <h1 class="text-4xl md:text-5xl font-bold text-white">
+          24/7 Emergency Roof Repair
+        </h1>
+        <p class="mt-4 text-lg text-white/85 max-w-2xl leading-relaxed">
+          Your roof can't wait and neither do we. Call now for same-day emergency assessment and repair.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          <Button href="tel:5405536007" size="lg">
+            Call Now — (540) 553-6007
+          </Button>
+          <Button href="#emergency-form" variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
+            Request Emergency Service
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Emergency Phone Banner */}
+  <div class="bg-accent py-6">
+    <div class="mx-auto max-w-[1200px] px-4 md:px-6 text-center">
+      <p class="text-white text-sm uppercase tracking-wider mb-1">Roof Emergency? Call Now.</p>
+      <a href="tel:5405536007" class="text-white text-3xl md:text-4xl font-display font-bold hover:underline">
+        (540) 553-6007
+      </a>
+    </div>
+  </div>
+
+  {/* What Qualifies */}
+  <SectionContainer background="white" padding="lg">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
+        What Qualifies as a Roofing Emergency?
+      </h2>
+      <p class="mt-3 text-text-muted max-w-xl mx-auto">
+        If any of these situations apply, call us immediately. Don't wait — water damage gets worse fast.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      {emergencyTypes.map((item) => (
+        <div class="bg-bg-card border border-border rounded-xl p-6 flex gap-4">
+          <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-text-primary mb-1">{item.title}</h3>
+            <p class="text-sm text-text-muted">{item.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </SectionContainer>
+
+  {/* Our Response */}
+  <SectionContainer background="light" padding="md">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
+        How We Respond
+      </h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+      {responseSteps.map((step, i) => (
+        <div class="text-center">
+          <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-accent text-white flex items-center justify-center text-lg font-bold">
+            {i + 1}
+          </div>
+          <h3 class="font-bold text-text-primary mb-2">{step.title}</h3>
+          <p class="text-sm text-text-muted">{step.description}</p>
+        </div>
+      ))}
+    </div>
+  </SectionContainer>
+
+  {/* Insurance Help */}
+  <SectionContainer background="white" padding="md">
+    <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary mb-4">
+          We Handle Your Insurance Claim
+        </h2>
+        <p class="text-text-body leading-relaxed mb-4">
+          Dealing with insurance after storm damage is stressful. We work directly with your insurance company to document the damage, file the claim, and ensure you get the coverage you're entitled to.
+        </p>
+        <ul class="space-y-2">
+          {["Free damage documentation with photos", "Direct communication with your adjuster", "Supplemental claim filing if needed", "No out-of-pocket beyond your deductible"].map((item) => (
+            <li class="flex items-center gap-2 text-text-body text-sm">
+              <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="bg-bg-card border border-border rounded-xl p-8 text-center">
+        <p class="text-text-muted text-sm uppercase tracking-wider mb-2">Insurance Claims</p>
+        <p class="text-4xl font-display font-bold text-accent mb-2">100%</p>
+        <p class="text-text-body">of eligible claims filed successfully</p>
+        <div class="mt-6">
+          <Button href="tel:5405536007" size="lg">Call for Emergency Help</Button>
+        </div>
+      </div>
+    </div>
+  </SectionContainer>
+
+  {/* Emergency Form */}
+  <SectionContainer background="warm" padding="md" id="emergency-form">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-text-primary">
+          Request Emergency Service
+        </h2>
+        <p class="mt-3 text-text-muted">
+          For fastest response, call <a href="tel:5405536007" class="text-accent font-semibold hover:underline">(540) 553-6007</a>. Or submit this form and we'll call you back immediately.
+        </p>
+      </div>
+      <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8">
+        <LeadCaptureForm client:load source="emergency" />
+      </div>
+    </div>
+  </SectionContainer>
+</Layout>

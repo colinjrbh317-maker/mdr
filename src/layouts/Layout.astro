@@ -58,6 +58,46 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage || `${Astro.site || "https://moderndayroof.com"}og-default.png`} />
 
+    <!-- Organization + AggregateRating JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "RoofingContractor",
+      "name": "Modern Day Roofing",
+      "url": "https://moderndayroof.com",
+      "telephone": "(540) 553-6007",
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "streetAddress": "80 College St. STE R",
+          "addressLocality": "Christiansburg",
+          "addressRegion": "VA",
+          "postalCode": "24073"
+        },
+        {
+          "@type": "PostalAddress",
+          "streetAddress": "2740 Franklin Rd SW",
+          "addressLocality": "Roanoke",
+          "addressRegion": "VA",
+          "postalCode": "24014"
+        }
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "231",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "image": "https://moderndayroof.com/og-default.png",
+      "priceRange": "$$",
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "08:30",
+        "closes": "17:00"
+      }
+    })} />
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
     <link rel="apple-touch-icon" sizes="150x150" href="/favicon-150x150.png" />

@@ -1,0 +1,469 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Card from "@/components/ui/Card.astro";
+import Button from "@/components/ui/Button.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
+import ScrollReveal from "@/components/common/ScrollReveal.astro";
+import { loadQuery } from "@/sanity/lib/load-query";
+import {
+  AREA_SERVICE_COMBO_QUERY,
+  ALL_AREA_SERVICE_COMBOS_QUERY,
+} from "@/sanity/lib/queries";
+import { urlForImage } from "@/sanity/lib/url-for-image";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const result = await loadQuery<{
+    areas: Array<{ slug: string }>;
+    services: Array<{ slug: string }>;
+  }>(ALL_AREA_SERVICE_COMBOS_QUERY);
+
+  const paths: Array<{ params: { area: string; service: string } }> = [];
+  for (const area of result.areas) {
+    for (const service of result.services) {
+      paths.push({
+        params: { area: area.slug, service: service.slug },
+      });
+    }
+  }
+  return paths;
+}
+
+const { area: areaSlug, service: serviceSlug } = Astro.params;
+
+const data = await loadQuery<{
+  area: any;
+  service: any;
+  otherServicesInArea: any[];
+  otherAreasForService: any[];
+}>(AREA_SERVICE_COMBO_QUERY, { areaSlug, serviceSlug });
+
+const { area, service, otherServicesInArea, otherAreasForService } = data;
+
+if (!area || !service) {
+  return Astro.redirect("/404");
+}
+
+// --- SEO ---
+const seoTitle = `${service.name} in ${area.name}, VA | Modern Day Roofing`;
+const seoDescription = `Professional ${service.name.toLowerCase()} services in ${area.name}, Virginia. Licensed, insured, GAF Master Elite certified. Free estimates. Call (540) 553-6007.`;
+
+// --- Breadcrumbs ---
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Service Areas", href: "/areas" },
+];
+if (area.parentHub) {
+  breadcrumbItems.push({
+    label: area.parentHub.name,
+    href: `/areas/${area.parentHub.slug}`,
+  });
+}
+breadcrumbItems.push({
+  label: area.name,
+  href: `/areas/${areaSlug}`,
+});
+breadcrumbItems.push({ label: service.name });
+
+// --- Fallback hero images ---
+const fallbackImages: Record<string, string> = {
+  "roof-replacement": "/assets/web/Untitled-1800-x-1440-px.jpg",
+  "shingle-roofing": "/assets/web/Untitled-1800-x-1440-px-1.jpg",
+  "metal-roofing": "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.jpg",
+  "timber-seal": "/assets/web/Untitled-1800-x-1440-px-4.jpg",
+  "roof-repair": "/assets/web/Untitled-1800-x-1440-px-2.jpg",
+  "roof-maintenance": "/assets/web/dji_fly_20250630_135554_733_1751306170083_photo.jpg",
+  "gutters": "/assets/web/dji_fly_20250630_140410_766_1751306661861_photo.jpg",
+  "storm-damage": "/assets/web/Untitled-1800-x-1440-px-3.jpg",
+};
+
+const heroImage = service.featuredImage
+  ? urlForImage(service.featuredImage).width(1600).height(800).url()
+  : fallbackImages[serviceSlug as string] || "/assets/web/dji_fly_20251105_160154_425_1762438973026_photo.jpg";
+
+// --- FAQ data per service ---
+const comboFaqs: Record<string, Array<{ q: string; a: string }>> = {
+  "roof-replacement": [
+    { q: `How much does a roof replacement cost in ${area.name}?`, a: `Roof replacement costs in ${area.name} vary based on roof size, pitch, material, and existing damage. Most residential roofs in the ${area.name} area range from $8,000 to $18,000 for quality architectural shingles. We provide free, no-obligation estimates with transparent, itemized pricing.` },
+    { q: `How long does roof replacement take in ${area.name}?`, a: `Most residential roof replacements in ${area.name} are completed in 1-2 days. Weather conditions can sometimes extend the timeline. We schedule around forecasts to minimize disruption and protect your home throughout the process.` },
+    { q: `Do you handle permits for ${area.name} roof replacements?`, a: `Yes. We handle all necessary building permits for ${area.name} and the surrounding area. Our team is familiar with local building codes and ensures every installation meets or exceeds requirements.` },
+    { q: `What roofing materials do you recommend for homes in ${area.name}?`, a: `For ${area.name}'s climate with hot summers, cold winters, and occasional severe storms, we recommend GAF Timberline HDZ architectural shingles for most homes. They offer 130 mph wind resistance and excellent durability. For homeowners wanting maximum longevity, standing seam metal roofing is an excellent choice.` },
+  ],
+  "roof-repair": [
+    { q: `How quickly can you repair my roof in ${area.name}?`, a: `We offer 24/7 emergency response for active leaks and storm damage in ${area.name}. For non-emergency repairs, we typically schedule within 3-5 business days. Emergency tarping is usually same-day.` },
+    { q: `What are the most common roof repairs needed in ${area.name}?`, a: `In ${area.name}, the most common repairs we see are wind-damaged or missing shingles, leaks around flashing and pipe boots, storm damage from hail, and wear from Virginia's freeze-thaw cycles. Regular inspections help catch these issues early.` },
+    { q: `Should I repair or replace my roof in ${area.name}?`, a: `If damage is isolated to one area and your roof is under 15 years old, repair is usually the best option. If you're seeing widespread issues or the roof is 20+ years old, replacement is more cost-effective. We'll give you an honest assessment during our free inspection.` },
+  ],
+  "shingle-roofing": [
+    { q: `What type of shingles work best in ${area.name}'s climate?`, a: `GAF Timberline HDZ architectural shingles are ideal for ${area.name}. They handle Virginia's temperature swings, resist winds up to 130 mph, and include algae resistance for the humidity. As a GAF Master Elite contractor, we back them with the industry's strongest warranty.` },
+    { q: `How long do shingle roofs last in ${area.name}?`, a: `Quality architectural shingles last 25-30 years in ${area.name}'s climate. Proper installation of the full roofing system — underlayment, ventilation, flashing, and shingles — is what makes the difference between a 20-year and 30-year roof.` },
+    { q: `What warranty comes with shingle roofing in ${area.name}?`, a: `As a GAF Master Elite contractor, we offer the Golden Pledge warranty — 50-year material coverage and 25-year workmanship coverage, backed by GAF. Only 3% of roofers nationwide qualify for this certification.` },
+  ],
+  "metal-roofing": [
+    { q: `Is metal roofing a good choice for ${area.name} homes?`, a: `Metal roofing is excellent for ${area.name}. It handles Virginia's severe weather, reflects heat in summer to reduce cooling costs, and lasts 50+ years with minimal maintenance. Standing seam metal roofs also increase home value.` },
+    { q: `How much does metal roofing cost in ${area.name}?`, a: `Standing seam metal roofing in ${area.name} typically costs more upfront than shingles, but the 50+ year lifespan and lower maintenance costs make it competitive on a per-year basis. We provide detailed quotes so you can compare the long-term value.` },
+    { q: `Do metal roofs work well in Virginia weather?`, a: `Absolutely. Metal roofs excel in Virginia's climate — they shed snow, resist high winds (up to 140+ mph for standing seam), and handle the freeze-thaw cycles better than most materials. They also stay cooler in our hot summers.` },
+  ],
+  "gutters": [
+    { q: `Why are gutters important for ${area.name} homes?`, a: `${area.name} receives significant rainfall throughout the year. Without properly functioning gutters, water pools around your foundation, causing erosion, basement flooding, and structural damage. Gutters protect your home's foundation, siding, and landscaping.` },
+    { q: `What type of gutters do you install in ${area.name}?`, a: `We install seamless aluminum gutters custom-formed on-site to fit your ${area.name} home precisely. Seamless means fewer joints, fewer leak points, and a cleaner appearance. We also offer gutter guard installation to reduce maintenance.` },
+    { q: `How often should gutters be cleaned in ${area.name}?`, a: `At minimum twice a year — spring and fall. With the trees common in ${area.name}, quarterly cleaning is even better. Clogged gutters cause water to back up under your roof edge, damaging fascia and potentially your roof decking.` },
+  ],
+  "storm-damage": [
+    { q: `What should I do after storm damage to my ${area.name} home?`, a: `Document the damage with photos, contact your insurance company, then call us at (540) 553-6007. We offer 24/7 emergency response in ${area.name} to tarp damaged areas and prevent further water intrusion while we plan the full repair.` },
+    { q: `Does insurance cover storm damage repairs in ${area.name}?`, a: `Most homeowner's policies cover storm damage from wind, hail, and fallen debris. We work with insurance adjusters regularly in the ${area.name} area and can help document damage to support your claim. You typically pay only your deductible.` },
+    { q: `How quickly can you respond to storm damage in ${area.name}?`, a: `We prioritize ${area.name} emergency calls and typically respond within hours for active leaks and exposed areas. Our goal is to get a tarp or temporary repair in place the same day to protect your home from further damage.` },
+  ],
+  "roof-maintenance": [
+    { q: `How often should my ${area.name} roof be inspected?`, a: `At least once a year, and after any major storm. ${area.name}'s climate — with hot summers, cold winters, and severe storms — puts extra stress on your roof. Regular inspections catch small issues before they become expensive repairs.` },
+    { q: `What does a roof maintenance visit include in ${area.name}?`, a: `We inspect shingles, flashing, ridge caps, valleys, pipe boots, ventilation, gutters, and attic ventilation. We check for moss or algae growth, clear debris, and provide a detailed report with photos. Minor repairs are handled on the spot.` },
+    { q: `Can maintenance extend my roof's lifespan in ${area.name}?`, a: `Significantly. A well-maintained roof in ${area.name} can last 5-10 years longer than a neglected one. Catching a $200 flashing repair early prevents a $5,000 water damage problem later. Our annual plans make it effortless.` },
+  ],
+  "timber-seal": [
+    { q: `Is Timber Seal available for homes in ${area.name}?`, a: `Yes. We install GAF Timber Seal throughout ${area.name} and the surrounding area. It gives you the premium wood-shake aesthetic with modern durability, fire resistance, and none of the maintenance headaches of real wood.` },
+    { q: `How does Timber Seal perform in ${area.name}'s weather?`, a: `Timber Seal is engineered for climates like ${area.name}'s. Unlike real wood shakes that can rot, split, and require constant treatment in Virginia's humidity, Timber Seal maintains its appearance and performance for decades.` },
+    { q: `What does Timber Seal cost compared to regular shingles?`, a: `Timber Seal is a premium product, priced higher than standard architectural shingles but significantly less than real wood shakes. For ${area.name} homeowners who want that distinctive wood-look, it's the best value. We'll walk you through exact pricing during your free estimate.` },
+  ],
+};
+
+const currentFaqs = comboFaqs[serviceSlug as string] || [
+  { q: `Do you offer ${service.name.toLowerCase()} in ${area.name}?`, a: `Yes. Modern Day Roofing provides professional ${service.name.toLowerCase()} services throughout ${area.name} and the surrounding Virginia communities. Contact us at (540) 553-6007 for a free estimate.` },
+  { q: `How do I get started with ${service.name.toLowerCase()} in ${area.name}?`, a: `Call us at (540) 553-6007 or fill out our contact form for a free, no-obligation estimate. We'll schedule a convenient time to inspect your property and provide a detailed quote.` },
+  { q: `Why choose Modern Day Roofing for ${service.name.toLowerCase()} in ${area.name}?`, a: `We're a GAF Master Elite certified contractor — a distinction held by only 3% of roofers nationwide. We offer the industry's strongest warranties, transparent pricing, and a commitment to quality that ${area.name} homeowners trust.` },
+];
+
+// --- JSON-LD ---
+const siteUrl = Astro.site?.href || "https://moderndayroofing.com";
+
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": ["LocalBusiness", "RoofingContractor"],
+  name: "Modern Day Roofing",
+  url: siteUrl,
+  telephone: "(540) 553-6007",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "80 College St. STE R",
+    addressLocality: "Christiansburg",
+    addressRegion: "VA",
+    postalCode: "24073",
+    addressCountry: "US",
+  },
+  areaServed: { "@type": "City", name: `${area.name}, VA` },
+  description: seoDescription,
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "5.0",
+    reviewCount: "231",
+    bestRating: "5",
+    worstRating: "1",
+  },
+};
+
+const serviceJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: `${service.name} in ${area.name}, VA`,
+  description: seoDescription,
+  provider: {
+    "@type": "RoofingContractor",
+    name: "Modern Day Roofing",
+    url: siteUrl,
+    telephone: "(540) 553-6007",
+  },
+  areaServed: { "@type": "City", name: `${area.name}, VA` },
+  url: `${siteUrl}areas/${areaSlug}/${serviceSlug}`,
+};
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: currentFaqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.q,
+    acceptedAnswer: { "@type": "Answer", text: faq.a },
+  })),
+};
+
+// --- Service-specific content ---
+const serviceContent: Record<string, { intro: string; includes: string[] }> = {
+  "roof-replacement": {
+    intro: `When your ${area.name} home needs a new roof, Modern Day Roofing delivers expert roof replacement with GAF Master Elite quality. We handle everything from tear-off to final inspection, ensuring your home is protected for decades to come.`,
+    includes: [
+      "Complete tear-off and disposal of old roofing materials",
+      "Full decking inspection and repair of any damaged wood",
+      "GAF WeatherWatch ice and water shield installation",
+      "GAF FeltBuster synthetic underlayment",
+      "GAF Timberline HDZ architectural shingles (or metal option)",
+      "Ridge cap, starter strip, and proper ventilation",
+      "Final cleanup with magnetic nail sweep of your property",
+    ],
+  },
+  "roof-repair": {
+    intro: `From minor leaks to storm damage, Modern Day Roofing provides fast, reliable roof repair services in ${area.name}. We diagnose the root cause and fix it right the first time, so you don't keep paying for the same problem.`,
+    includes: [
+      "Thorough leak detection and source identification",
+      "Shingle replacement for wind or hail damage",
+      "Flashing repair around chimneys, skylights, and walls",
+      "Pipe boot and vent replacement",
+      "Emergency tarping for active leaks (24/7)",
+      "Post-repair inspection and documentation",
+    ],
+  },
+  "shingle-roofing": {
+    intro: `Modern Day Roofing installs premium GAF Timberline HDZ shingles on homes throughout ${area.name}. As a GAF Master Elite contractor, we deliver the industry's best shingle system backed by the strongest available warranty.`,
+    includes: [
+      "GAF Timberline HDZ architectural shingles (130 mph wind rating)",
+      "Full GAF roofing system installation",
+      "StainGuard Plus algae protection",
+      "LayerLock technology for superior wind resistance",
+      "Multiple color and style options",
+      "Golden Pledge warranty (50-year material, 25-year workmanship)",
+    ],
+  },
+  "metal-roofing": {
+    intro: `Standing seam metal roofing offers ${area.name} homeowners unmatched longevity and performance. Modern Day Roofing installs premium metal roofs that protect your home for 50+ years while reducing energy costs.`,
+    includes: [
+      "Standing seam panel installation (concealed fasteners)",
+      "Custom panel fabrication for precise fit",
+      "Premium underlayment and ice shield",
+      "Proper ventilation and thermal break",
+      "Multiple color options with Kynar 500 finish",
+      "50+ year expected lifespan with minimal maintenance",
+    ],
+  },
+  "gutters": {
+    intro: `Properly functioning gutters protect your ${area.name} home's foundation, siding, and landscaping from water damage. Modern Day Roofing installs seamless aluminum gutters custom-formed on-site for a perfect fit.`,
+    includes: [
+      "Seamless aluminum gutter fabrication on-site",
+      "Custom sizing and pitch for optimal water flow",
+      "Secure hidden hanger installation",
+      "Downspout placement for proper drainage",
+      "Optional gutter guard installation",
+      "Gutter cleaning and maintenance services",
+    ],
+  },
+  "storm-damage": {
+    intro: `When severe weather strikes ${area.name}, Modern Day Roofing responds fast. We provide 24/7 emergency service, work directly with your insurance company, and restore your roof to pre-storm condition.`,
+    includes: [
+      "24/7 emergency response and tarping",
+      "Comprehensive storm damage assessment",
+      "Detailed documentation for insurance claims",
+      "Insurance adjuster coordination and support",
+      "Complete repair or replacement as needed",
+      "Debris cleanup and property restoration",
+    ],
+  },
+  "roof-maintenance": {
+    intro: `Regular roof maintenance in ${area.name} catches small problems before they become costly repairs. Modern Day Roofing's maintenance program helps your roof reach its full lifespan while keeping your home protected.`,
+    includes: [
+      "Complete roof inspection (shingles, flashing, vents, valleys)",
+      "Gutter cleaning and downspout check",
+      "Minor repair of cracked caulk, loose flashing, lifted shingles",
+      "Moss, algae, and debris removal",
+      "Attic ventilation assessment",
+      "Detailed written report with photos",
+    ],
+  },
+  "timber-seal": {
+    intro: `Give your ${area.name} home the premium look of natural wood shakes without the maintenance headaches. GAF Timber Seal delivers stunning aesthetics with modern performance and fire resistance.`,
+    includes: [
+      "GAF Timber Seal premium shingle installation",
+      "Authentic wood-shake appearance",
+      "Fire-resistant and algae-resistant construction",
+      "Full GAF roofing system underlayment",
+      "Color-matched ridge caps and accessories",
+      "Premium warranty backed by GAF",
+    ],
+  },
+};
+
+const content = serviceContent[serviceSlug as string] || {
+  intro: `Modern Day Roofing provides professional ${service.name.toLowerCase()} services throughout ${area.name}, Virginia. Our experienced team delivers quality workmanship backed by industry-leading warranties and a commitment to customer satisfaction.`,
+  includes: [
+    "Free, no-obligation estimate and inspection",
+    "Licensed and insured professional crew",
+    "Quality materials from trusted manufacturers",
+    "Clean, respectful worksite management",
+    "Post-project inspection and documentation",
+    "Industry-leading warranty protection",
+  ],
+};
+---
+
+<Layout title={seoTitle} description={seoDescription} ogImage={service.featuredImage ? urlForImage(service.featuredImage).width(1200).height(630).url() : undefined}>
+  <script type="application/ld+json" set:html={JSON.stringify(localBusinessJsonLd)} />
+  <script type="application/ld+json" set:html={JSON.stringify(serviceJsonLd)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+
+  {/* Hero */}
+  <section class="relative min-h-[50vh] flex items-center dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src={heroImage}
+        alt={`${service.name} in ${area.name}, VA`}
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/60"></div>
+    </div>
+
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <Breadcrumb items={breadcrumbItems} />
+      <h1 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold text-white">
+        {service.name} in {area.name}, VA
+      </h1>
+      <p class="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed">
+        {seoDescription}
+      </p>
+      <div class="mt-6 flex items-center gap-3">
+        <div class="flex items-center gap-1">
+          {[1,2,3,4,5].map(() => (
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          ))}
+        </div>
+        <span class="text-white/90 text-sm font-medium">5.0 stars from 231 reviews</span>
+      </div>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4">
+        <Button href="#get-estimate" size="lg">Get Your Free Estimate</Button>
+        <Button href="tel:5405536007" variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
+          Call (540) 553-6007
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  {/* Intro + What's Included */}
+  <SectionContainer background="white" padding="md">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
+      {/* Main content (2/3) */}
+      <div class="lg:col-span-2">
+        <ScrollReveal>
+          <div class="prose prose-lg max-w-none text-text-body prose-headings:text-text-primary prose-headings:mt-10 prose-headings:mb-4 prose-a:text-accent prose-strong:text-text-primary prose-p:leading-relaxed">
+            <h2>Professional {service.name} in {area.name}</h2>
+            <p>{content.intro}</p>
+
+            <h3>What's Included</h3>
+            <ul>
+              {content.includes.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+
+            <h3>Why {area.name} Homeowners Choose Modern Day Roofing</h3>
+            <p>
+              As a <strong>GAF Master Elite certified contractor</strong> — a distinction held by only 3% of roofers nationwide — we deliver the industry's highest standards right here in {area.name}. Every project comes with transparent pricing, respectful worksite management, and the strongest warranties available.
+            </p>
+            <p>
+              We've served the {area.parentHub ? area.parentHub.name : area.name} community for years, building a reputation on honest assessments and quality workmanship. When we say we'll take care of your home, we mean it.
+            </p>
+          </div>
+        </ScrollReveal>
+      </div>
+
+      {/* Sidebar (1/3) */}
+      <aside class="lg:col-span-1">
+        <div class="sticky top-[100px] space-y-6">
+          {/* Quick Contact Form */}
+          <div class="bg-bg-card border border-border rounded-xl p-6 shadow-sm">
+            <h3 class="text-lg font-bold text-text-primary mb-1">Get a Free Quote</h3>
+            <p class="text-text-muted text-sm mb-4">No obligation. Fast response.</p>
+            <LeadCaptureForm client:load source={`combo-${areaSlug}-${serviceSlug}`} compact />
+          </div>
+
+          {/* Phone CTA */}
+          <div class="bg-accent rounded-xl p-6 text-center">
+            <p class="text-white/90 text-sm mb-2">Prefer to talk?</p>
+            <a href="tel:5405536007" class="text-white text-xl font-bold hover:underline">
+              (540) 553-6007
+            </a>
+          </div>
+
+          {/* Other Services */}
+          {otherServicesInArea.length > 0 && (
+            <div>
+              <h3 class="text-sm font-semibold uppercase tracking-wider text-text-muted mb-4">
+                Other Services in {area.name}
+              </h3>
+              <div class="space-y-2">
+                {otherServicesInArea.map((s: any) => (
+                  <a
+                    href={`/areas/${areaSlug}/${s.slug}`}
+                    class="block px-4 py-2.5 rounded-lg border border-border text-sm font-medium text-text-primary hover:border-accent/30 hover:text-accent transition-colors no-underline"
+                  >
+                    {s.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </aside>
+    </div>
+  </SectionContainer>
+
+  {/* FAQs */}
+  <SectionContainer background="light" padding="md">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary text-center mb-8">
+        {service.name} in {area.name} — FAQs
+      </h2>
+      <div class="space-y-4">
+        {currentFaqs.map((faq) => (
+          <details class="group bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+            <summary class="flex items-center justify-between gap-4 p-5 cursor-pointer list-none font-semibold text-text-primary hover:bg-bg-light/50 transition-colors">
+              <span>{faq.q}</span>
+              <svg class="w-5 h-5 flex-shrink-0 text-text-muted transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-5 pb-5 text-text-body leading-relaxed">
+              {faq.a}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </SectionContainer>
+
+  {/* Lead Capture Form */}
+  <SectionContainer background="warm" padding="md" id="get-estimate">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-text-primary">
+          Get Your Free {service.name} Estimate in {area.name}
+        </h2>
+        <p class="mt-3 text-text-muted">
+          Free inspection. No obligation. We'll provide an honest assessment and competitive quote for your {area.name} property.
+        </p>
+      </div>
+      <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8 shadow-sm">
+        <LeadCaptureForm client:load source={`combo-${areaSlug}-${serviceSlug}`} />
+      </div>
+    </div>
+  </SectionContainer>
+
+  {/* Sibling Areas offering same service */}
+  {otherAreasForService.length > 0 && (
+    <SectionContainer background="dark" padding="sm">
+      <div class="text-center dark-section">
+        <p class="text-sm text-text-dim mb-3">Also offering {service.name.toLowerCase()} in:</p>
+        <div class="flex flex-wrap justify-center gap-2">
+          {otherAreasForService.map((a: any) => (
+            <a
+              href={`/areas/${a.slug}/${serviceSlug}`}
+              class="inline-block px-4 py-2 bg-bg-card border border-border rounded-full text-sm text-text-muted hover:text-accent hover:border-accent/30 transition-colors no-underline"
+            >
+              {a.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    </SectionContainer>
+  )}
+</Layout>
