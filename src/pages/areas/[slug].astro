@@ -34,6 +34,30 @@ if (!area) {
 
 const isHub = area.isHubPage === true;
 const childAreas = area.childAreas || [];
+
+// Area-specific hero images (generated via NanoBanana Pro — unique per area)
+const areaHeroImages: Record<string, string> = {
+  "roanoke": "/assets/areas/roanoke-hero.png",
+  "christiansburg": "/assets/areas/christiansburg-hero.png",
+  "blacksburg": "/assets/areas/blacksburg-hero.png",
+  "salem": "/assets/areas/salem-hero.png",
+  "radford": "/assets/areas/radford-hero.png",
+  "bedford": "/assets/areas/bedford-hero.png",
+  "pulaski": "/assets/areas/pulaski-hero.png",
+  "dublin": "/assets/areas/dublin-hero.png",
+  "floyd": "/assets/areas/floyd-hero.png",
+  "wytheville": "/assets/areas/wytheville-hero.png",
+  "vinton": "/assets/areas/vinton-hero.png",
+  "troutville": "/assets/areas/troutville-hero.png",
+  "lexington": "/assets/areas/lexington-hero.png",
+  "covington": "/assets/areas/covington-hero.png",
+  "smith-mountain-lake": "/assets/areas/smith-mountain-lake-hero.png",
+  "new-river-valley": "/assets/areas/new-river-valley-hero.png",
+  "roanoke-area": "/assets/areas/roanoke-area-hero.png",
+};
+const areaHeroImage = area.featuredImage
+  ? urlForImage(area.featuredImage).width(1600).height(800).url()
+  : areaHeroImages[slug as string] || "/assets/branding/crew-working-harness-1.png";
 const siblingAreas = area.siblingAreas || [];
 const servicesOffered = area.servicesOffered || [];
 
@@ -93,55 +117,33 @@ const localBusinessJsonLd = {
 <Layout title={seoTitle} description={seoDescription} ogImage={area.featuredImage ? urlForImage(area.featuredImage).width(1200).height(630).url() : undefined}>
   <script type="application/ld+json" set:html={JSON.stringify(localBusinessJsonLd)} />
 
-  {/* Split Hero: Content + Map */}
-  <section class="relative dark-section bg-bg-darker" data-transparent-header>
-    <div class="mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-        {/* Left: Content */}
-        <div>
-          <Breadcrumb items={breadcrumbItems} />
-          <h1 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold text-white">
-            Roofing Services in {area.name}, VA
-          </h1>
-          {area.description && (
-            <p class="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed">
-              {area.description}
-            </p>
-          )}
-          <div class="mt-8 flex flex-col sm:flex-row gap-4">
-            <Button href="#get-estimate" size="lg">Get Your Free Estimate</Button>
-            <Button href="tel:5405536007" variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
-              Call (540) 553-6007
-            </Button>
-          </div>
-        </div>
-        {/* Right: Map or Image */}
-        <div class="rounded-xl overflow-hidden border border-white/10" style="aspect-ratio: 4/3;">
-          {area.mapEmbedUrl ? (
-            <iframe
-              src={area.mapEmbedUrl}
-              width="100%"
-              height="100%"
-              style="border:0;"
-              allowfullscreen=""
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              title={`Google Maps showing ${area.name}, Virginia`}
-            ></iframe>
-          ) : area.featuredImage ? (
-            <img
-              src={urlForImage(area.featuredImage).width(800).height(600).url()}
-              alt={area.name}
-              class="w-full h-full object-cover"
-              loading="eager"
-            />
-          ) : (
-            <ImagePlaceholder
-              description={`${area.name} area`}
-              class="w-full h-full rounded-none border-none"
-            />
-          )}
-        </div>
+  {/* Full-Width Hero with Area Image */}
+  <section class="relative min-h-[50vh] flex items-center dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src={areaHeroImage}
+        alt={`Roofing services in ${area.name}, Virginia`}
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/60"></div>
+    </div>
+
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <Breadcrumb items={breadcrumbItems} />
+      <h1 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold text-white">
+        Roofing Services in {area.name}, VA
+      </h1>
+      {area.description && (
+        <p class="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed">
+          {area.description}
+        </p>
+      )}
+      <div class="mt-8 flex flex-col sm:flex-row gap-4">
+        <Button href="#get-estimate" size="lg">Get Your Free Estimate</Button>
+        <Button href="tel:5405536007" variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
+          Call (540) 553-6007
+        </Button>
       </div>
     </div>
   </section>

@@ -30,3 +30,4 @@ token.json
 .playwright-mcp/
 test-results/
 *.png
+!public/assets/**/*.png
