@@ -3,7 +3,6 @@ import Layout from "@/layouts/Layout.astro";
 import SectionContainer from "@/components/ui/SectionContainer.astro";
 import Breadcrumb from "@/components/common/Breadcrumb.astro";
 import Button from "@/components/ui/Button.astro";
-import BeforeAfterSlider from "@/components/cro/BeforeAfterSlider";
 import { loadQuery } from "@/sanity/lib/load-query";
 import { BEFORE_AFTER_PROJECTS_QUERY } from "@/sanity/lib/queries";
 import { urlForImage } from "@/sanity/lib/url-for-image";
@@ -24,47 +23,123 @@ const categories = [
   { label: "Gutters", value: "gutters" },
 ];
 
-const projects = await loadQuery<any[]>(BEFORE_AFTER_PROJECTS_QUERY).catch(() => []);
+// Static gallery projects with categories and before/after data
+const galleryProjects = [
+  { src: "/assets/web/Untitled-1800-x-1440-px.webp", title: "Premium Shingle Roof — Stone Estate", location: "New River Valley, VA", category: "shingle" },
+  { src: "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.webp", title: "Standing Seam Metal Roof", location: "Christiansburg, VA", category: "metal" },
+  { src: "/assets/web/gallery-dji_fly_20251105_160154_425_1762438973026_photo.jpg", title: "Architectural Shingle Replacement", location: "Roanoke, VA", category: "shingle" },
+  { src: "/assets/web/Untitled-1800-x-1440-px-1.webp", title: "Full Roof Replacement — Aerial View", location: "Blacksburg, VA", category: "shingle" },
+  { src: "/assets/web/gallery-dji_fly_20250630_135332_722_1751306023542_photo.jpg", title: "New Roof — Residential Home", location: "Salem, VA", category: "shingle" },
+  { src: "/assets/web/Untitled-1800-x-1440-px-2.webp", title: "GAF Timberline HDZ Installation", location: "Christiansburg, VA", category: "shingle" },
+  { src: "/assets/web/gallery-dji_fly_20250721_123356_135_1753115663863_photo.jpg", title: "Complete Roof System — Drone View", location: "Radford, VA", category: "shingle" },
+  { src: "/assets/web/Untitled-1800-x-1440-px-3.webp", title: "Premium Roof Replacement", location: "Roanoke, VA", category: "shingle" },
+  { src: "/assets/web/gallery-dji_fly_20250711_160918_986_1752264568015_photo.jpg", title: "Metal Roofing — Farmhouse Style", location: "Floyd, VA", category: "metal" },
+  { src: "/assets/web/gallery-img_5561-1.jpg", title: "Ridge Cap Detail", location: "Christiansburg, VA", category: "repair" },
+  { src: "/assets/web/gallery-dji_fly_20251105_160244_430_1762438961614_photo.jpg", title: "Completed Shingle Roof — Aerial", location: "Blacksburg, VA", category: "shingle" },
+  { src: "/assets/web/gallery-img_5558-1.jpg", title: "Installation In Progress", location: "New River Valley, VA", category: "repair" },
+  { src: "/assets/web/gallery-dji_fly_20250630_140228_761_1751306561592_photo.jpg", title: "Flat Roof System", location: "Christiansburg, VA", category: "repair" },
+  { src: "/assets/web/gallery-dji_fly_20250711_170804_84_1752268097606_photo.jpg", title: "Standing Seam Metal — After", location: "Roanoke, VA", category: "metal" },
+  { src: "/assets/web/gallery-img_5557-1.jpg", title: "Gutter Guard Installation", location: "Blacksburg, VA", category: "gutters" },
+  { src: "/assets/web/gallery-dji_fly_20251105_160302_432_1762438957426_photo.jpg", title: "Storm Damage Repair — Completed", location: "Salem, VA", category: "storm-damage" },
+  { src: "/assets/web/gallery-img_6325.jpg", title: "Residential Roof — Street View", location: "Christiansburg, VA", category: "shingle" },
+  { src: "/assets/web/gallery-img_6324.jpg", title: "Roof Replacement — Complete", location: "Radford, VA", category: "shingle" },
+];
 
-// Build image URLs server-side
-const projectsWithUrls = (projects || []).map((p: any) => ({
-  ...p,
-  beforeUrl: p.beforeImage ? urlForImage(p.beforeImage).width(800).height(600).url() : null,
-  afterUrl: p.afterImage ? urlForImage(p.afterImage).width(800).height(600).url() : null,
-  thumbUrl: p.afterImage ? urlForImage(p.afterImage).width(400).height(300).url() : null,
-}));
+// Before/after project pairs
+const beforeAfterProjects = [
+  {
+    title: "Full Roof Replacement — Before & After",
+    location: "Christiansburg, VA",
+    category: "shingle",
+    before: "/assets/web/IMG_8457-2.webp",
+    after: "/assets/web/IMG_8458-2.webp",
+  },
+  {
+    title: "Shingle Replacement — Before & After",
+    location: "New River Valley, VA",
+    category: "shingle",
+    before: "/assets/web/IMG_1661-1.webp",
+    after: "/assets/web/IMG_1662-1.webp",
+  },
+];
 ---
 
 <Layout
   title="Project Gallery | Before & After Roofing Projects"
   description="See the results of our roofing work. Browse before and after photos of roof replacements, repairs, metal roofing, and storm damage restoration in the New River Valley."
 >
-  <SectionContainer background="warm" padding="lg">
-    <Breadcrumb items={breadcrumbItems} />
-    <div class="mt-6 text-center max-w-3xl mx-auto">
-      <p class="text-accent font-semibold text-sm uppercase tracking-wider mb-3">
-        Our Work
-      </p>
-      <h1 class="text-4xl md:text-5xl font-bold text-text-primary">
-        Before & After Gallery
-      </h1>
-      <p class="mt-4 text-lg text-text-muted max-w-2xl mx-auto">
-        See the transformation. Browse our completed roofing projects from across the New River Valley and Roanoke area.
-      </p>
+  {/* Hero with background image */}
+  <section class="relative py-16 md:py-24 dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src="/assets/web/gallery-dji_fly_20250630_135454_730_1751306110963_photo.jpg"
+        alt="Completed roofing project aerial view"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-bg-darker/80"></div>
+    </div>
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6">
+      <Breadcrumb items={breadcrumbItems} />
+      <div class="mt-6 text-center max-w-3xl mx-auto">
+        <p class="text-accent-light font-semibold text-sm uppercase tracking-wider mb-3">
+          Our Work
+        </p>
+        <h1 class="text-4xl md:text-5xl font-bold text-white">
+          Project Gallery
+        </h1>
+        <p class="mt-4 text-lg text-white/80 max-w-2xl mx-auto">
+          See the transformation. Browse completed roofing projects from across the New River Valley and Roanoke area.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* Before & After Section */}
+  <SectionContainer background="white" padding="md">
+    <div class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-bold text-text-primary">Before & After</h2>
+      <p class="mt-2 text-text-muted">See the difference quality roofing makes</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      {beforeAfterProjects.map((project) => (
+        <div class="bg-bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
+          <div class="grid grid-cols-2 gap-0">
+            <div class="relative">
+              <span class="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold uppercase px-2 py-1 rounded">Before</span>
+              <img src={project.before} alt={`Before — ${project.title}`} class="w-full aspect-square object-cover" loading="lazy" />
+            </div>
+            <div class="relative">
+              <span class="absolute top-2 left-2 bg-accent text-white text-[10px] font-bold uppercase px-2 py-1 rounded">After</span>
+              <img src={project.after} alt={`After — ${project.title}`} class="w-full aspect-square object-cover" loading="lazy" />
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-semibold text-text-primary text-sm">{project.title}</h3>
+            <p class="text-xs text-text-muted mt-1">{project.location}</p>
+          </div>
+        </div>
+      ))}
     </div>
   </SectionContainer>
 
+  {/* Project Gallery Grid */}
   <SectionContainer background="light" padding="md">
-    <!-- Category Filter -->
-    <div class="flex flex-wrap justify-center gap-2 mb-10" id="gallery-filters">
+    <div class="text-center mb-8">
+      <h2 class="text-2xl md:text-3xl font-bold text-text-primary">Completed Projects</h2>
+      <p class="mt-2 text-text-muted">Browse our work by category</p>
+    </div>
+
+    {/* Category Filter */}
+    <div class="flex overflow-x-auto gap-2 mb-10 pb-2 -mx-4 px-4 md:flex-wrap md:justify-center md:overflow-visible md:mx-0 md:px-0 scrollbar-hide" id="gallery-filters">
       {categories.map((cat) => (
         <button
           data-category={cat.value}
           class:list={[
-            "gallery-filter px-4 py-2 rounded-full text-sm font-medium border transition-colors",
+            "gallery-filter px-5 py-2.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap flex-shrink-0",
             cat.value === "all"
               ? "bg-accent text-white border-accent"
-              : "bg-bg-card text-text-muted border-border hover:border-accent hover:text-text-primary",
+              : "bg-white text-text-muted border-border hover:border-accent hover:text-text-primary",
           ]}
         >
           {cat.label}
@@ -72,35 +147,28 @@ const projectsWithUrls = (projects || []).map((p: any) => ({
       ))}
     </div>
 
-    {/* Static gallery photos — will be replaced with CMS content when Sanity is connected */}
-    <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6" id="gallery-grid">
-      {[
-        { src: "/assets/web/Untitled-1800-x-1440-px.webp", title: "Premium Shingle Roof — Stone Estate", location: "New River Valley, VA" },
-        { src: "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.webp", title: "Standing Seam Metal Roof", location: "Christiansburg, VA" },
-        { src: "/assets/web/gallery-dji_fly_20251105_160154_425_1762438973026_photo.webp", title: "Architectural Shingle Replacement", location: "Roanoke, VA" },
-        { src: "/assets/web/Untitled-1800-x-1440-px-1.jpg", title: "Full Roof Replacement — Aerial View", location: "Blacksburg, VA" },
-        { src: "/assets/web/gallery-dji_fly_20250630_135332_722_1751306023542_photo.jpg", title: "New Roof — Residential Home", location: "Salem, VA" },
-        { src: "/assets/web/Untitled-1800-x-1440-px-2.webp", title: "GAF Timberline HDZ Installation", location: "Christiansburg, VA" },
-        { src: "/assets/web/gallery-dji_fly_20250721_123356_135_1753115663863_photo.jpg", title: "Complete Roof System — Drone View", location: "Radford, VA" },
-        { src: "/assets/web/Untitled-1800-x-1440-px-3.webp", title: "Premium Roof Replacement", location: "Roanoke, VA" },
-        { src: "/assets/web/gallery-dji_fly_20250711_160918_986_1752264568015_photo.jpg", title: "Metal Roofing — Farmhouse Style", location: "Floyd, VA" },
-        { src: "/assets/web/gallery-img_5561-1.jpg", title: "Roof Detail — Ridge Cap", location: "Christiansburg, VA" },
-        { src: "/assets/web/gallery-dji_fly_20251105_160244_430_1762438961614_photo.jpg", title: "Completed Shingle Roof — Aerial", location: "Blacksburg, VA" },
-        { src: "/assets/web/gallery-img_5558-1.jpg", title: "Installation In Progress", location: "New River Valley, VA" },
-      ].map((photo) => (
-        <div class="gallery-item group break-inside-avoid">
-          <div class="bg-bg-card border border-border rounded-xl overflow-hidden transition-all hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5">
-            <div class="aspect-[4/3] overflow-hidden">
+    {/* Card Grid */}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="gallery-grid">
+      {galleryProjects.map((project) => (
+        <div class="gallery-item group" data-category={project.category}>
+          <div class="bg-white border border-border rounded-xl overflow-hidden transition-all hover:border-accent/40 hover:shadow-lg">
+            <div class="relative aspect-[4/3] overflow-hidden">
               <img
-                src={photo.src}
-                alt={photo.title}
+                src={project.src}
+                alt={project.title}
                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
               />
+              <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-text-primary text-[11px] font-semibold uppercase tracking-wide px-3 py-1 rounded-full">
+                {project.category === "storm-damage" ? "Storm Damage" : project.category.charAt(0).toUpperCase() + project.category.slice(1)}
+              </span>
             </div>
             <div class="p-4">
-              <h3 class="font-semibold text-text-primary text-sm">{photo.title}</h3>
-              <p class="text-xs text-text-muted mt-1">{photo.location}</p>
+              <h3 class="font-semibold text-text-primary text-sm group-hover:text-accent transition-colors">{project.title}</h3>
+              <p class="text-xs text-text-muted mt-1 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                {project.location}
+              </p>
             </div>
           </div>
         </div>
@@ -108,32 +176,7 @@ const projectsWithUrls = (projects || []).map((p: any) => ({
     </div>
   </SectionContainer>
 
-  <!-- Lightbox Modal (hidden by default) -->
-  <div id="gallery-lightbox" class="fixed inset-0 z-[60] hidden items-center justify-center">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="lightbox-backdrop"></div>
-    <div class="relative w-full max-w-3xl mx-4 bg-white border border-border rounded-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto shadow-2xl">
-      <button
-        id="lightbox-close"
-        class="absolute top-4 right-4 text-text-dim hover:text-text-primary transition-colors p-1 z-10"
-        aria-label="Close"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-      </button>
-      <div id="lightbox-slider" class="mb-4">
-        <!-- BeforeAfterSlider renders here -->
-      </div>
-      <h3 id="lightbox-title" class="text-xl font-bold text-text-primary"></h3>
-      <div class="flex items-center gap-2 mt-1 mb-2">
-        <span id="lightbox-category" class="text-sm text-accent font-medium"></span>
-        <span id="lightbox-location" class="text-sm text-text-dim"></span>
-      </div>
-      <p id="lightbox-description" class="text-text-muted text-sm"></p>
-    </div>
-  </div>
-
-  <!-- CTA -->
+  {/* CTA */}
   <SectionContainer background="accent" padding="md">
     <div class="text-center">
       <h2 class="text-3xl md:text-4xl font-bold text-white">
@@ -143,20 +186,25 @@ const projectsWithUrls = (projects || []).map((p: any) => ({
         Join 600+ Virginia homeowners who chose MDR. Get a free inspection and see what's possible.
       </p>
       <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-        <Button href="/contact" variant="secondary" size="lg">
+        <a href="/contact" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-lg bg-white text-accent hover:bg-gray-100 shadow-lg transition-all min-h-[52px]">
           Get Free Estimate
-        </Button>
-        <Button href="tel:5405536007" variant="ghost" size="lg" class="text-white border-white/30 hover:bg-white/10">
+          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </a>
+        <a href="tel:5405536007" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-lg border-2 border-white text-white hover:bg-white/10 transition-all min-h-[52px]">
           Call (540) 553-6007
-        </Button>
+        </a>
       </div>
     </div>
   </SectionContainer>
 </Layout>
 
+<style>
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
 <script>
   function initGallery() {
-    // Category filtering
     const filters = document.querySelectorAll<HTMLButtonElement>(".gallery-filter");
     const items = document.querySelectorAll<HTMLElement>(".gallery-item");
 
@@ -167,12 +215,12 @@ const projectsWithUrls = (projects || []).map((p: any) => ({
         // Update active state
         filters.forEach((f) => {
           f.classList.remove("bg-accent", "text-white", "border-accent");
-          f.classList.add("bg-bg-card", "text-text-muted", "border-border");
+          f.classList.add("bg-white", "text-text-muted", "border-border");
         });
-        btn.classList.remove("bg-bg-card", "text-text-muted", "border-border");
+        btn.classList.remove("bg-white", "text-text-muted", "border-border");
         btn.classList.add("bg-accent", "text-white", "border-accent");
 
-        // Filter items
+        // Filter items with fade
         items.forEach((item) => {
           if (category === "all" || item.dataset.category === category) {
             item.style.display = "";
@@ -181,62 +229,6 @@ const projectsWithUrls = (projects || []).map((p: any) => ({
           }
         });
       });
-    });
-
-    // Lightbox
-    const lightbox = document.getElementById("gallery-lightbox");
-    const lightboxClose = document.getElementById("lightbox-close");
-    const lightboxBackdrop = document.getElementById("lightbox-backdrop");
-    const lightboxTitle = document.getElementById("lightbox-title");
-    const lightboxCategory = document.getElementById("lightbox-category");
-    const lightboxLocation = document.getElementById("lightbox-location");
-    const lightboxDescription = document.getElementById("lightbox-description");
-    const lightboxSlider = document.getElementById("lightbox-slider");
-
-    function closeLightbox() {
-      if (lightbox) {
-        lightbox.classList.add("hidden");
-        lightbox.classList.remove("flex");
-        document.body.style.overflow = "";
-      }
-    }
-
-    items.forEach((item) => {
-      item.addEventListener("click", () => {
-        const { before, after, title, description, location, category } = item.dataset;
-        if (!before || !after || !lightbox) return;
-
-        if (lightboxTitle) lightboxTitle.textContent = title || "";
-        if (lightboxCategory) lightboxCategory.textContent = (category || "").replace("-", " ").toUpperCase();
-        if (lightboxLocation) lightboxLocation.textContent = location ? `· ${location}` : "";
-        if (lightboxDescription) lightboxDescription.textContent = description || "";
-
-        // Render slider as simple comparison (React hydration not available in lightbox)
-        if (lightboxSlider) {
-          lightboxSlider.innerHTML = `
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <span class="block text-xs font-semibold text-text-dim mb-2 uppercase">Before</span>
-                <img src="${before}" alt="Before" class="w-full rounded-lg aspect-[4/3] object-cover" />
-              </div>
-              <div>
-                <span class="block text-xs font-semibold text-text-dim mb-2 uppercase">After</span>
-                <img src="${after}" alt="After" class="w-full rounded-lg aspect-[4/3] object-cover" />
-              </div>
-            </div>
-          `;
-        }
-
-        lightbox.classList.remove("hidden");
-        lightbox.classList.add("flex");
-        document.body.style.overflow = "hidden";
-      });
-    });
-
-    lightboxClose?.addEventListener("click", closeLightbox);
-    lightboxBackdrop?.addEventListener("click", closeLightbox);
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeLightbox();
     });
   }
 

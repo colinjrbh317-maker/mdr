@@ -116,7 +116,7 @@ export default function ChatWidget() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: newMessages.filter((m) => m !== WELCOME_MESSAGE),
+          messages: newMessages.filter((m) => m.role !== "assistant" || m.content !== WELCOME_MESSAGE.content),
           page: window.location.pathname,
         }),
       });
@@ -135,6 +135,7 @@ export default function ChatWidget() {
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       let assistantContent = "";
+      let buffer = "";
 
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
@@ -143,8 +144,10 @@ export default function ChatWidget() {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const text = decoder.decode(value);
-          const lines = text.split("\n");
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          // Keep the last incomplete line in the buffer
+          buffer = lines.pop() || "";
 
           for (const line of lines) {
             if (line.startsWith("data: ")) {

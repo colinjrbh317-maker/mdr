@@ -12,14 +12,12 @@ const services: Service[] = [
     {
         title: "Roof Replacement",
         description: "Complete tear-off and replacement with premium GAF roofing systems. Lifetime warranty available from a GAF Master Elite contractor.",
-        testimonial: { quote: "Done in one day. The crew was incredible.", name: "Dawn M., Christiansburg" },
         image: "/assets/web/Untitled-1800-x-1440-px.webp",
         href: "/services/roof-replacement",
     },
     {
         title: "Metal Roofing",
         description: "Durable standing seam and metal panel systems built to last 50+ years with minimal maintenance.",
-        testimonial: { quote: "Professional and on time. Our roof looks great.", name: "Bonnie D., Blacksburg" },
         image: "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.webp",
         href: "/services/metal-roofing",
     },
@@ -38,7 +36,6 @@ const services: Service[] = [
     {
         title: "Storm Damage",
         description: "Insurance claim assistance and emergency tarping. We work directly with your insurer from start to finish.",
-        testimonial: { quote: "They made this process a breeze. Really made it easy to understand.", name: "Amory L., Roanoke" },
         image: "/assets/web/Untitled-1800-x-1440-px-3.webp",
         href: "/services/storm-damage",
     },
