@@ -17,7 +17,7 @@
     </div>
     <button
       id="bar-dismiss"
-      class="absolute right-2 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-1"
+      class="absolute right-1 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
       aria-label="Dismiss announcement"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -75,7 +75,7 @@
           <span>${msg.text} </span>
           <a
             href="${msg.href}"
-            class="underline font-semibold hover:text-white/80 transition-colors"
+            class="underline font-semibold hover:text-white/80 transition-colors inline-block py-2"
             data-bar-message="${index}"
           >${msg.cta} →</a>
         `;
