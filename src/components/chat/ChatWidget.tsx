@@ -255,17 +255,18 @@ export default function ChatWidget() {
       {isOpen && (
         <div className="fixed z-50 lg:bottom-6 lg:right-6 lg:w-[380px] lg:h-[520px] lg:rounded-2xl inset-0 lg:inset-auto bg-white shadow-2xl border border-border flex flex-col overflow-hidden lg:animate-slide-up">
           {/* Header */}
-          <div className="bg-dark text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
+          <div className="px-4 py-3 flex items-center justify-between flex-shrink-0" style={{ backgroundColor: "#1B1B1B" }}>
             <div>
-              <h3 className="font-bold text-sm">Chat with MDR</h3>
-              <span className="text-[10px] text-white/60">Powered by AI</span>
+              <h3 className="font-bold text-sm text-white">Chat with MDR</h3>
+              <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.6)" }}>Powered by AI</span>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white hover:text-white/80 transition-colors p-1.5 bg-white/20 rounded-full"
+              className="rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "rgba(255,255,255,0.25)", padding: "6px" }}
               aria-label="Close chat"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
