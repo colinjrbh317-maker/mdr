@@ -145,10 +145,12 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
 
       {/* Project Type */}
       <div>
+        <label htmlFor={`service-${source}`} className="sr-only">Project Type</label>
         <select
           id={`service-${source}`}
           name="service"
           className={inputClass}
+          aria-label="Project Type"
         >
           <option value="">Project Type</option>
           <option value="Roof Replacement">Roof Replacement</option>

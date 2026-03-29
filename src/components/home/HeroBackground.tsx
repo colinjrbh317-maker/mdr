@@ -24,8 +24,11 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
             loop
             playsInline
             poster={posterUrl}
+            // @ts-ignore -- fetchpriority not yet in React types
+            fetchpriority="high"
           >
             <source src={videoUrl} type="video/mp4" />
+            <track kind="captions" label="No dialogue" default />
           </video>
         ) : posterUrl ? (
           <img

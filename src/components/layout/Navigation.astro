@@ -192,7 +192,7 @@ const ctaLink = navigation?.ctaLink || "/contact";
   <div
     id="mobile-menu"
     class="fixed inset-0 z-50 transform translate-x-full transition-transform duration-300 lg:hidden"
-    aria-hidden="true"
+    inert
   >
     {/* Backdrop */}
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity opacity-0" id="mobile-menu-backdrop"></div>
@@ -307,6 +307,7 @@ const ctaLink = navigation?.ctaLink || "/contact";
     
     if (!isExpanded) {
       // Open
+      menu?.removeAttribute("inert");
       menu?.classList.remove("translate-x-full");
       setTimeout(() => {
           backdrop?.classList.remove("opacity-0");
@@ -319,6 +320,7 @@ const ctaLink = navigation?.ctaLink || "/contact";
       menuContent?.classList.add("translate-x-full");
       setTimeout(() => {
         menu?.classList.add("translate-x-full");
+        menu?.setAttribute("inert", "");
         document.body.style.overflow = "";
       }, 300);
     }
