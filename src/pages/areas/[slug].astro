@@ -88,6 +88,34 @@ const areaServed = isHub
     }))
   : [{ "@type": "City", name: `${area.name}, VA` }];
 
+// Fallback images for services without CMS photos
+const serviceFallbackImages: Record<string, string> = {
+  "roof-replacement": "/assets/projects/Untitled-1800-x-1440-px.jpg",
+  "shingle-roofing": "/assets/projects/Untitled-1800-x-1440-px-1.jpg",
+  "metal-roofing": "/assets/projects/dji_fly_20250630_135406_726_1751306060507_photo.JPG",
+  "timber-seal": "/assets/projects/Untitled-1800-x-1440-px-4.jpg",
+  "roof-repair": "/assets/projects/Untitled-1800-x-1440-px-2.jpg",
+  "roof-maintenance": "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG",
+  "gutters": "/assets/projects/dji_fly_20251105_160008_416_1762439005458_photo.JPG",
+  "storm-damage": "/assets/projects/Untitled-1800-x-1440-px-3.jpg",
+  "commercial-roofing": "/assets/projects/dji_fly_20251105_155920_411_1762439016516_photo.JPG",
+  "flat-roofing": "/assets/projects/dji_fly_20250630_140410_766_1751306661861_photo.JPG",
+  "siding": "/assets/projects/dji_fly_20251105_160046_419_1762438984409_photo-1.JPG",
+  "skylights": "/assets/projects/IMG_5558-1.jpg",
+  "roof-coatings": "/assets/projects/dji_fly_20250630_135844_746_1751306349301_photo.JPG",
+};
+
+function getServiceImage(service: any): string {
+  if (service.featuredImage) return urlForImage(service.featuredImage).width(400).height(225).url();
+  return serviceFallbackImages[service.slug] || "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG";
+}
+
+function getAreaImage(areaItem: any): string {
+  if (areaItem.featuredImage) return urlForImage(areaItem.featuredImage).width(400).height(225).url();
+  const slug = areaItem.slug?.current || areaItem.slug;
+  return `/assets/areas/${slug}-hero.webp`;
+}
+
 const localBusinessJsonLd = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "RoofingContractor"],
@@ -185,20 +213,13 @@ const localBusinessJsonLd = {
           <ScrollReveal delay={i * 100}>
             <Card variant="service" href={`/areas/${child.slug}`}>
               <div class="mb-4">
-                {child.featuredImage ? (
-                  <img
-                    src={urlForImage(child.featuredImage).width(400).height(225).url()}
-                    alt={child.name}
-                    class="w-full rounded-lg object-cover"
-                    style="aspect-ratio: 16/9;"
-                  />
-                ) : (
-                  <ImagePlaceholder
-                    description={`${child.name} area photo`}
-                    aspectRatio="16/9"
-                    class="w-full"
-                  />
-                )}
+                <img
+                  src={getAreaImage(child)}
+                  alt={`Roofing services in ${child.name}, VA`}
+                  class="w-full rounded-lg object-cover"
+                  style="aspect-ratio: 16/9;"
+                  loading="lazy"
+                />
               </div>
               <h3 class="text-lg font-semibold text-text-primary mb-2">
                 {child.name}
@@ -224,20 +245,13 @@ const localBusinessJsonLd = {
           <ScrollReveal delay={i * 100}>
             <Card variant="service" href={`/services/${service.slug}`}>
               <div class="mb-4">
-                {service.featuredImage ? (
-                  <img
-                    src={urlForImage(service.featuredImage).width(400).height(225).url()}
-                    alt={service.name}
-                    class="w-full rounded-lg object-cover"
-                    style="aspect-ratio: 16/9;"
-                  />
-                ) : (
-                  <ImagePlaceholder
-                    description={`${service.name} service photo`}
-                    aspectRatio="16/9"
-                    class="w-full"
-                  />
-                )}
+                <img
+                  src={getServiceImage(service)}
+                  alt={service.name}
+                  class="w-full rounded-lg object-cover"
+                  style="aspect-ratio: 16/9;"
+                  loading="lazy"
+                />
               </div>
               <h3 class="text-lg font-semibold text-text-primary mb-2">
                 {service.name}
