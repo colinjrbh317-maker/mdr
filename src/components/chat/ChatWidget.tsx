@@ -5,6 +5,32 @@ interface Message {
   content: string;
 }
 
+/**
+ * Converts [Link Text](URL) to clickable HTML links and strips any
+ * remaining markdown formatting (bold, italic, headers, etc.)
+ */
+function formatChatMessage(text: string): string {
+  let formatted = text;
+  // Convert markdown links [text](url) to HTML links
+  formatted = formatted.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    '<a href="$2" class="underline text-accent hover:text-accent-dark" target="_self">$1</a>'
+  );
+  // Strip bold **text** or __text__
+  formatted = formatted.replace(/\*\*(.+?)\*\*/g, "$1");
+  formatted = formatted.replace(/__(.+?)__/g, "$1");
+  // Strip italic *text* or _text_
+  formatted = formatted.replace(/\*(.+?)\*/g, "$1");
+  formatted = formatted.replace(/_(.+?)_/g, "$1");
+  // Strip headers (# ## ### etc)
+  formatted = formatted.replace(/^#{1,6}\s+/gm, "");
+  // Strip backticks
+  formatted = formatted.replace(/`([^`]+)`/g, "$1");
+  // Convert line breaks to <br>
+  formatted = formatted.replace(/\n/g, "<br>");
+  return formatted;
+}
+
 const STORAGE_KEY = "mdr_chat_history";
 const MAX_MESSAGES = 20;
 
@@ -259,12 +285,16 @@ export default function ChatWidget() {
                       : "bg-bg-light text-text-primary rounded-bl-sm"
                   }`}
                 >
-                  {msg.content || (
+                  {!msg.content ? (
                     <span className="flex gap-1">
                       <span className="animate-pulse">●</span>
                       <span className="animate-pulse" style={{ animationDelay: "0.2s" }}>●</span>
                       <span className="animate-pulse" style={{ animationDelay: "0.4s" }}>●</span>
                     </span>
+                  ) : msg.role === "assistant" ? (
+                    <span dangerouslySetInnerHTML={{ __html: formatChatMessage(msg.content) }} />
+                  ) : (
+                    msg.content
                   )}
                 </div>
               </div>
