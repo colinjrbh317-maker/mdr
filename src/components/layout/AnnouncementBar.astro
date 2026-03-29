@@ -65,6 +65,12 @@
           href: "/gallery",
           show: true,
         },
+        {
+          text: "🔥 Spring 2026 Special — $500 Off Any Roofing Service. Expires May 31.",
+          cta: "Claim Offer",
+          href: "/offers/500-off",
+          show: new Date() < new Date("2026-06-01"),
+        },
       ].filter((m) => m.show);
 
       let currentIndex = 0;

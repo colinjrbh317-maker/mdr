@@ -194,6 +194,7 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
             <h2 className="text-2xl font-bold text-text-primary mb-2">
               $500 Off Your {selectedService || "Roof Project"}
             </h2>
+            <p className="text-accent font-semibold text-sm mb-1">Spring 2026 Special — expires May 31</p>
             <p className="text-text-muted mb-6">
               Claim your discount — just tell us how to reach you.
             </p>

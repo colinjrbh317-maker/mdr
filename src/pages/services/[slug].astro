@@ -16,6 +16,7 @@ import {
 } from "@/sanity/lib/queries";
 import { urlForImage } from "@/sanity/lib/url-for-image";
 import ScrollReveal from "@/components/common/ScrollReveal.astro";
+import PromoBanner from "@/components/cro/PromoBanner.astro";
 
 export const prerender = true;
 
@@ -435,6 +436,9 @@ const serviceJsonLd = {
               (540) 553-6007
             </a>
           </div>
+
+          {/* Promo Banner */}
+          <PromoBanner />
 
           {/* Related Services */}
           {allRelated.length > 0 && (
