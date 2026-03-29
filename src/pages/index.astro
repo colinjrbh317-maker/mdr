@@ -94,6 +94,16 @@ const homepageFaqs = [
   <AngleDivider direction="up" color="var(--color-bg-white)" />
   <ServicesAndGallery />
 
+  {/* Inline CTA after services */}
+  <SectionContainer background="light" padding="sm">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+      <p class="text-text-muted text-sm">Ready to get started?</p>
+      <Button href="/contact" size="sm">Get a Free Estimate</Button>
+      <span class="text-text-dim text-sm hidden sm:inline">or</span>
+      <a href="tel:5405536007" class="text-sm font-semibold text-text-primary hover:text-accent transition-colors">(540) 553-6007</a>
+    </div>
+  </SectionContainer>
+
   {/* 4. WHY MDR — value proposition cards */}
   <WhyMDR />
 
@@ -165,6 +175,14 @@ const homepageFaqs = [
       <Button href="/areas" variant="outline" size="lg">
         View All Service Areas
       </Button>
+    </div>
+  </SectionContainer>
+
+  {/* Inline CTA before reviews */}
+  <SectionContainer background="warm" padding="sm">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+      <p class="text-text-body font-medium text-sm">Not sure what you need? We'll figure it out together.</p>
+      <Button href="/contact" size="sm" variant="outline">Schedule Free Inspection</Button>
     </div>
   </SectionContainer>
 

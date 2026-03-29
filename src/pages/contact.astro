@@ -73,8 +73,17 @@ const jsonLd = {
   })} />
 
   {/* Hero Banner */}
-  <section class="bg-bg-darker py-14 md:py-20">
-    <div class="mx-auto max-w-[900px] px-4 md:px-6 text-center">
+  <section class="relative py-14 md:py-20 dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src="/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG"
+        alt="Roof replacement project"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-bg-darker/85"></div>
+    </div>
+    <div class="relative z-10 mx-auto max-w-[900px] px-4 md:px-6 text-center">
       <Breadcrumb items={breadcrumbItems} />
       <h1 class="text-3xl md:text-5xl font-display font-bold mb-4 mt-4" style="color: #fff;">
         Get Your Free Roofing Estimate!
