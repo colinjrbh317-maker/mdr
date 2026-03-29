@@ -72,8 +72,11 @@ export async function createContact(data: ContactData): Promise<CreateContactRes
     return null;
   }
 
+  // Contact type GUIDs from GET /contacts/contact-types
+  const CUSTOMER_TYPE_ID = "52ba94c5-3ecf-4e7f-90cd-a91de12a72f5";
+
   const body: Record<string, unknown> = {
-    contactType: "Customer",
+    contactTypeIds: [CUSTOMER_TYPE_ID],
     firstName: data.firstName,
     lastName: data.lastName,
   };
@@ -97,14 +100,15 @@ export async function createContact(data: ContactData): Promise<CreateContactRes
     ];
   }
 
-  // Build mailing address
-  if (data.address || data.city || data.state || data.zip) {
-    body.mailingAddress = {
-      street1: data.address || "",
-      city: data.city || "",
-      state: data.state || "",
-      zip: data.zip || "",
-    };
+  // Build mailing address — only include fields with actual values
+  // AccuLynx requires state to be a valid enum (e.g. "VA"), not empty string
+  const mailingAddress: Record<string, string> = {};
+  if (data.address) mailingAddress.street1 = data.address;
+  if (data.city) mailingAddress.city = data.city;
+  if (data.state) mailingAddress.state = data.state;
+  if (data.zip) mailingAddress.zip = data.zip;
+  if (Object.keys(mailingAddress).length > 0) {
+    body.mailingAddress = mailingAddress;
   }
 
   const res = await post("/contacts", body);
@@ -146,22 +150,22 @@ export async function createJob(data: JobData): Promise<CreateJobResult | null> 
   }
 
   const body: Record<string, unknown> = {
-    contactId: data.contactId,
+    contact: { id: data.contactId },
   };
 
-  // Location address (required for job creation)
-  if (data.address || data.city || data.state || data.zip) {
-    body.locationAddress = {
-      street1: data.address || "",
-      city: data.city || "",
-      state: data.state || "",
-      zip: data.zip || "",
-    };
+  // Location address — only include fields with actual values
+  const locationAddress: Record<string, string> = {};
+  if (data.address) locationAddress.street1 = data.address;
+  if (data.city) locationAddress.city = data.city;
+  if (data.state) locationAddress.state = data.state;
+  if (data.zip) locationAddress.zip = data.zip;
+  if (Object.keys(locationAddress).length > 0) {
+    body.locationAddress = locationAddress;
   }
 
-  // Lead source
+  // Lead source — AccuLynx expects object with name, not plain string
   if (data.leadSource) {
-    body.leadSource = data.leadSource;
+    body.leadSource = { name: data.leadSource };
   }
 
   // Work type / service type
