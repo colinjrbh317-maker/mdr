@@ -1,0 +1,117 @@
+---
+/**
+ * Rotating announcement bar with social proof, financing, and seasonal messages.
+ * Replaces the static bar that was in Header.astro.
+ * Visible on both mobile and desktop. Dismissible per session.
+ */
+---
+
+<div
+  id="announcement-bar"
+  class="bg-accent text-white text-center text-xs sm:text-sm py-2 px-4 relative"
+  role="banner"
+>
+  <div class="max-w-[1200px] mx-auto flex items-center justify-center gap-2">
+    <div id="bar-messages" class="flex-1 transition-opacity duration-500">
+      <!-- Messages injected by script -->
+    </div>
+    <button
+      id="bar-dismiss"
+      class="absolute right-2 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-1"
+      aria-label="Dismiss announcement"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M18 6L6 18M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  const bar = document.getElementById("announcement-bar");
+  const container = document.getElementById("bar-messages");
+  const dismissBtn = document.getElementById("bar-dismiss");
+
+  if (bar && container) {
+    // Check if dismissed this session
+    if (sessionStorage.getItem("bar_dismissed")) {
+      bar.style.display = "none";
+    } else {
+      const month = new Date().getMonth(); // 0-indexed
+      const isStormSeason = month >= 2 && month <= 8; // March–September
+
+      const messages = [
+        {
+          text: "★ 231 Five-Star Reviews — Virginia's #1 Rated Roofer",
+          cta: "Book Free Inspection",
+          href: "#hero-form",
+          show: true,
+        },
+        {
+          text: "$0 Down Financing Available — Check Your Rate in 2 Min",
+          cta: "See Options",
+          href: "/financing",
+          show: true,
+        },
+        {
+          text: "⚡ Storm Season Alert — Free Damage Inspections Available",
+          cta: "Schedule Now",
+          href: "/contact",
+          show: isStormSeason,
+        },
+        {
+          text: "GAF President's Club 2026 — Top 1% Contractor in America",
+          cta: "See Our Work",
+          href: "/gallery",
+          show: true,
+        },
+      ].filter((m) => m.show);
+
+      let currentIndex = 0;
+
+      function render(index: number) {
+        const msg = messages[index];
+        container!.innerHTML = `
+          <span>${msg.text} </span>
+          <a
+            href="${msg.href}"
+            class="underline font-semibold hover:text-white/80 transition-colors"
+            data-bar-message="${index}"
+          >${msg.cta} →</a>
+        `;
+      }
+
+      render(0);
+
+      // Rotate every 6 seconds
+      if (messages.length > 1) {
+        setInterval(() => {
+          container!.style.opacity = "0";
+          setTimeout(() => {
+            currentIndex = (currentIndex + 1) % messages.length;
+            render(currentIndex);
+            container!.style.opacity = "1";
+          }, 400);
+        }, 6000);
+      }
+
+      // GA4 tracking on CTA clicks
+      container.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const link = target.closest("a[data-bar-message]");
+        if (link && typeof (window as any).gtag === "function") {
+          (window as any).gtag("event", "announcement_bar_click", {
+            event_category: "cro",
+            event_label: messages[currentIndex]?.cta || "unknown",
+          });
+        }
+      });
+
+      // Dismiss button
+      dismissBtn?.addEventListener("click", () => {
+        sessionStorage.setItem("bar_dismissed", "1");
+        bar.style.display = "none";
+      });
+    }
+  }
+</script>

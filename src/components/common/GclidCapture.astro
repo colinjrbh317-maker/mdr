@@ -1,5 +1,5 @@
 ---
-// Captures gclid/fclid from URL params and stores in sessionStorage for lead attribution
+// Captures gclid/fclid/UTM params from URL and stores in sessionStorage for lead attribution and personalization
 ---
 
 <script>
@@ -10,6 +10,20 @@
   if (gclid) sessionStorage.setItem("gclid", gclid);
   if (fclid) sessionStorage.setItem("fclid", fclid);
   if (gclid || fclid) {
+    sessionStorage.setItem("landing_page", window.location.href);
+  }
+
+  // UTM parameter capture for personalization
+  const utmSource = params.get("utm_source");
+  const utmMedium = params.get("utm_medium");
+  const utmCampaign = params.get("utm_campaign");
+
+  if (utmSource) sessionStorage.setItem("utm_source", utmSource);
+  if (utmMedium) sessionStorage.setItem("utm_medium", utmMedium);
+  if (utmCampaign) sessionStorage.setItem("utm_campaign", utmCampaign);
+
+  // Set landing page for any tracked visit
+  if (!sessionStorage.getItem("landing_page") && (utmSource || gclid || fclid)) {
     sessionStorage.setItem("landing_page", window.location.href);
   }
 </script>

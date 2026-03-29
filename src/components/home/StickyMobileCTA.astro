@@ -47,9 +47,10 @@
     if (!bar) return;
 
     let shown = false;
+    let chatOpen = false;
 
-    function checkScroll() {
-      const shouldShow = window.scrollY > 300;
+    function updateVisibility() {
+      const shouldShow = window.scrollY > 300 && !chatOpen;
       if (shouldShow && !shown) {
         bar.classList.remove('translate-y-full');
         bar.classList.add('translate-y-0');
@@ -61,8 +62,19 @@
       }
     }
 
-    window.addEventListener('scroll', checkScroll, { passive: true });
-    checkScroll();
+    window.addEventListener('scroll', updateVisibility, { passive: true });
+
+    // Hide when chatbot is open
+    window.addEventListener('mdr:chat-open', () => {
+      chatOpen = true;
+      updateVisibility();
+    });
+    window.addEventListener('mdr:chat-close', () => {
+      chatOpen = false;
+      updateVisibility();
+    });
+
+    updateVisibility();
   }
 
   initStickyBar();

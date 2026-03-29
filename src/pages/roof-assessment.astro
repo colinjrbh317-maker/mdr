@@ -1,0 +1,30 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import RoofQuiz from "@/components/quiz/RoofQuiz";
+
+export const prerender = true;
+---
+
+<Layout
+  title="Free Roof Assessment"
+  description="Answer 4 quick questions to get a personalized roofing recommendation from Modern Day Roofing. Free inspections available in the New River Valley and Roanoke."
+>
+  <SectionContainer background="white">
+    <div class="py-12 md:py-20">
+      <div class="text-center mb-10">
+        <span class="inline-block px-3 py-1 bg-accent/10 text-accent text-xs font-semibold uppercase tracking-wide rounded-full mb-4">
+          Free Assessment
+        </span>
+        <h1 class="text-3xl md:text-4xl font-heading font-extrabold text-text-primary mb-3">
+          Get Your Personalized Roof Recommendation
+        </h1>
+        <p class="text-text-muted max-w-md mx-auto">
+          Answer 4 quick questions and we'll tell you exactly what your roof needs — plus a free inspection.
+        </p>
+      </div>
+
+      <RoofQuiz client:load />
+    </div>
+  </SectionContainer>
+</Layout>

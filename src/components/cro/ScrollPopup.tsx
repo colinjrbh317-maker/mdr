@@ -1,20 +1,24 @@
 import { useState, useEffect } from "react";
-import FormModal from "../forms/FormModal";
 
+/**
+ * Redesigned scroll popup — slide-in toast from bottom-right instead of
+ * full-screen modal. Social proof messaging, less interruptive.
+ * Coordinated with exit-intent: won't show if exit popup already appeared.
+ */
 export default function ScrollPopup() {
-  const [showPromo, setShowPromo] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem("scroll_popup_shown")) return;
     if (sessionStorage.getItem("form_submitted")) return;
+    // Coordination: skip if exit popup already shown
+    if (sessionStorage.getItem("exit_popup_shown")) return;
 
     const pageLoadTime = Date.now();
     let triggered = false;
 
     function handleScroll() {
       if (triggered) return;
-      // Must be on page for at least 15 seconds
       if (Date.now() - pageLoadTime < 15000) return;
 
       const scrollPercent =
@@ -23,7 +27,7 @@ export default function ScrollPopup() {
       if (scrollPercent >= 0.5) {
         triggered = true;
         sessionStorage.setItem("scroll_popup_shown", "1");
-        setShowPromo(true);
+        setVisible(true);
         window.removeEventListener("scroll", handleScroll);
       }
     }
@@ -32,81 +36,71 @@ export default function ScrollPopup() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close on Escape
   useEffect(() => {
-    if (!showPromo) return;
+    if (!visible) return;
     function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setShowPromo(false);
+      if (e.key === "Escape") setVisible(false);
     }
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [showPromo]);
+  }, [visible]);
 
-  if (!showPromo && !showForm) return null;
-
-  if (showForm) {
-    return <FormModal isOpen={true} onClose={() => setShowForm(false)} />;
-  }
+  if (!visible) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) setShowPromo(false);
-      }}
+      className="fixed bottom-6 right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl border border-border overflow-hidden animate-slide-up"
+      role="complementary"
+      aria-label="Special offer"
     >
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      {/* Accent top stripe */}
+      <div className="h-1 bg-accent" />
 
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Financing offer"
-        className="relative w-full max-w-md mx-4 bg-white border border-border rounded-2xl p-8 animate-slide-up text-center shadow-2xl"
-      >
+      <div className="p-5">
         <button
-          onClick={() => setShowPromo(false)}
-          className="absolute top-4 right-4 text-text-dim hover:text-text-primary transition-colors p-1"
+          onClick={() => setVisible(false)}
+          className="absolute top-3 right-3 text-text-dim hover:text-text-primary transition-colors p-1"
           aria-label="Close"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </button>
 
-        <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-          </svg>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex -space-x-1.5">
+            {[...Array(5)].map((_, i) => (
+              <span key={i} className="text-amber-400 text-sm">★</span>
+            ))}
+          </div>
+          <span className="text-xs font-semibold text-text-muted">231 Reviews</span>
         </div>
 
-        <h2 className="text-2xl font-bold text-text-primary mb-2">
-          0% Financing Available
-        </h2>
-        <p className="text-text-muted mb-6">
-          Get a new roof with $0 down and low monthly payments. Check your rate in minutes — no impact to your credit score.
+        <h3 className="text-lg font-bold text-text-primary leading-tight mb-1">
+          Join 600+ Homeowners Who Trust Modern Day Roofing
+        </h3>
+        <p className="text-sm text-text-muted mb-4">
+          Free inspections. GAF Golden Pledge warranty. $0 down financing available.
         </p>
 
-        <div className="flex flex-col gap-3">
-          <a
-            href="/financing"
-            className="w-full px-6 py-3 bg-accent hover:bg-accent-dark text-white font-semibold rounded-lg transition-colors inline-block"
-          >
-            View Financing Options
-          </a>
-          <button
-            onClick={() => {
-              setShowPromo(false);
-              setShowForm(true);
-            }}
-            className="w-full px-6 py-3 border border-border text-text-primary hover:bg-bg-card font-semibold rounded-lg transition-colors"
-          >
-            Get a Free Estimate
-          </button>
-        </div>
+        <a
+          href="/contact"
+          className="block w-full px-5 py-2.5 bg-accent hover:bg-accent-dark text-white text-sm font-semibold rounded-lg transition-colors text-center"
+          onClick={() => {
+            if (typeof (window as any).gtag === "function") {
+              (window as any).gtag("event", "scroll_popup_click", {
+                event_category: "cro",
+                event_label: "get_free_inspection",
+              });
+            }
+          }}
+        >
+          Get Your Free Inspection
+        </a>
 
         <button
-          onClick={() => setShowPromo(false)}
-          className="mt-3 text-sm text-text-dim hover:text-text-muted transition-colors"
+          onClick={() => setVisible(false)}
+          className="mt-2 w-full text-xs text-text-dim hover:text-text-muted transition-colors text-center"
         >
           Maybe later
         </button>
