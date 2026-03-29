@@ -257,7 +257,7 @@ export default function ChatWidget() {
           {/* Header */}
           <div className="px-4 py-3 flex items-center justify-between flex-shrink-0" style={{ backgroundColor: "#1B1B1B" }}>
             <div>
-              <h3 className="font-bold text-sm text-white">Chat with MDR</h3>
+              <h3 className="font-bold text-sm" style={{ color: "#FFFFFF" }}>Chat with MDR</h3>
               <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.6)" }}>Powered by AI</span>
             </div>
             <button
