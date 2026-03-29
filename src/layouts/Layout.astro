@@ -10,7 +10,7 @@ import ScrollPopup from "@/components/cro/ScrollPopup";
 import MobileRetentionPopup from "@/components/cro/MobileRetentionPopup";
 import SocialProofToast from "@/components/cro/SocialProofToast";
 import ChatWidget from "@/components/chat/ChatWidget";
-import StickyMobileCTA from "@/components/home/StickyMobileCTA.astro";
+// StickyMobileCTA removed — phone icon in header is sufficient
 import "@/styles/global.css";
 
 interface Props {
@@ -177,7 +177,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     <MobileRetentionPopup client:idle />
     <SocialProofToast client:idle />
     <ChatWidget client:idle />
-    <StickyMobileCTA />
+    {/* StickyMobileCTA removed — phone icon in header is sufficient */}
 
     <GclidCapture />
   </body>
