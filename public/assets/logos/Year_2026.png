@@ -1,0 +1,15 @@
+{
+  "error": {
+    "code": 404,
+    "message": "File not found: Year_2026.png.",
+    "errors": [
+      {
+        "message": "File not found: Year_2026.png.",
+        "domain": "global",
+        "reason": "notFound",
+        "location": "fileId",
+        "locationType": "parameter"
+      }
+    ]
+  }
+}

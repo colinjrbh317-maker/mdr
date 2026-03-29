@@ -1,0 +1,15 @@
+{
+  "error": {
+    "code": 404,
+    "message": "File not found: Border.png.",
+    "errors": [
+      {
+        "message": "File not found: Border.png.",
+        "domain": "global",
+        "reason": "notFound",
+        "location": "fileId",
+        "locationType": "parameter"
+      }
+    ]
+  }
+}

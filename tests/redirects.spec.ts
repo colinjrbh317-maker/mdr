@@ -28,10 +28,14 @@ const redirects = [
   { from: "/wytheville-roofing-company/", to: "/areas/wytheville" },
   { from: "/troutville-roofing-company/", to: "/areas/troutville" },
   { from: "/smith-mountain-lake-roofing-company/", to: "/areas/smith-mountain-lake" },
-  { from: "/privacy-policy/", to: "/" },
+  { from: "/privacy-policy/", to: "/privacy" },
   { from: "/sitemap/", to: "/sitemap-index.xml" },
   { from: "/referral-program/", to: "/" },
   { from: "/roofgiveaway2026/", to: "/" },
+  { from: "/roanokehomeandgardengiveaway/", to: "/" },
+  { from: "/feed/", to: "/" },
+  { from: "/comments/feed/", to: "/" },
+  { from: "/testimonials/", to: "/reviews" },
 ];
 
 test.describe("301 Redirects - vercel.json config", () => {

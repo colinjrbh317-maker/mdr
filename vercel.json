@@ -19,10 +19,16 @@
     { "source": "/wytheville-roofing-company/", "destination": "/areas/wytheville", "permanent": true },
     { "source": "/troutville-roofing-company/", "destination": "/areas/troutville", "permanent": true },
     { "source": "/smith-mountain-lake-roofing-company/", "destination": "/areas/smith-mountain-lake", "permanent": true },
-    { "source": "/privacy-policy/", "destination": "/", "permanent": true },
+    { "source": "/privacy-policy/", "destination": "/privacy", "permanent": true },
     { "source": "/sitemap/", "destination": "/sitemap-index.xml", "permanent": true },
     { "source": "/referral-program/", "destination": "/", "permanent": true },
     { "source": "/roofgiveaway2026/", "destination": "/", "permanent": true },
-    { "source": "/custom-testimonial/:path*", "destination": "/", "permanent": true }
+    { "source": "/custom-testimonial/:path*", "destination": "/", "permanent": true },
+    { "source": "/roanokehomeandgardengiveaway/", "destination": "/", "permanent": true },
+    { "source": "/feed/", "destination": "/", "permanent": true },
+    { "source": "/comments/feed/", "destination": "/", "permanent": true },
+    { "source": "/author/:path*", "destination": "/", "permanent": true },
+    { "source": "/wp-json/:path*", "destination": "/", "permanent": true },
+    { "source": "/testimonials/", "destination": "/reviews", "permanent": true }
   ]
 }

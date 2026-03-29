@@ -1,21 +1,29 @@
 import type { APIRoute } from "astro";
+import { spamCheck, getClientIP } from "@/lib/spam-filter";
+import { createLead } from "@/lib/acculynx";
 
 export const prerender = false;
+
+/** Fake success response — used for spam rejections to avoid tipping off bots */
+function fakeSuccess() {
+  return new Response(JSON.stringify({ success: true, message: "Thank you! We'll be in touch shortly." }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
     const { name, phone, email, address, service, message, website, source, gclid, fclid, landing_page } = body;
 
-    // Honeypot check — return fake success to avoid tipping off bots
+    // --- Layer 1: Honeypot check ---
     if (website) {
-      return new Response(JSON.stringify({ success: true, message: "Thank you! We'll be in touch shortly." }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      console.log("[Spam] Honeypot triggered");
+      return fakeSuccess();
     }
 
-    // Validation
+    // --- Basic validation ---
     if (!name?.trim() || !phone?.trim()) {
       return new Response(JSON.stringify({ success: false, message: "Name and phone are required." }), {
         status: 400,
@@ -23,7 +31,54 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Fire-and-forget webhook to Google Sheets
+    // --- Layer 2: Server-side spam filter ---
+    const clientIP = getClientIP(request);
+    const spamResult = spamCheck(
+      {
+        name: name.trim(),
+        phone: phone.trim(),
+        email: email?.trim() || "",
+        message: message?.trim() || "",
+      },
+      clientIP,
+    );
+
+    if (!spamResult.pass) {
+      console.log(`[Spam] Rejected: ${spamResult.reason} (score: ${spamResult.score}, IP: ${clientIP})`);
+      return fakeSuccess();
+    }
+
+    // --- Passed all filters — this is a legitimate lead ---
+
+    // Parse name into first/last for AccuLynx
+    const nameParts = name.trim().split(/\s+/);
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    // Parse address components (if provided as combined string)
+    // Forms may send full address or separate city/state/zip
+    const addressStr = address?.trim() || "";
+
+    // Fire-and-forget: Create lead in AccuLynx CRM
+    createLead({
+      firstName,
+      lastName,
+      phone: phone.trim(),
+      email: email?.trim() || "",
+      address: addressStr,
+      leadSource: "Website Form Submission",
+      serviceType: service?.trim() || "",
+    }).then((result) => {
+      if (result) {
+        console.log(`[AccuLynx] Lead created: contact=${result.contactId}, job=${result.jobId}`);
+      } else {
+        console.error("[AccuLynx] Lead creation failed — falling through to Sheets");
+      }
+    }).catch((err) => {
+      console.error("[AccuLynx] Lead creation error:", err);
+    });
+
+    // Fire-and-forget: Google Sheets webhook (backup)
     const webhookUrl = import.meta.env.FORM_WEBHOOK_URL;
     if (webhookUrl) {
       fetch(webhookUrl, {
@@ -34,7 +89,7 @@ export const POST: APIRoute = async ({ request }) => {
           name: name.trim(),
           phone: phone.trim(),
           email: email?.trim() || "",
-          address: address?.trim() || "",
+          address: addressStr,
           service: service?.trim() || "",
           message: message?.trim() || "",
           source: source || "",
