@@ -50,6 +50,8 @@ export default function ChatWidget() {
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesRef = useRef<Message[]>(messages);
+  messagesRef.current = messages;
 
   // Restore messages from sessionStorage
   useEffect(() => {
@@ -106,7 +108,8 @@ export default function ChatWidget() {
     if (!input.trim() || streaming) return;
 
     const userMessage: Message = { role: "user", content: input.trim() };
-    const newMessages = [...messages, userMessage].slice(-MAX_MESSAGES);
+    const currentMessages = messagesRef.current;
+    const newMessages = [...currentMessages, userMessage].slice(-MAX_MESSAGES);
     setMessages(newMessages);
     setInput("");
     setStreaming(true);
@@ -190,7 +193,7 @@ export default function ChatWidget() {
     }
 
     setStreaming(false);
-  }, [input, messages, streaming]);
+  }, [input, streaming]);
 
   async function handleLeadSubmit(e: React.FormEvent) {
     e.preventDefault();
