@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { spamCheck, getClientIP } from "@/lib/spam-filter";
-import { createLead, addJobNote, formatFinancingNote } from "@/lib/acculynx";
+import { createLead, addJobNote, addJobMessage, formatFinancingNote } from "@/lib/acculynx";
+import { sendLeadConfirmationSMS } from "@/lib/twilio";
 
 export const prerender = false;
 
@@ -15,7 +16,7 @@ function fakeSuccess() {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, phone, email, address, service, message, website, source, gclid, fclid, landing_page, financing_data } = body;
+    const { name, phone, email, address, service, message, website, source, gclid, fclid, landing_page, financing_data, sms_consent } = body;
 
     // --- Layer 1: Honeypot check ---
     if (website) {
@@ -85,6 +86,16 @@ export const POST: APIRoute = async ({ request }) => {
     }).then(async (result) => {
       if (result) {
         console.log(`[AccuLynx] Lead created: contact=${result.contactId}, job=${result.jobId}`);
+
+        // For financing leads: add a detailed note to the job so reps see everything
+        // Send instant SMS confirmation via Twilio (if consent given or always for now)
+        if (result.jobId && phone) {
+          const smsResult = await sendLeadConfirmationSMS(phone.trim(), firstName);
+          if (smsResult) {
+            // Log the text in AccuLynx job messages so Sierra sees it
+            await addJobMessage(result.jobId, `[Auto-SMS sent via Twilio] Hi ${firstName}! This is Modern Day Roofing. We received your inquiry and will be reaching out shortly. Need immediate help? Call us at (540) 553-6007`);
+          }
+        }
 
         // For financing leads: add a detailed note to the job so reps see everything
         if (isFinancingLead && result.jobId) {

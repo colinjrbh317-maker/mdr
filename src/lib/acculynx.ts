@@ -356,6 +356,20 @@ export async function addJobNote(jobId: string, text: string): Promise<boolean> 
   return true;
 }
 
+/** Add a message to a job's message thread. Used to log Twilio SMS in CRM. */
+export async function addJobMessage(jobId: string, message: string): Promise<boolean> {
+  if (!API_KEY) {
+    console.error("[AccuLynx] No API key configured");
+    return false;
+  }
+
+  const res = await post(`/jobs/${jobId}/messages`, { message });
+  if (!res) return false;
+
+  console.log(`[AccuLynx] Message logged to job ${jobId}`);
+  return true;
+}
+
 /**
  * Build a formatted financing lead note for AccuLynx.
  * Human-readable, not JSON — so sales reps can scan it instantly.
