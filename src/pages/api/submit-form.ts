@@ -72,23 +72,28 @@ export const POST: APIRoute = async ({ request }) => {
       } catch { /* non-fatal — profile just won't be in note */ }
     }
 
-    // Fire-and-forget: Create lead in AccuLynx CRM
-    createLead({
-      firstName,
-      lastName,
-      phone: phone.trim(),
-      email: email?.trim() || "",
-      address: addressStr,
-      serviceType: service?.trim() || "",
-      formSource: source || "",
-      gclid: gclid || "",
-      fclid: fclid || "",
-    }).then(async (result) => {
+    // --- CRM + SMS + Sheets: await all before returning response ---
+    // Vercel serverless kills execution after response is sent,
+    // so everything must complete before we return.
+
+    // 1. Create lead in AccuLynx CRM
+    try {
+      const result = await createLead({
+        firstName,
+        lastName,
+        phone: phone.trim(),
+        email: email?.trim() || "",
+        address: addressStr,
+        serviceType: service?.trim() || "",
+        formSource: source || "",
+        gclid: gclid || "",
+        fclid: fclid || "",
+      });
+
       if (result) {
         console.log(`[AccuLynx] Lead created: contact=${result.contactId}, job=${result.jobId}`);
 
-        // For financing leads: add a detailed note to the job so reps see everything
-        // Send instant SMS confirmation via Twilio (if consent given or always for now)
+        // Send instant SMS confirmation via Twilio
         if (result.jobId && phone) {
           const smsResult = await sendLeadConfirmationSMS(phone.trim(), firstName);
           if (smsResult) {
@@ -120,37 +125,39 @@ export const POST: APIRoute = async ({ request }) => {
       } else {
         console.error("[AccuLynx] Lead creation failed — falling through to Sheets");
       }
-    }).catch((err) => {
+    } catch (err) {
       console.error("[AccuLynx] Lead creation error:", err);
-    });
+    }
 
-    // Fire-and-forget: Google Sheets webhook (backup)
+    // 2. Google Sheets webhook (backup) — await to ensure it completes
     const webhookUrl = import.meta.env.FORM_WEBHOOK_URL;
     if (webhookUrl) {
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        redirect: "follow",
-        body: JSON.stringify({
-          timestamp: new Date().toISOString(),
-          name: name.trim(),
-          phone: phone.trim(),
-          email: email?.trim() || "",
-          address: addressStr,
-          service: service?.trim() || "",
-          message: message?.trim() || "",
-          source: source || "",
-          gclid: gclid || "",
-          fclid: fclid || "",
-          landing_page: landing_page || "",
-          financing_data: financing_data || "",
-          is_financing_lead: isFinancingLead,
-          financing_profile: isFinancingLead ? JSON.stringify(financingProfile) : "",
-          financing_tier: financingProfile.qualificationTier || "",
-        }),
-      }).catch((err) => {
+      try {
+        await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          redirect: "follow",
+          body: JSON.stringify({
+            timestamp: new Date().toISOString(),
+            name: name.trim(),
+            phone: phone.trim(),
+            email: email?.trim() || "",
+            address: addressStr,
+            service: service?.trim() || "",
+            message: message?.trim() || "",
+            source: source || "",
+            gclid: gclid || "",
+            fclid: fclid || "",
+            landing_page: landing_page || "",
+            financing_data: financing_data || "",
+            is_financing_lead: isFinancingLead,
+            financing_profile: isFinancingLead ? JSON.stringify(financingProfile) : "",
+            financing_tier: financingProfile.qualificationTier || "",
+          }),
+        });
+      } catch (err) {
         console.error("Webhook error:", err);
-      });
+      }
     }
 
     return new Response(JSON.stringify({ success: true, message: "Thank you! We'll be in touch shortly." }), {
