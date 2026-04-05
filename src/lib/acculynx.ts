@@ -6,6 +6,60 @@
 const API_URL = import.meta.env.ACCULYNX_API_URL || "https://api.acculynx.com/api/v2";
 const API_KEY = import.meta.env.ACCULYNX_API_KEY || "";
 
+// --- AccuLynx ID mappings (from GET /company-settings/* endpoints) ---
+
+/** Lead source IDs — must match names configured in AccuLynx */
+const LEAD_SOURCES: Record<string, string> = {
+  "website":          "0d0f692b-f016-4328-acc0-6080e0a46817", // "Form Submission Website"
+  "facebook":         "388292df-ee5b-4a5a-9caf-a2fba4d1e947", // "Form Facebook Submission"
+  "google-ads":       "a4d84415-9551-4811-9378-5be20fa20238", // "Google Ads"
+  "referral":         "b9e4f996-1b60-4bf5-8cc7-df5e0fcbffb3", // "Referral"
+};
+
+/** Work type IDs — numeric IDs from AccuLynx */
+const WORK_TYPES: Record<string, number> = {
+  "Roof Replacement":  3,     // Retail
+  "Roof Repair":       10454, // Roofing Repair
+  "Storm Damage":      1,     // Insurance
+  "Metal Roofing":     3,     // Retail
+  "Gutters":           3,     // Retail
+  "Roof Inspection":   6,     // Inspection
+  "Other":             3,     // Retail (default)
+};
+
+/** Trade type GUIDs — from GET /company-settings/job-file-settings/trade-types */
+const TRADE_TYPES: Record<string, string> = {
+  "Roof Replacement":  "62520283-8160-4723-b76e-35096af275b9", // Roof Replacement – Shingle
+  "Roof Repair":       "d6d5666e-4d0c-4026-99b4-895d3c7b1c80", // Repair
+  "Storm Damage":      "d6d5666e-4d0c-4026-99b4-895d3c7b1c80", // Repair
+  "Metal Roofing":     "3c4d3d25-6a9a-4c0e-a9f3-f4daa8bcc38c", // Roof Replacement – Metal
+  "Gutters":           "2d7087f7-40e2-445b-b8bd-f8b2980c8b28", // Gutter Install 5",6"
+  "Roof Inspection":   "f5d4e85f-3e66-491e-8408-a327de638ea5", // Inspection Only
+};
+
+const CUSTOMER_TYPE_ID = "52ba94c5-3ecf-4e7f-90cd-a91de12a72f5";
+
+/** Default company representative for new web leads (Sierra Duncan — front desk/sales manager) */
+const DEFAULT_COMPANY_REP_ID = "a13f80c0-3ce2-4f96-8476-ada53589b697";
+
+/**
+ * Build an AccuLynx-format address object from parsed fields.
+ * Contact mailingAddress requires state as { abbreviation: "VA" }.
+ * Job locationAddress requires state as a plain string "VA".
+ */
+function buildAddress(street1: string, city: string, state: string, zip: string, context: "contact" | "job"): Record<string, unknown> | null {
+  const addr: Record<string, unknown> = {};
+  if (street1) addr.street1 = street1;
+  if (city) addr.city = city;
+  if (state) {
+    addr.state = context === "contact"
+      ? { abbreviation: state.toUpperCase() }
+      : state.toUpperCase();
+  }
+  if (zip) addr.zip = zip;
+  return Object.keys(addr).length > 0 ? addr : null;
+}
+
 function headers(): Record<string, string> {
   return {
     Authorization: `Bearer ${API_KEY}`,
@@ -50,6 +104,66 @@ async function post(path: string, body: Record<string, unknown>): Promise<Respon
   return null;
 }
 
+/**
+ * Parse a combined address string into structured fields.
+ * Handles formats like:
+ *   "123 Main St, Blacksburg, VA 24060"
+ *   "123 Main St, Christiansburg, VA"
+ *   "123 Main St"
+ */
+export function parseAddress(combined: string): {
+  street1: string;
+  city: string;
+  state: string;
+  zip: string;
+} {
+  const result = { street1: "", city: "", state: "", zip: "" };
+  if (!combined?.trim()) return result;
+
+  const parts = combined.split(",").map((p) => p.trim());
+
+  if (parts.length >= 1) {
+    result.street1 = parts[0];
+  }
+
+  if (parts.length >= 2) {
+    result.city = parts[1];
+  }
+
+  if (parts.length >= 3) {
+    // Last part might be "VA 24060" or just "VA" or "24060"
+    const lastPart = parts[parts.length - 1].trim();
+    const stateZipMatch = lastPart.match(/^([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/);
+    if (stateZipMatch) {
+      result.state = stateZipMatch[1];
+      result.zip = stateZipMatch[2];
+    } else if (/^[A-Z]{2}$/.test(lastPart)) {
+      result.state = lastPart;
+    } else if (/^\d{5}/.test(lastPart)) {
+      result.zip = lastPart;
+    }
+  }
+
+  return result;
+}
+
+/** Resolve a form source string to an AccuLynx lead source ID */
+function resolveLeadSourceId(source?: string): string {
+  if (!source) return LEAD_SOURCES["website"];
+
+  const s = source.toLowerCase();
+  if (s.includes("facebook") || s.includes("meta") || s.includes("fclid")) {
+    return LEAD_SOURCES["facebook"];
+  }
+  if (s.includes("google") || s.includes("gclid")) {
+    return LEAD_SOURCES["google-ads"];
+  }
+  if (s.includes("referral")) {
+    return LEAD_SOURCES["referral"];
+  }
+  return LEAD_SOURCES["website"];
+}
+
 export interface ContactData {
   firstName: string;
   lastName: string;
@@ -71,9 +185,6 @@ export async function createContact(data: ContactData): Promise<CreateContactRes
     console.error("[AccuLynx] No API key configured");
     return null;
   }
-
-  // Contact type GUIDs from GET /contacts/contact-types
-  const CUSTOMER_TYPE_ID = "52ba94c5-3ecf-4e7f-90cd-a91de12a72f5";
 
   const body: Record<string, unknown> = {
     contactTypeIds: [CUSTOMER_TYPE_ID],
@@ -100,14 +211,23 @@ export async function createContact(data: ContactData): Promise<CreateContactRes
     ];
   }
 
-  // Build mailing address — only include fields with actual values
-  // AccuLynx requires state to be a valid enum (e.g. "VA"), not empty string
-  const mailingAddress: Record<string, string> = {};
-  if (data.address) mailingAddress.street1 = data.address;
-  if (data.city) mailingAddress.city = data.city;
-  if (data.state) mailingAddress.state = data.state;
-  if (data.zip) mailingAddress.zip = data.zip;
-  if (Object.keys(mailingAddress).length > 0) {
+  // Build mailing address from structured fields or parse combined string
+  let street1 = data.address || "";
+  let city = data.city || "";
+  let stateAbbr = data.state || "";
+  let zip = data.zip || "";
+
+  // If we have a combined address but no city/state, try to parse it
+  if (street1 && !city && !stateAbbr) {
+    const parsed = parseAddress(street1);
+    street1 = parsed.street1;
+    city = parsed.city;
+    stateAbbr = parsed.state;
+    zip = parsed.zip || zip;
+  }
+
+  const mailingAddress = buildAddress(street1, city, stateAbbr, zip, "contact");
+  if (mailingAddress) {
     body.mailingAddress = mailingAddress;
   }
 
@@ -136,6 +256,9 @@ export interface JobData {
   city?: string;
   state?: string;
   zip?: string;
+  formSource?: string;
+  gclid?: string;
+  fclid?: string;
 }
 
 export interface CreateJobResult {
@@ -153,24 +276,39 @@ export async function createJob(data: JobData): Promise<CreateJobResult | null> 
     contact: { id: data.contactId },
   };
 
-  // Location address — only include fields with actual values
-  const locationAddress: Record<string, string> = {};
-  if (data.address) locationAddress.street1 = data.address;
-  if (data.city) locationAddress.city = data.city;
-  if (data.state) locationAddress.state = data.state;
-  if (data.zip) locationAddress.zip = data.zip;
-  if (Object.keys(locationAddress).length > 0) {
+  // Location address — parse combined string if no structured fields
+  let street1 = data.address || "";
+  let city = data.city || "";
+  let stateAbbr = data.state || "";
+  let zip = data.zip || "";
+
+  if (street1 && !city && !stateAbbr) {
+    const parsed = parseAddress(street1);
+    street1 = parsed.street1;
+    city = parsed.city;
+    stateAbbr = parsed.state;
+    zip = parsed.zip || zip;
+  }
+
+  const locationAddress = buildAddress(street1, city, stateAbbr, zip, "job");
+  if (locationAddress) {
     body.locationAddress = locationAddress;
   }
 
-  // Lead source — AccuLynx expects object with name, not plain string
-  if (data.leadSource) {
-    body.leadSource = { name: data.leadSource };
-  }
+  // Lead source — use AccuLynx ID, auto-detect from form source, gclid, fclid
+  let leadSourceId = resolveLeadSourceId(data.formSource);
+  if (data.fclid) leadSourceId = LEAD_SOURCES["facebook"];
+  if (data.gclid) leadSourceId = LEAD_SOURCES["google-ads"];
+  body.leadSource = { id: leadSourceId };
 
-  // Work type / service type
-  if (data.serviceType) {
-    body.workType = data.serviceType;
+  // Work type — map service selection to AccuLynx work type ID
+  const workTypeId = WORK_TYPES[data.serviceType || ""] || WORK_TYPES["Other"];
+  body.workType = { id: workTypeId };
+
+  // Trade type — map service selection to AccuLynx trade type GUID
+  const tradeTypeId = TRADE_TYPES[data.serviceType || ""];
+  if (tradeTypeId) {
+    body.tradeTypes = [{ id: tradeTypeId }];
   }
 
   const res = await post("/jobs", body);
@@ -190,6 +328,112 @@ export async function createJob(data: JobData): Promise<CreateJobResult | null> 
   }
 }
 
+/** Assign the default company representative (Sierra Duncan) to a job. */
+export async function assignCompanyRep(jobId: string, userId: string = DEFAULT_COMPANY_REP_ID): Promise<boolean> {
+  if (!API_KEY) {
+    console.error("[AccuLynx] No API key configured");
+    return false;
+  }
+
+  const res = await post(`/jobs/${jobId}/representatives/company`, { id: userId });
+  if (!res) return false;
+
+  console.log(`[AccuLynx] Company rep assigned to job ${jobId}`);
+  return true;
+}
+
+/** Add a note to an existing job. Returns true on success. */
+export async function addJobNote(jobId: string, text: string): Promise<boolean> {
+  if (!API_KEY) {
+    console.error("[AccuLynx] No API key configured");
+    return false;
+  }
+
+  const res = await post(`/jobs/${jobId}/notes`, { text });
+  if (!res) return false;
+
+  console.log(`[AccuLynx] Note added to job ${jobId}`);
+  return true;
+}
+
+/**
+ * Build a formatted financing lead note for AccuLynx.
+ * Human-readable, not JSON — so sales reps can scan it instantly.
+ */
+export function formatFinancingNote(data: {
+  name: string;
+  phone: string;
+  email: string;
+  service?: string;
+  address?: string;
+  budget?: string;
+  timeline?: string;
+  homeowner?: string;
+  propertyType?: string;
+  credit?: string;
+  income?: string;
+  employment?: string;
+  qualificationTier?: string;
+  skipped?: boolean;
+}): string {
+  const lines: string[] = [
+    "HOT FINANCING LEAD -- CALL WITHIN 5 MINUTES",
+    "=============================================",
+    "",
+    `Contact: ${data.name}`,
+    `Phone: ${data.phone}`,
+    `Email: ${data.email || "Not provided"}`,
+    "",
+    "-- PROJECT DETAILS --",
+    `Service: ${data.service || "Not specified"}`,
+    `Address: ${data.address || "Not provided"}`,
+    `Budget: ${data.budget || "Not provided"}`,
+    `Timeline: ${data.timeline || "Not provided"}`,
+    `Homeowner: ${data.homeowner || "Not answered"}`,
+    `Property Type: ${data.propertyType || "Not answered"}`,
+  ];
+
+  if (!data.skipped) {
+    lines.push(
+      "",
+      "-- FINANCIAL PROFILE --",
+      `Credit Range: ${data.credit || "Not provided"}`,
+      `Income Range: ${data.income || "Not provided"}`,
+      `Employment: ${data.employment || "Not provided"}`,
+    );
+  } else {
+    lines.push(
+      "",
+      "-- FINANCIAL PROFILE --",
+      "Customer skipped financial questions -- prefers phone consultation",
+    );
+  }
+
+  const tierLabels: Record<string, string> = {
+    excellent: "EXCELLENT -- Strong candidate, recommend GoodLeap",
+    good: "GOOD -- Solid candidate, offer both lenders",
+    fair: "FAIR -- May qualify, recommend GreenSky (wider approval)",
+    "needs-review": "NEEDS REVIEW -- Discuss options by phone",
+    "call-us": "PHONE CONSULTATION -- Customer wants to discuss by phone",
+  };
+
+  lines.push(
+    "",
+    "-- QUALIFICATION RESULT --",
+    `Tier: ${tierLabels[data.qualificationTier || "call-us"] || data.qualificationTier}`,
+    "",
+    "-- ACTION REQUIRED --",
+    "1. Call this lead ASAP -- they just completed the financing form",
+    "2. Confirm project details and schedule free inspection",
+    "3. Guide them to the recommended lender application",
+    "",
+    `Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })} ET`,
+    "Source: Website Financing Funnel",
+  );
+
+  return lines.join("\n");
+}
+
 /**
  * Full lead creation flow: Create contact → Create job.
  * Returns both IDs or null if contact creation fails.
@@ -198,6 +442,9 @@ export async function createJob(data: JobData): Promise<CreateJobResult | null> 
 export async function createLead(data: ContactData & {
   leadSource?: string;
   serviceType?: string;
+  formSource?: string;
+  gclid?: string;
+  fclid?: string;
 }): Promise<{ contactId: string; jobId: string | null } | null> {
   // Step 1: Create contact
   const contact = await createContact(data);
@@ -209,13 +456,22 @@ export async function createLead(data: ContactData & {
   // Step 2: Create job with the new contact
   const job = await createJob({
     contactId: contact.contactId,
-    leadSource: data.leadSource || "Website Form Submission",
     serviceType: data.serviceType,
     address: data.address,
     city: data.city,
     state: data.state,
     zip: data.zip,
+    formSource: data.formSource,
+    gclid: data.gclid,
+    fclid: data.fclid,
   });
+
+  // Step 3: Assign company representative (Sierra Duncan) so the lead isn't unassigned
+  if (job?.jobId) {
+    assignCompanyRep(job.jobId).catch((err) => {
+      console.error("[AccuLynx] Failed to assign company rep:", err);
+    });
+  }
 
   return {
     contactId: contact.contactId,
