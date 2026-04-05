@@ -51,6 +51,22 @@ function getPostImage(post: any, index: number): string {
   title="Roofing Blog & Education Hub"
   description="Expert roofing advice, maintenance tips, and industry insights from Modern Day Roofing. Learn about roof repair, replacement, materials, and more."
 >
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Roofing Blog & Education Hub",
+    "description": "Expert roofing advice and industry insights from Modern Day Roofing.",
+    "url": "https://moderndayroof.com/blog",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": posts.map((p: any, i: number) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "url": `https://moderndayroof.com/blog/${p.slug}`,
+        "name": p.title
+      }))
+    }
+  })} />
   <section class="relative py-14 md:py-20 dark-section" data-transparent-header>
     <div class="absolute inset-0 z-0">
       <img

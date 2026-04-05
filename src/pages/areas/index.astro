@@ -70,6 +70,22 @@ function getAreaThumb(area: ServiceArea): string {
   title="Service Areas"
   description="Professional roofing in the New River Valley and Roanoke Area. Serving Christiansburg, Blacksburg, Radford, Salem, and surrounding Virginia communities."
 >
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Service Areas",
+    "description": "Professional roofing in the New River Valley and Roanoke Area.",
+    "url": "https://moderndayroof.com/areas",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": areas.map((a, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "url": `https://moderndayroof.com/areas/${a.slug}`,
+        "name": a.name
+      }))
+    }
+  })} />
   {/* Hero */}
   <section class="relative min-h-[40vh] flex items-center dark-section" data-transparent-header>
     <div class="absolute inset-0 z-0">

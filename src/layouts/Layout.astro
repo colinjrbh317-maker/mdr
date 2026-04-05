@@ -6,7 +6,7 @@ import { loadQuery } from "@/sanity/lib/load-query";
 import { SITE_SETTINGS_QUERY, NAVIGATION_QUERY } from "@/sanity/lib/queries";
 import GclidCapture from "@/components/common/GclidCapture.astro";
 import ExitIntentPopup from "@/components/cro/ExitIntentPopup";
-import ScrollPopup from "@/components/cro/ScrollPopup";
+// ScrollPopup removed — less intrusive CRO approach preferred
 import MobileRetentionPopup from "@/components/cro/MobileRetentionPopup";
 import SocialProofToast from "@/components/cro/SocialProofToast";
 import ChatWidget from "@/components/chat/ChatWidget";
@@ -21,7 +21,7 @@ interface Props {
 
 const {
   title,
-  description = "Modern Day Roofing — GAF Master Elite roofing contractor serving Christiansburg, Roanoke, and the New River Valley. Built to protect. Backed for life.",
+  description = "Modern Day Roofing — Southwest Virginia's trusted roofing contractor serving Christiansburg, Roanoke, and the New River Valley. GAF Master Elite certified. Free inspections.",
   ogImage,
 } = Astro.props;
 
@@ -99,7 +99,14 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
         "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
         "opens": "08:30",
         "closes": "17:00"
-      }
+      },
+      "sameAs": [
+        "https://www.facebook.com/moderndayroofing",
+        "https://www.instagram.com/moderndayroofing",
+        "https://www.linkedin.com/company/modern-day-roofing"
+      ],
+      "email": "sales@moderndayroof.com",
+      "foundingDate": "2019"
     })} />
 
     <!-- Favicon -->
@@ -173,7 +180,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     <VisualEditing enabled={import.meta.env.DEV} />
 
     <ExitIntentPopup client:idle currentPage={Astro.url.pathname} />
-    <ScrollPopup client:idle />
+    {/* ScrollPopup removed — less intrusive CRO approach preferred */}
     <MobileRetentionPopup client:idle />
     <SocialProofToast client:idle />
     <ChatWidget client:idle />

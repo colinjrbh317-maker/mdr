@@ -68,6 +68,19 @@ const beforeAfterProjects = [
   title="Project Gallery | Before & After Roofing Projects"
   description="See the results of our roofing work. Browse before and after photos of roof replacements, repairs, metal roofing, and storm damage restoration in the New River Valley."
 >
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "ImageGallery",
+    "name": "Project Gallery",
+    "description": "Before and after photos of roofing projects in the New River Valley.",
+    "url": "https://moderndayroof.com/gallery",
+    "image": galleryProjects.map(p => ({
+      "@type": "ImageObject",
+      "contentUrl": `https://moderndayroof.com${p.src}`,
+      "name": p.title,
+      "description": `${p.title} — ${p.location}`
+    }))
+  })} />
   {/* Hero with background image */}
   <section class="relative py-16 md:py-24 dark-section" data-transparent-header>
     <div class="absolute inset-0 z-0">

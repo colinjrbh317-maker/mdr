@@ -29,6 +29,12 @@
     { "source": "/comments/feed/", "destination": "/", "permanent": true },
     { "source": "/author/:path*", "destination": "/", "permanent": true },
     { "source": "/wp-json/:path*", "destination": "/", "permanent": true },
-    { "source": "/testimonials/", "destination": "/reviews", "permanent": true }
+    { "source": "/testimonials/", "destination": "/reviews", "permanent": true },
+    { "source": "/wp-login.php", "destination": "/", "permanent": true },
+    { "source": "/wp-admin/:path*", "destination": "/", "permanent": true },
+    { "source": "/wp-includes/:path*", "destination": "/", "permanent": true },
+    { "source": "/wp-content/:path*", "destination": "/", "permanent": true },
+    { "source": "/xmlrpc.php", "destination": "/", "permanent": true },
+    { "source": "/:path*/page/:num(\\d+)", "destination": "/:path*", "permanent": true }
   ]
 }
