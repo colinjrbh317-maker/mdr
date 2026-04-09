@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import DOMPurify from "dompurify";
 
 interface Message {
   role: "user" | "assistant";
@@ -8,13 +9,14 @@ interface Message {
 /**
  * Converts [Link Text](URL) to clickable HTML links and strips any
  * remaining markdown formatting (bold, italic, headers, etc.)
+ * Output is sanitized with DOMPurify to prevent XSS.
  */
 function formatChatMessage(text: string): string {
   let formatted = text;
   // Convert markdown links [text](url) to HTML links
   formatted = formatted.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" class="underline text-accent hover:text-accent-dark" target="_self">$1</a>'
+    '<a href="$2" class="underline text-accent hover:text-accent-dark" target="_self" rel="noopener noreferrer">$1</a>'
   );
   // Strip bold **text** or __text__
   formatted = formatted.replace(/\*\*(.+?)\*\*/g, "$1");
@@ -28,7 +30,10 @@ function formatChatMessage(text: string): string {
   formatted = formatted.replace(/`([^`]+)`/g, "$1");
   // Convert line breaks to <br>
   formatted = formatted.replace(/\n/g, "<br>");
-  return formatted;
+  return DOMPurify.sanitize(formatted, {
+    ALLOWED_TAGS: ["a", "br"],
+    ALLOWED_ATTR: ["href", "class", "target", "rel"],
+  });
 }
 
 const STORAGE_KEY = "mdr_chat_history";

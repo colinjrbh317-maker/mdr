@@ -82,16 +82,20 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
         <input type="text" id={`website-${source}`} name="website" tabIndex={-1} autoComplete="off" />
       </div>
 
+      <label htmlFor={`mini-name-${source}`} className="sr-only">Your Name</label>
       <input
         type="text"
+        id={`mini-name-${source}`}
         name="name"
         required
         className={inputClass}
         placeholder="Your Name"
       />
 
+      <label htmlFor={`mini-phone-${source}`} className="sr-only">Phone Number</label>
       <input
         type="tel"
+        id={`mini-phone-${source}`}
         name="phone"
         required
         className={inputClass}

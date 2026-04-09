@@ -15,7 +15,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run preview",
+    command: "npm run dev -- --host 127.0.0.1 --port 4321",
     port: 4321,
     reuseExistingServer: true,
   },

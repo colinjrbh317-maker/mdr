@@ -92,53 +92,54 @@ export default function ContactForm() {
       {/* First Name + Last Name */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-text-body mb-1">First name</label>
-          <input type="text" name="first_name" required className={inputClass} placeholder="First name" />
+          <label htmlFor="first_name" className="block text-sm font-medium text-text-body mb-1">First name</label>
+          <input type="text" id="first_name" name="first_name" required className={inputClass} placeholder="First name" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-text-body mb-1">Last name</label>
-          <input type="text" name="last_name" className={inputClass} placeholder="Last name" />
+          <label htmlFor="last_name" className="block text-sm font-medium text-text-body mb-1">Last name</label>
+          <input type="text" id="last_name" name="last_name" className={inputClass} placeholder="Last name" />
         </div>
       </div>
 
       {/* Email + Phone */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-text-body mb-1">Email</label>
-          <input type="email" name="email" required className={inputClass} placeholder="your@email.com" />
+          <label htmlFor="contact_email" className="block text-sm font-medium text-text-body mb-1">Email</label>
+          <input type="email" id="contact_email" name="email" required className={inputClass} placeholder="your@email.com" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-text-body mb-1">Phone</label>
-          <input type="tel" name="phone" required className={inputClass} placeholder="(540) 555-0123" />
+          <label htmlFor="contact_phone" className="block text-sm font-medium text-text-body mb-1">Phone</label>
+          <input type="tel" id="contact_phone" name="phone" required className={inputClass} placeholder="(540) 555-0123" />
         </div>
       </div>
 
       {/* Address */}
       <div>
-        <label className="block text-sm font-medium text-text-body mb-1">Address</label>
-        <input type="text" name="address" className={inputClass} placeholder="123 Main St" />
+        <label htmlFor="contact_address" className="block text-sm font-medium text-text-body mb-1">Address</label>
+        <input type="text" id="contact_address" name="address" className={inputClass} placeholder="123 Main St" />
       </div>
 
       {/* City + State + Zip */}
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2 sm:col-span-1" style={{ gridColumn: "span 1 / span 1" }}>
-          <label className="block text-sm font-medium text-text-body mb-1">City</label>
-          <input type="text" name="city" className={inputClass} placeholder="Christiansburg" />
+          <label htmlFor="contact_city" className="block text-sm font-medium text-text-body mb-1">City</label>
+          <input type="text" id="contact_city" name="city" className={inputClass} placeholder="Christiansburg" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-text-body mb-1">State</label>
-          <input type="text" name="state" className={inputClass} placeholder="VA" maxLength={2} />
+          <label htmlFor="contact_state" className="block text-sm font-medium text-text-body mb-1">State</label>
+          <input type="text" id="contact_state" name="state" className={inputClass} placeholder="VA" maxLength={2} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-text-body mb-1">Zip</label>
-          <input type="text" name="zip" className={inputClass} placeholder="24073" />
+          <label htmlFor="contact_zip" className="block text-sm font-medium text-text-body mb-1">Zip</label>
+          <input type="text" id="contact_zip" name="zip" className={inputClass} placeholder="24073" />
         </div>
       </div>
 
       {/* Message */}
       <div>
-        <label className="block text-sm font-medium text-text-body mb-1">Message</label>
+        <label htmlFor="contact_message" className="block text-sm font-medium text-text-body mb-1">Message</label>
         <textarea
+          id="contact_message"
           name="message"
           rows={4}
           className={`${inputClass} resize-y`}

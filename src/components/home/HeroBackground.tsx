@@ -23,9 +23,9 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
             muted
             loop
             playsInline
+            preload="metadata"
             poster={posterUrl}
-            // @ts-ignore -- fetchpriority not yet in React types
-            fetchpriority="high"
+            fetchPriority="high"
           >
             <source src={videoUrl} type="video/mp4" />
             <track kind="captions" label="No dialogue" default />

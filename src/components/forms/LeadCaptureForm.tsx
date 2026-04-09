@@ -98,6 +98,7 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
 
       {/* Full Name */}
       <div>
+        <label htmlFor={`name-${source}`} className="sr-only">Full Name</label>
         <input
           type="text"
           id={`name-${source}`}
@@ -110,6 +111,7 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
 
       {/* Email Address */}
       <div>
+        <label htmlFor={`email-${source}`} className="sr-only">Email Address</label>
         <input
           type="email"
           id={`email-${source}`}
@@ -122,6 +124,7 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
 
       {/* Phone Number */}
       <div>
+        <label htmlFor={`phone-${source}`} className="sr-only">Phone Number</label>
         <input
           type="tel"
           id={`phone-${source}`}
@@ -134,6 +137,7 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
 
       {/* Full Address */}
       <div>
+        <label htmlFor={`address-${source}`} className="sr-only">Full Address</label>
         <input
           type="text"
           id={`address-${source}`}
@@ -165,6 +169,7 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
 
       {/* Project Description */}
       <div>
+        <label htmlFor={`message-${source}`} className="sr-only">Project Description</label>
         <textarea
           id={`message-${source}`}
           name="message"
