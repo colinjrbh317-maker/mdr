@@ -7,7 +7,7 @@
     { "source": "/roof-repair/", "destination": "/services/roof-repair", "permanent": true },
     { "source": "/roof-inspections-and-safety/", "destination": "/services/roof-inspection", "permanent": true },
     { "source": "/blog/", "destination": "/blog", "permanent": true },
-    { "source": "/faqs/", "destination": "/", "permanent": true },
+    { "source": "/faqs/", "destination": "/faq", "permanent": true },
     { "source": "/local-roofing-services/", "destination": "/areas", "permanent": true },
     { "source": "/roanoke/", "destination": "/areas/roanoke", "permanent": true },
     { "source": "/radford/", "destination": "/areas/radford", "permanent": true },
