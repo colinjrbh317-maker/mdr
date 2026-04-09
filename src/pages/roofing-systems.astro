@@ -1,0 +1,206 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Button from "@/components/ui/Button.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import ScrollReveal from "@/components/common/ScrollReveal.astro";
+
+export const prerender = true;
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Roofing Systems" },
+];
+
+const layers = [
+  {
+    number: 1,
+    title: "Roof Deck Protection",
+    description: "The foundation of every great roof. GAF FeltBuster synthetic underlayment covers your entire roof deck, creating a water-resistant barrier between the wood decking and your shingles. Unlike traditional felt paper, synthetic underlayment won't wrinkle, tear, or rot — giving you a smoother, more durable base layer.",
+    benefits: ["Prevents moisture infiltration to the deck", "Lies flat for cleaner shingle installation", "Won't tear or wrinkle like felt paper"],
+    image: "/assets/projects/IMG_5558-1.jpg",
+  },
+  {
+    number: 2,
+    title: "Leak Barrier",
+    description: "Your most vulnerable areas get extra protection. GAF WeatherWatch or StormGuard self-adhesive leak barriers are installed along eaves, valleys, around skylights, and anywhere water tends to collect. This layer seals around nail penetrations to prevent ice dam and wind-driven rain leaks.",
+    benefits: ["Self-sealing around nails and fasteners", "Protects valleys, eaves, and penetrations", "Prevents ice dam damage"],
+    image: "/assets/projects/IMG_5560-1.jpg",
+  },
+  {
+    number: 3,
+    title: "Starter Strip Shingles",
+    description: "The first row matters most. GAF ProStart Starter Strip shingles provide a factory-applied adhesive sealant along the eaves and rakes, securing the first course of shingles against blow-offs. This eliminates the old-school practice of cutting shingles to use as starters — saving time and improving performance.",
+    benefits: ["Factory sealant for superior wind resistance", "Consistent, precise installation", "Protects the most wind-vulnerable edge"],
+    image: "/assets/projects/IMG_5557-1.jpg",
+  },
+  {
+    number: 4,
+    title: "Lifetime Shingles",
+    description: "The visible layer that protects and beautifies your home. GAF Timberline HDZ shingles are the #1 selling shingle in North America — with a dimensional wood-shake look, LayerLock technology for 130 MPH wind resistance, and StainGuard Plus protection against blue-green algae. Available in dozens of colors to match your home.",
+    benefits: ["130 MPH wind warranty (LayerLock)", "StainGuard Plus algae protection", "#1 selling shingle in North America"],
+    image: "/assets/projects/IMG_5561-1.jpg",
+  },
+  {
+    number: 5,
+    title: "Ridge Cap Shingles",
+    description: "The finishing touch at the peak. GAF TimberTex or Seal-A-Ridge cap shingles are specially designed for hips and ridges — the most visible part of your roof. They provide a polished, dimensional appearance while creating an extra seal along the ridge where two slopes meet.",
+    benefits: ["Designed specifically for ridge lines", "Adds visual depth and dimension", "Extra seal at the most exposed point"],
+    image: "/assets/projects/HVAC-protection.jpg",
+  },
+  {
+    number: 6,
+    title: "Attic Ventilation",
+    description: "The hidden layer that makes everything last. Proper attic ventilation (using GAF Cobra ridge vents and soffit intake) prevents heat and moisture buildup that can warp decking, cause ice dams, and dramatically shorten shingle life. A balanced ventilation system keeps your attic dry and your energy bills lower.",
+    benefits: ["Extends shingle and deck lifespan", "Prevents ice dams in winter", "Reduces cooling costs in summer"],
+    image: "/assets/projects/Landscaping-nets.jpg",
+  },
+];
+
+const stats = [
+  { value: "130", label: "MPH Wind Resistance" },
+  { value: "25", label: "Years Workmanship Coverage" },
+  { value: "6", label: "Integrated System Layers" },
+  { value: "Top 2%", label: "GAF Contractors Nationwide" },
+];
+
+const trustItems = [
+  { label: "GAF Master Elite", value: "Top 2% Nationwide" },
+  { label: "System Plus Warranty", value: "50-Year Coverage" },
+  { label: "Golden Pledge", value: "Lifetime Coverage" },
+  { label: "Workmanship", value: "25 Years by GAF" },
+];
+---
+
+<Layout
+  title="GAF Lifetime Roofing System | Modern Day Roofing"
+  description="Learn about the 6-layer GAF Lifetime Roofing System installed by Modern Day Roofing — roof deck protection, leak barriers, starter strips, lifetime shingles, ridge caps, and ventilation."
+>
+  {/* Hero */}
+  <section class="relative min-h-[50vh] flex items-center dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src="/assets/projects/dji_fly_20241025_170718_583_1729890501648_photo-1.jpg"
+        alt="Aerial view of completed GAF roofing system"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/50"></div>
+    </div>
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-28 w-full">
+      <Breadcrumb items={breadcrumbItems} />
+      <div class="mt-6 max-w-3xl">
+        <p class="text-accent-light font-semibold text-sm uppercase tracking-wider mb-3">
+          More Than Just Shingles
+        </p>
+        <h1 class="text-4xl md:text-5xl font-bold text-white">
+          The Complete GAF Lifetime Roofing System
+        </h1>
+        <p class="mt-4 text-lg text-white/85 max-w-2xl leading-relaxed">
+          A roof is more than just shingles. The GAF Lifetime Roofing System uses 6 integrated layers that work together to protect your home and unlock industry-leading warranty coverage.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          <Button href="/contact" size="lg">Get a System Quote</Button>
+          <Button href="/services" variant="outline" size="lg" class="text-white border-white hover:bg-white hover:text-bg-dark">
+            Our Services
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Intro */}
+  <SectionContainer background="white" padding="md">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary mb-4">
+        Why a Complete System Matters
+      </h2>
+      <p class="text-text-muted leading-relaxed">
+        Most roofers install shingles and call it a day. We install a complete, integrated system — because every layer plays a role in keeping water out, reducing energy costs, and qualifying you for the strongest warranties in roofing. When all 6 layers work together as designed by GAF, you get maximum protection and the GAF Golden Pledge warranty.
+      </p>
+    </div>
+  </SectionContainer>
+
+  {/* Layers */}
+  {layers.map((layer, i) => (
+    <SectionContainer background={i % 2 === 0 ? "light" : "white"} padding="md">
+      <ScrollReveal>
+        <div class={`max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center ${i % 2 !== 0 ? "md:[direction:rtl] md:[&>*]:[direction:ltr]" : ""}`}>
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                {layer.number}
+              </div>
+              <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
+                {layer.title}
+              </h2>
+            </div>
+            <p class="text-text-muted leading-relaxed mb-5">
+              {layer.description}
+            </p>
+            <ul class="space-y-2">
+              {layer.benefits.map((benefit) => (
+                <li class="flex items-start gap-2 text-text-body text-sm">
+                  <svg class="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="rounded-xl overflow-hidden shadow-md">
+            <img
+              src={layer.image}
+              alt={layer.title}
+              class="w-full h-64 md:h-80 object-cover"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </ScrollReveal>
+    </SectionContainer>
+  ))}
+
+  {/* Stats */}
+  <SectionContainer background="dark" padding="md">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-4xl mx-auto text-center dark-section">
+      {stats.map((stat) => (
+        <div>
+          <p class="text-3xl md:text-4xl font-display font-bold text-accent">{stat.value}</p>
+          <p class="text-white/70 text-sm mt-1">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+  </SectionContainer>
+
+  {/* Trust Bar */}
+  <SectionContainer background="white" padding="md">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-center">
+      {trustItems.map((item) => (
+        <div class="p-4">
+          <p class="text-sm font-semibold text-accent uppercase tracking-wider">{item.label}</p>
+          <p class="text-lg font-bold text-text-primary mt-1">{item.value}</p>
+        </div>
+      ))}
+    </div>
+  </SectionContainer>
+
+  {/* CTA */}
+  <SectionContainer background="accent" padding="md">
+    <div class="text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white">
+        Get a Complete System Quote
+      </h2>
+      <p class="mt-4 text-white/90 max-w-2xl mx-auto text-lg">
+        See what the full GAF Lifetime Roofing System looks like for your home — with a free inspection and detailed estimate.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <Button href="/contact" variant="secondary" size="lg">Get Your Free Estimate</Button>
+        <Button href="tel:5405536007" variant="ghost" size="lg" class="text-white border-white/30 hover:bg-white/10">
+          Call (540) 553-6007
+        </Button>
+      </div>
+    </div>
+  </SectionContainer>
+</Layout>

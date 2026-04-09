@@ -1,0 +1,225 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionContainer from "@/components/ui/SectionContainer.astro";
+import Button from "@/components/ui/Button.astro";
+import Breadcrumb from "@/components/common/Breadcrumb.astro";
+
+export const prerender = true;
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "FAQ" },
+];
+
+const faqSections = [
+  {
+    title: "General Questions",
+    faqs: [
+      {
+        q: "How do I know if I need a new roof?",
+        a: "Common signs include missing or curling shingles, granules in your gutters, daylight visible through roof boards, sagging areas, and a roof older than 20-25 years. We offer free inspections to assess your roof's condition and provide an honest recommendation — if a repair will do, we'll tell you.",
+      },
+      {
+        q: "Do you offer free roof inspections?",
+        a: "Yes! Every inspection is completely free with no obligation. Our certified inspectors will evaluate your roof, take photos, and provide a detailed report of their findings. We believe in earning your trust before earning your business.",
+      },
+      {
+        q: "What areas do you serve?",
+        a: "We serve the entire New River Valley and Roanoke Valley, including Christiansburg, Blacksburg, Radford, Salem, Roanoke, Floyd, Dublin, Pulaski, Wytheville, Bedford, Lexington, Covington, and surrounding communities in Southwest Virginia.",
+      },
+      {
+        q: "Are you licensed and insured?",
+        a: "Absolutely. We hold a Class A contractor's license in Virginia, carry general liability insurance, and provide workers' compensation coverage for our entire crew. We're also a BBB A+ rated business.",
+      },
+      {
+        q: "What makes Modern Day Roofing different from other roofers?",
+        a: "We're a GAF Master Elite contractor — that puts us in the top 2% of roofing contractors nationwide. This means factory-certified installers, access to the strongest warranties in roofing (including the GAF Golden Pledge), and a proven track record of quality. Plus, we're local — we live and work right here in the New River Valley.",
+      },
+    ],
+  },
+  {
+    title: "Roofing Process",
+    faqs: [
+      {
+        q: "How long does a roof replacement take?",
+        a: "Most residential roof replacements are completed in 1-3 days, depending on the size and complexity of the roof. We'll give you a clear timeline before work begins and keep you updated throughout the process.",
+      },
+      {
+        q: "Will you remove my old roof or go over it?",
+        a: "We always recommend a full tear-off of the old roofing material. This allows us to inspect the roof deck for damage, ensure proper underlayment installation, and provide the best warranty coverage. Going over old shingles can hide problems and void manufacturer warranties.",
+      },
+      {
+        q: "What happens if it rains during my roof replacement?",
+        a: "We monitor weather forecasts closely and plan accordingly. If unexpected rain occurs, we use tarps and other protective measures to keep your home dry. We never leave your home exposed overnight.",
+      },
+      {
+        q: "Do I need to be home during the installation?",
+        a: "No, you don't need to be home. We'll coordinate access details before the project starts. Many homeowners prefer to be away during installation to avoid the noise. We'll contact you when the work is complete and schedule a final walkthrough.",
+      },
+    ],
+  },
+  {
+    title: "Pricing & Financing",
+    faqs: [
+      {
+        q: "How much does a new roof cost?",
+        a: "Roof replacement typically ranges from $8,000 to $25,000 for most homes, depending on size, material choice, and complexity. Metal roofing ranges from $15,000 to $40,000. The best way to get an accurate estimate is to schedule a free inspection — we'll provide a detailed, itemized quote.",
+      },
+      {
+        q: "Do you offer financing?",
+        a: "Yes! Through our partner Hearth, we offer $0 down financing with multiple options including 0% promotional rates. Soft credit check to see your rates — no impact to your credit score. Loans from $1,000 to $250,000 with terms from 2 to 12 years.",
+      },
+      {
+        q: "Will checking my rate affect my credit score?",
+        a: "No. Our pre-qualification through Hearth is a soft inquiry only. Your credit score is not affected until you formally apply with a specific lender.",
+      },
+      {
+        q: "Do you provide written estimates?",
+        a: "Yes, every estimate is provided in writing with a detailed breakdown of materials, labor, and warranty coverage. We believe in complete transparency — no hidden fees or surprise charges.",
+      },
+    ],
+  },
+  {
+    title: "Materials & Warranties",
+    faqs: [
+      {
+        q: "What roofing materials do you use?",
+        a: "As a GAF Master Elite contractor, we primarily install GAF Timberline HDZ shingles — the #1 selling shingle in North America. We also offer metal roofing, flat roofing systems (TPO, EPDM), and specialty options. We'll recommend the best material for your home and budget.",
+      },
+      {
+        q: "What is the GAF Golden Pledge warranty?",
+        a: "The GAF Golden Pledge is the strongest warranty in roofing. It provides 50-year non-prorated material coverage and 25-year workmanship coverage — both backed by GAF, not just the installer. It's only available through Master Elite contractors like us, and it's transferable if you sell your home.",
+      },
+      {
+        q: "How long do roofing materials last?",
+        a: "GAF architectural shingles typically last 25-30 years with proper installation and ventilation. Metal roofing can last 40-70 years. The actual lifespan depends on material quality, installation, ventilation, and local weather conditions.",
+      },
+      {
+        q: "Can I see color samples before choosing?",
+        a: "Absolutely. We bring full-size shingle samples to your home so you can see how they look against your siding, trim, and surroundings in natural light. We can also show you homes in your area with similar materials installed.",
+      },
+    ],
+  },
+  {
+    title: "Insurance & Storm Claims",
+    faqs: [
+      {
+        q: "Do you help with insurance claims?",
+        a: "Yes, we work with insurance companies every day. We'll document the damage, meet with your adjuster on-site, and help ensure your claim covers the full scope of necessary repairs. We're experienced with the claims process and will advocate for you.",
+      },
+      {
+        q: "What should I do after a storm damages my roof?",
+        a: "First, document any visible damage with photos. Then call us for a free emergency inspection — we'll assess the damage and help you file your insurance claim. Don't wait, as some insurance policies have time limits for filing claims after storm events.",
+      },
+      {
+        q: "Will my insurance cover the full replacement?",
+        a: "It depends on your policy and the extent of the damage. Most homeowner policies cover storm damage, but coverage varies. We'll work directly with your adjuster to maximize your claim and ensure all legitimate damage is documented.",
+      },
+      {
+        q: "Do you offer emergency tarping?",
+        a: "Yes, we provide emergency tarping to protect your home from further water damage until permanent repairs can be made. Call us at (540) 553-6007 — we respond to emergencies 24/7.",
+      },
+    ],
+  },
+];
+
+const allFaqs = faqSections.flatMap((s) => s.faqs);
+---
+
+<Layout
+  title="Frequently Asked Questions | Modern Day Roofing"
+  description="Get answers to common questions about roofing costs, timelines, materials, warranties, financing, and insurance claims. Modern Day Roofing serves the New River Valley and Roanoke."
+>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: allFaqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
+  })} />
+
+  {/* Hero */}
+  <section class="relative min-h-[40vh] flex items-center dark-section" data-transparent-header>
+    <div class="absolute inset-0 z-0">
+      <img
+        src="/assets/projects/dji_fly_20241025_170718_583_1729890501648_photo-1.jpg"
+        alt="Aerial view of completed roofing project"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/50"></div>
+    </div>
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
+      <Breadcrumb items={breadcrumbItems} />
+      <div class="mt-6 max-w-3xl">
+        <p class="text-accent-light font-semibold text-sm uppercase tracking-wider mb-3">
+          Your Questions, Answered
+        </p>
+        <h1 class="text-4xl md:text-5xl font-bold text-white">
+          Frequently Asked Questions
+        </h1>
+        <p class="mt-4 text-lg text-white/85 max-w-2xl leading-relaxed">
+          Get answers to the most common questions about roofing, repairs, materials, warranties, and working with Modern Day Roofing.
+        </p>
+        <div class="mt-8">
+          <Button href="/contact" size="lg">Contact Us</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* FAQ Sections */}
+  {faqSections.map((section, i) => (
+    <SectionContainer background={i % 2 === 0 ? "white" : "light"} padding="md">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary mb-8">
+          {section.title}
+        </h2>
+        <div class="space-y-4">
+          {section.faqs.map((faq) => (
+            <details class="group bg-bg-card border border-border rounded-xl overflow-hidden">
+              <summary class="flex items-center justify-between cursor-pointer p-5 text-left">
+                <h3 class="text-text-primary font-medium pr-4">{faq.q}</h3>
+                <svg
+                  class="w-5 h-5 text-text-dim flex-shrink-0 transition-transform group-open:rotate-180"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div class="px-5 pb-5 text-text-muted text-sm leading-relaxed border-t border-border pt-4">
+                {faq.a}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </SectionContainer>
+  ))}
+
+  {/* CTA */}
+  <SectionContainer background="accent" padding="md">
+    <div class="text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white">
+        Still Have Questions?
+      </h2>
+      <p class="mt-4 text-white/90 max-w-2xl mx-auto text-lg">
+        We're happy to help. Reach out and our team will get back to you within 24 hours.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <Button href="/contact" variant="secondary" size="lg">Contact Us</Button>
+        <Button href="tel:5405536007" variant="ghost" size="lg" class="text-white border-white/30 hover:bg-white/10">
+          Call (540) 553-6007
+        </Button>
+      </div>
+    </div>
+  </SectionContainer>
+</Layout>
