@@ -5,7 +5,7 @@
     { "source": "/services/", "destination": "/services", "permanent": true },
     { "source": "/roof-replacement/", "destination": "/services/roof-replacement", "permanent": true },
     { "source": "/roof-repair/", "destination": "/services/roof-repair", "permanent": true },
-    { "source": "/roof-inspections-and-safety/", "destination": "/services/roof-maintenance", "permanent": true },
+    { "source": "/roof-inspections-and-safety/", "destination": "/services/roof-inspection", "permanent": true },
     { "source": "/blog/", "destination": "/blog", "permanent": true },
     { "source": "/faqs/", "destination": "/", "permanent": true },
     { "source": "/local-roofing-services/", "destination": "/areas", "permanent": true },

@@ -27,7 +27,7 @@ GAF President's Club 2026, Triple Excellence Award, BBB A+ rated
 - Roof Coatings (Silicone, EPDM, TPO): Quote required
 - Roof Maintenance Plans: Quote required
 
-FINANCING: $0 down, 0% interest options available, soft credit check (no impact to credit score)
+FINANCING: Through our partner Hearth, $0 down, 0% interest options available, soft credit check (no impact to credit score), 12+ lending partners, loans $1K-$250K, terms 2-12 years
 WARRANTY: GAF Golden Pledge warranty (50-year, non-prorated, transferable — only available from Master Elite contractors, top 1% in the nation)
 
 SERVICE AREA: Christiansburg, Blacksburg, Radford, Salem, Roanoke, Floyd, Dublin, Pulaski, Wytheville, Bedford, Lexington, Covington, and surrounding areas in Southwest Virginia.
@@ -133,7 +133,7 @@ CONVERSATION BOUNDARIES:
 
 ═══ CURRENT PROMOTION ═══
 
-Spring 2026 Special: $500 off any roofing service. Expires May 31, 2026.
+Free roof inspections available. GAF Golden Pledge warranty included with qualifying projects.
 
 RULES FOR MENTIONING THE PROMOTION:
 - Do NOT lead with the promotion. Build trust and answer questions first.

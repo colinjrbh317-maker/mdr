@@ -110,6 +110,7 @@ export default function ChatWidget() {
     const userMessage: Message = { role: "user", content: input.trim() };
     const currentMessages = messagesRef.current;
     const newMessages = [...currentMessages, userMessage].slice(-MAX_MESSAGES);
+    messagesRef.current = newMessages;
     setMessages(newMessages);
     setInput("");
     setStreaming(true);
@@ -178,6 +179,12 @@ export default function ChatWidget() {
         }
       }
 
+      // Sync ref with final state so next sendMessage reads the complete conversation
+      setMessages((prev) => {
+        messagesRef.current = prev;
+        return prev;
+      });
+
       // Track chat interaction
       if (typeof (window as any).gtag === "function") {
         (window as any).gtag("event", "chat_message", {
@@ -186,10 +193,14 @@ export default function ChatWidget() {
         });
       }
     } catch {
-      setMessages((prev) => [
-        ...prev.slice(0, -1), // remove empty assistant message
-        { role: "assistant", content: "Sorry, I'm having trouble connecting. Please call us at (540) 553-6007." },
-      ]);
+      setMessages((prev) => {
+        const updated = [
+          ...prev.slice(0, -1),
+          { role: "assistant" as const, content: "Sorry, I'm having trouble connecting. Please call us at (540) 553-6007." },
+        ];
+        messagesRef.current = updated;
+        return updated;
+      });
     }
 
     setStreaming(false);

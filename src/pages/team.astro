@@ -4,7 +4,6 @@ import SectionContainer from "@/components/ui/SectionContainer.astro";
 import Button from "@/components/ui/Button.astro";
 import Breadcrumb from "@/components/common/Breadcrumb.astro";
 import ScrollReveal from "@/components/common/ScrollReveal.astro";
-import ImagePlaceholder from "@/components/common/ImagePlaceholder.astro";
 
 export const prerender = true;
 
@@ -15,24 +14,79 @@ const breadcrumbItems = [
 
 const leadership = [
   {
-    name: "Alicia, Owner",
-    role: "Owner & Founder",
-    description: "Founded Modern Day Roofing with a vision to bring honest, high-quality roofing to southwest Virginia. Leads the company with a focus on customer satisfaction and community involvement.",
+    name: "Austin Hungate",
+    role: "CEO",
+    photo: "/assets/team/optimized/Austin-Hungate-CEO.webp",
+    description: "Leads Modern Day Roofing with a commitment to honest work and top-tier craftsmanship across Southwest Virginia.",
   },
   {
-    name: "Operations Manager",
-    role: "Operations Manager",
-    description: "Oversees day-to-day operations, crew scheduling, and material logistics. Ensures every project runs on time and meets our quality standards.",
+    name: "Alex Bohm",
+    role: "COO",
+    photo: "/assets/team/optimized/Alex-Bohm-COO.webp",
+    description: "Oversees day-to-day operations, crew scheduling, and material logistics to keep every project on time and on standard.",
   },
   {
-    name: "Sales Manager",
-    role: "Sales Manager",
-    description: "Leads our sales team with a consultative approach. Helps homeowners understand their options without pressure, ensuring they get the right solution for their home.",
+    name: "Sierra Duncan",
+    role: "Director of First Impressions",
+    photo: "/assets/team/optimized/Sierra-DuncanDirector-of-First-Impressions.webp",
+    description: "Your first point of contact — makes sure every homeowner feels heard, informed, and taken care of from the start.",
   },
   {
-    name: "Lead Foreman",
-    role: "Lead Foreman",
-    description: "Our most experienced installer with over a decade in the field. Trains new crew members and sets the standard for quality workmanship on every job.",
+    name: "Alicia Umberto",
+    role: "Marketing & Outreach Director",
+    photo: "/assets/team/optimized/Alicia-Umberto-Marketing-and-Outreach-Dirctor.webp",
+    description: "Drives community engagement and brand growth, connecting MDR with homeowners across the New River Valley and Roanoke.",
+  },
+];
+
+const operations = [
+  {
+    name: "Wesley Diaz",
+    role: "Project Manager",
+    photo: "/assets/team/optimized/Wesley-Diaz-Project-Manager.webp",
+  },
+  {
+    name: "Rodrigo Cordova",
+    role: "Inside Project Manager",
+    photo: "/assets/team/optimized/Rodrigo-CordovaInside-Project-Manager.webp",
+  },
+];
+
+const salesTeam = [
+  {
+    name: "AJ Jaklitsch",
+    role: "Sales Representative",
+    photo: "/assets/team/optimized/AJ-Jaklitsch-sales.webp",
+  },
+  {
+    name: "Chris Duncan",
+    role: "Sales Representative",
+    photo: "/assets/team/optimized/Chris-Duncan-Sales.webp",
+  },
+  {
+    name: "Cory Clement",
+    role: "Sales Representative",
+    photo: "/assets/team/optimized/Cory-Clement-Sales.webp",
+  },
+  {
+    name: "Jake Perdue",
+    role: "Sales Representative",
+    photo: "/assets/team/optimized/Jake-Perdue-Sales.webp",
+  },
+  {
+    name: "Joe Furrow",
+    role: "Sales Representative",
+    photo: "/assets/team/optimized/Joe-Furrow-Sales.webp",
+  },
+  {
+    name: "Paul VanWagoner",
+    role: "Sales Representative",
+    photo: "/assets/team/optimized/Paul-VanWagoner-Sales.webp",
+  },
+  {
+    name: "Trey Hylton",
+    role: "Sales Representative",
+    photo: "/assets/team/optimized/Trey-HyltonSales.webp",
   },
 ];
 
@@ -88,7 +142,7 @@ const certifications = [
     <div class="absolute inset-0 z-0">
       <img
         src="/assets/team/ASP_6501.jpg"
-        alt="The Modern Day Roofing team in front of stone building"
+        alt="The Modern Day Roofing team"
         class="w-full h-full object-cover"
         loading="eager"
       />
@@ -116,7 +170,7 @@ const certifications = [
     </div>
   </section>
 
-  {/* Our Leadership */}
+  {/* Leadership */}
   <SectionContainer background="white" padding="lg">
     <div class="text-center mb-12">
       <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
@@ -130,11 +184,14 @@ const certifications = [
       {leadership.map((member) => (
         <ScrollReveal>
           <div class="bg-bg-card border border-border rounded-xl overflow-hidden text-center">
-            <ImagePlaceholder
-              description="Photo Coming Soon"
-              aspectRatio="1/1"
-              class="w-full"
-            />
+            <div class="aspect-square overflow-hidden">
+              <img
+                src={member.photo}
+                alt={`${member.name}, ${member.role} at Modern Day Roofing`}
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
             <div class="p-5">
               <h3 class="font-display font-bold text-text-primary">{member.name}</h3>
               <p class="text-xs text-accent font-semibold uppercase tracking-wider mt-1 mb-3">{member.role}</p>
@@ -146,8 +203,72 @@ const certifications = [
     </div>
   </SectionContainer>
 
-  {/* Our Values */}
+  {/* Operations Team */}
   <SectionContainer background="light" padding="md">
+    <div class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
+        Project Management
+      </h2>
+      <p class="mt-3 text-text-muted max-w-xl mx-auto">
+        The team that keeps your project on track from start to finish.
+      </p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+      {operations.map((member) => (
+        <ScrollReveal>
+          <div class="bg-bg-card border border-border rounded-xl overflow-hidden text-center">
+            <div class="aspect-square overflow-hidden">
+              <img
+                src={member.photo}
+                alt={`${member.name}, ${member.role} at Modern Day Roofing`}
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+            <div class="p-4">
+              <h3 class="font-display font-bold text-text-primary">{member.name}</h3>
+              <p class="text-xs text-accent font-semibold uppercase tracking-wider mt-1">{member.role}</p>
+            </div>
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+  </SectionContainer>
+
+  {/* Sales Team */}
+  <SectionContainer background="white" padding="md">
+    <div class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
+        Sales Team
+      </h2>
+      <p class="mt-3 text-text-muted max-w-xl mx-auto">
+        Your local roofing consultants — no pressure, just honest advice for your home.
+      </p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 max-w-4xl mx-auto">
+      {salesTeam.map((member) => (
+        <ScrollReveal>
+          <div class="bg-bg-card border border-border rounded-xl overflow-hidden text-center">
+            <div class="aspect-square overflow-hidden">
+              <img
+                src={member.photo}
+                alt={`${member.name}, ${member.role} at Modern Day Roofing`}
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+            <div class="p-3">
+              <h3 class="font-display font-bold text-text-primary text-sm">{member.name}</h3>
+              <p class="text-xs text-accent font-semibold uppercase tracking-wider mt-0.5">{member.role}</p>
+            </div>
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+  </SectionContainer>
+
+  {/* Our Values */}
+  <SectionContainer background="warm" padding="md">
     <div class="text-center mb-12">
       <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
         Our Values
@@ -178,7 +299,7 @@ const certifications = [
   </SectionContainer>
 
   {/* Certifications & Training */}
-  <SectionContainer background="warm" padding="md">
+  <SectionContainer background="light" padding="md">
     <div class="text-center mb-12">
       <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
         Certifications & Training
@@ -215,11 +336,11 @@ const certifications = [
         Want to Join Our Team?
       </h2>
       <p class="text-text-muted mb-8 max-w-xl mx-auto">
-        We're always looking for skilled, motivated people who take pride in their work. Check out our open positions and apply today.
+        We're always looking for skilled, motivated people who take pride in their work. Reach out and let's talk.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <Button href="/careers" size="lg">View Careers</Button>
-        <Button href="/contact" variant="outline" size="lg">Contact Us</Button>
+        <Button href="/contact" size="lg">Get in Touch</Button>
+        <Button href="tel:5405536007" variant="outline" size="lg">Call (540) 553-6007</Button>
       </div>
     </div>
   </SectionContainer>

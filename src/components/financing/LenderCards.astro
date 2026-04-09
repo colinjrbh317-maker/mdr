@@ -1,0 +1,69 @@
+---
+const hearth = {
+  name: "Hearth",
+  description: "Hearth connects you with 12+ lending partners to find the best rate and terms for your situation.",
+  highlights: [
+    "Rates from multiple lenders — compare your options",
+    "Loan amounts from $1,000 to $250,000",
+    "Terms from 2 to 12 years",
+    "0% promotional financing available",
+    "No prepayment penalties",
+    "Soft credit check — no impact to your score",
+    "Funding in as little as 1–5 business days",
+  ],
+  url: "https://app.gethearth.com/partners/modern-day-roofing/alicia-alex/apply",
+};
+---
+
+<div class="max-w-xl mx-auto">
+  <div
+    class="rounded-xl bg-bg-card border border-border border-t-4 border-t-accent p-6 md:p-8 shadow-sm transition-all duration-300 hover:shadow-lg"
+  >
+    <div class="flex items-center gap-3 mb-2">
+      <h3 class="text-2xl font-bold text-text-primary">{hearth.name}</h3>
+      <span class="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full font-medium">Official Partner</span>
+    </div>
+    <p class="text-text-muted mb-5">
+      {hearth.description}
+    </p>
+
+    <ul class="space-y-2.5 mb-6">
+      {hearth.highlights.map((item) => (
+        <li class="flex items-start gap-2 text-text-body text-sm">
+          <svg
+            class="w-5 h-5 text-accent flex-shrink-0 mt-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+
+    <a
+      href={hearth.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-2 bg-accent text-white font-semibold text-sm px-6 py-3 rounded-lg hover:bg-accent/90 transition-colors w-full justify-center sm:w-auto"
+    >
+      Check Your Rate with Hearth
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+      </svg>
+    </a>
+
+    <p class="text-xs text-text-muted mt-4">
+      Hearth is a technology company (NMLS #1628533). All loans are subject to credit review and approval.
+    </p>
+  </div>
+</div>
