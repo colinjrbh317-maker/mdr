@@ -1,0 +1,38 @@
+---
+import ProcessSteps from "@/components/common/ProcessSteps.astro";
+
+const steps = [
+  {
+    number: 1,
+    title: "Apply Online",
+    description:
+      "Complete our quick 3-minute pre-qualification form. No credit impact — just a few questions about your project and finances.",
+  },
+  {
+    number: 2,
+    title: "Get Matched With a Lender",
+    description:
+      "Based on your profile, we'll connect you with the best financing partner for your situation — GoodLeap or GreenSky.",
+  },
+  {
+    number: 3,
+    title: "Receive Your Approval",
+    description:
+      "Your lender reviews your application and provides a decision, often within the same business day.",
+  },
+  {
+    number: 4,
+    title: "Project Begins",
+    description:
+      "Once approved, we schedule your roofing project. Work begins with $0 out of pocket.",
+  },
+  {
+    number: 5,
+    title: "Project Complete",
+    description:
+      "Your new roof is installed, inspected, and warrantied. Monthly payments begin per your loan terms.",
+  },
+];
+---
+
+<ProcessSteps heading="What to Expect" steps={steps} />
