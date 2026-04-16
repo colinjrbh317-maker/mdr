@@ -3,7 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import SectionContainer from "@/components/ui/SectionContainer.astro";
 import Button from "@/components/ui/Button.astro";
 import Breadcrumb from "@/components/common/Breadcrumb.astro";
-import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
+import ReferralForm from "@/components/forms/ReferralForm";
 
 export const prerender = true;
 
@@ -167,7 +167,7 @@ const testimonials = [
         </p>
       </div>
       <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8">
-        <LeadCaptureForm client:load source="referral-program" />
+        <ReferralForm client:load />
       </div>
     </div>
   </SectionContainer>

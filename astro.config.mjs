@@ -13,7 +13,9 @@ export default defineConfig({
     },
   }),
   integrations: [
-    sitemap(),
+    sitemap({
+      filter: (page) => !page.includes("/lp/"),
+    }),
     sanity({
       projectId: "2rj2jdb4",
       dataset: "production",

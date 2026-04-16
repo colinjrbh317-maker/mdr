@@ -250,6 +250,7 @@ export async function createContact(data: ContactData): Promise<CreateContactRes
 
 export interface JobData {
   contactId: string;
+  contactName?: string;
   leadSource?: string;
   serviceType?: string;
   address?: string;
@@ -275,6 +276,13 @@ export async function createJob(data: JobData): Promise<CreateJobResult | null> 
   const body: Record<string, unknown> = {
     contact: { id: data.contactId },
   };
+
+  // Job name — visible in CRM list and automation emails
+  // Format: "Web Lead — FirstName LastName — ServiceType"
+  if (data.contactName) {
+    const service = data.serviceType || "General Inquiry";
+    body.name = `Web Lead — ${data.contactName} — ${service}`;
+  }
 
   // Location address — parse combined string if no structured fields
   let street1 = data.address || "";
@@ -468,8 +476,10 @@ export async function createLead(data: ContactData & {
   }
 
   // Step 2: Create job with the new contact
+  const contactName = [data.firstName, data.lastName].filter(Boolean).join(" ");
   const job = await createJob({
     contactId: contact.contactId,
+    contactName,
     serviceType: data.serviceType,
     address: data.address,
     city: data.city,

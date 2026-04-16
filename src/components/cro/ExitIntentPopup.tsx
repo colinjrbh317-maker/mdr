@@ -35,8 +35,7 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
   useEffect(() => {
     // Desktop only
     if (window.innerWidth < 768) return;
-    // Skip on financing page (user is already engaged)
-    if (currentPage.includes("/financing")) return;
+    // Financing page: allow exit intent (captures abandoners before funnel completion)
     if (sessionStorage.getItem("exit_popup_shown")) return;
     if (sessionStorage.getItem("form_submitted")) return;
 
@@ -192,11 +191,10 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
             </div>
 
             <h2 className="text-2xl font-bold text-text-primary mb-2">
-              $500 Off Your {selectedService || "Roof Project"}
+              Get a Free Quote on Your {selectedService || "Roof Project"}
             </h2>
-            <p className="text-accent font-semibold text-sm mb-1">Spring 2026 Special — expires May 31</p>
             <p className="text-text-muted mb-6">
-              Claim your discount — just tell us how to reach you.
+              Schedule your free inspection — no obligation, no hidden fees.
             </p>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 text-left">

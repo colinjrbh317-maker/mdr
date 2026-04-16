@@ -12,18 +12,21 @@ test.describe("CRO Features", () => {
       sessionStorage.removeItem("form_submitted");
     });
 
-    // Wait for the 10s delay to pass, then simulate mouse leaving viewport
-    await page.waitForTimeout(11000);
-    await page.mouse.move(500, 0);
+    // Wait for the 20s delay to pass (component uses 20s timer), then simulate mouse leaving viewport
+    await page.waitForTimeout(21000);
+    await page.mouse.move(500, 10);
+    await page.waitForTimeout(200);
+
+    // Dispatch mouseleave on document element (exit intent trigger)
     await page.evaluate(() => {
       document.documentElement.dispatchEvent(
         new MouseEvent("mouseleave", { clientY: -10, bubbles: true })
       );
     });
 
-    // Check popup appeared
+    // Check popup appeared — give it a bit longer in dev mode
     const popup = page.locator('[aria-label="Special offer"]');
-    await expect(popup).toBeVisible({ timeout: 3000 });
+    await expect(popup).toBeVisible({ timeout: 5000 });
 
     // Dismiss with close button
     await page.locator('[aria-label="Close"]').first().click();
@@ -51,33 +54,7 @@ test.describe("CRO Features", () => {
     await expect(popup).not.toBeVisible();
   });
 
-  test("scroll popup renders after 50% scroll and 15s delay", async ({ page }) => {
-    await page.goto("/", { waitUntil: "domcontentloaded" });
-
-    // Clear session
-    await page.evaluate(() => {
-      sessionStorage.removeItem("scroll_popup_shown");
-      sessionStorage.removeItem("form_submitted");
-    });
-
-    // Wait for time gate
-    await page.waitForTimeout(16000);
-
-    // Scroll past 50%
-    await page.evaluate(() => {
-      window.scrollTo(0, document.documentElement.scrollHeight);
-    });
-
-    // Wait a bit for the scroll handler to fire
-    await page.waitForTimeout(500);
-
-    const popup = page.locator('[aria-label="Financing offer"]');
-    await expect(popup).toBeVisible({ timeout: 3000 });
-
-    // Dismiss with Escape
-    await page.keyboard.press("Escape");
-    await expect(popup).not.toBeVisible();
-  });
+  // ScrollPopup was removed — test removed
 
   test("gallery page loads and has category filters", async ({ page }) => {
     await page.goto("/gallery", { waitUntil: "domcontentloaded" });

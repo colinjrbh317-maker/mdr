@@ -249,7 +249,7 @@ export function spamCheck(
   }
 
   // Final verdict
-  if (score >= 60) {
+  if (score >= 80) {
     return { pass: false, reason: "spam_score", score };
   }
 

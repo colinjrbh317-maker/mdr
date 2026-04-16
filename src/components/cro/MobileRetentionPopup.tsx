@@ -146,10 +146,9 @@ export default function MobileRetentionPopup() {
           <>
             <div className="text-center mb-4">
               <span className="text-3xl">💰</span>
-              <h2 className="text-xl font-bold text-text-primary mt-2">$500 Off Any Roofing Service</h2>
-              <p className="text-accent font-semibold text-xs mt-1">Spring 2026 Special — expires May 31</p>
+              <h2 className="text-xl font-bold text-text-primary mt-2">Free Roof Inspection</h2>
               <p className="text-sm text-text-muted mt-1">
-                Claim your discount — we'll call to schedule your free inspection.
+                Schedule your free inspection — we'll call to set it up.
               </p>
             </div>
 

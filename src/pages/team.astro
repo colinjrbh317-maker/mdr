@@ -49,6 +49,7 @@ const operations = [
     name: "Rodrigo Cordova",
     role: "Inside Project Manager",
     photo: "/assets/team/optimized/Rodrigo-CordovaInside-Project-Manager.webp",
+    rotate: true,
   },
 ];
 
@@ -57,6 +58,7 @@ const salesTeam = [
     name: "AJ Jaklitsch",
     role: "Sales Representative",
     photo: "/assets/team/optimized/AJ-Jaklitsch-sales.webp",
+    rotate: true,
   },
   {
     name: "Chris Duncan",
@@ -82,6 +84,7 @@ const salesTeam = [
     name: "Paul VanWagoner",
     role: "Sales Representative",
     photo: "/assets/team/optimized/Paul-VanWagoner-Sales.webp",
+    rotate: true,
   },
   {
     name: "Trey Hylton",
@@ -221,7 +224,7 @@ const certifications = [
               <img
                 src={member.photo}
                 alt={`${member.name}, ${member.role} at Modern Day Roofing`}
-                class="w-full h-full object-cover"
+                class={`w-full h-full object-cover${member.rotate ? " rotate-90 scale-[1.4] origin-center" : ""}`}
                 loading="lazy"
               />
             </div>
@@ -253,7 +256,7 @@ const certifications = [
               <img
                 src={member.photo}
                 alt={`${member.name}, ${member.role} at Modern Day Roofing`}
-                class="w-full h-full object-cover"
+                class={`w-full h-full object-cover${member.rotate ? " rotate-90 scale-[1.4] origin-center" : ""}`}
                 loading="lazy"
               />
             </div>

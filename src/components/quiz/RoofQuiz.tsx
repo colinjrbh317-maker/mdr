@@ -202,6 +202,9 @@ export default function RoofQuiz() {
             <button className={optionClass} onClick={() => selectAnswer("type", "metal")}>
               Metal
             </button>
+            <button className={optionClass} onClick={() => selectAnswer("type", "comparing")}>
+              Comparing Both (Shingles &amp; Metal)
+            </button>
             <button className={optionClass} onClick={() => selectAnswer("type", "flat")}>
               Flat / Low-Slope
             </button>

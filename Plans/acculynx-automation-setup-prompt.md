@@ -137,7 +137,7 @@ Customer fills website form
   → "Changed to Lead" automations fire instantly:
      → Customer gets confirmation email (A)
      → Customer gets confirmation text (B)
-     → Sierra/Alicia get internal alert (C)
+     → Sierra gets internal alert (C)
      → If nobody acts in 24hrs → follow-up (D, if updated)
   → Sierra sees the lead in AccuLynx, assigned to her
   → When she sets appointment → existing automations take over
