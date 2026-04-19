@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import DOMPurify from "dompurify";
+import { getBusinessHoursInfo } from "@/lib/business-hours";
+
+/** US phone formatter: "5405536007" → "(540) 553-6007". Accepts partial input. */
+function formatPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 10);
+  if (digits.length < 4) return digits;
+  if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
 
 interface Message {
   role: "user" | "assistant";
@@ -42,7 +51,7 @@ const MAX_MESSAGES = 20;
 const WELCOME_MESSAGE: Message = {
   role: "assistant",
   content:
-    "Hi! 👋 I'm the Modern Day Roofing assistant. I can help with questions about roofing, pricing, financing, or scheduling a free inspection. How can I help you today?",
+    "Hey — thanks for stopping by Modern Day Roofing. What's going on with the roof?",
 };
 
 export default function ChatWidget() {
@@ -51,8 +60,10 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [showLeadCapture, setShowLeadCapture] = useState(false);
-  const [leadForm, setLeadForm] = useState({ name: "", phone: "" });
+  const [leadForm, setLeadForm] = useState({ name: "", phone: "", email: "" });
   const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesRef = useRef<Message[]>(messages);
@@ -85,26 +96,31 @@ export default function ChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streaming]);
 
-  // Dispatch events for StickyMobileCTA coordination
+  // Dispatch events for StickyMobileCTA coordination + PostHog engagement funnel
   useEffect(() => {
     window.dispatchEvent(new CustomEvent(isOpen ? "mdr:chat-open" : "mdr:chat-close"));
     if (isOpen) {
       sessionStorage.setItem("chat_active", "1");
+      const ph = (window as any).posthog;
+      if (ph?.capture) ph.capture("chat_opened", { landing_page: sessionStorage.getItem("landing_page") || "" });
     } else {
       sessionStorage.removeItem("chat_active");
+      const ph = (window as any).posthog;
+      if (ph?.capture) ph.capture("chat_closed", { user_turns: messagesRef.current.filter((m) => m.role === "user").length, lead_submitted: leadSubmitted });
     }
-  }, [isOpen]);
+  }, [isOpen, leadSubmitted]);
 
   // Focus input when opened
   useEffect(() => {
     if (isOpen) inputRef.current?.focus();
   }, [isOpen]);
 
-  // Check if we should show lead capture (after 3+ user messages and no lead yet)
+  // Check if we should show lead capture (after 2+ user messages and no lead yet —
+  // faster qualification than the old 3-message threshold).
   useEffect(() => {
     if (leadSubmitted) return;
     const userMsgCount = messages.filter((m) => m.role === "user").length;
-    if (userMsgCount >= 3 && !showLeadCapture) {
+    if (userMsgCount >= 2 && !showLeadCapture) {
       setShowLeadCapture(true);
     }
   }, [messages, showLeadCapture, leadSubmitted]);
@@ -121,12 +137,16 @@ export default function ChatWidget() {
     setStreaming(true);
 
     try {
+      const userTurnCount = newMessages.filter((m) => m.role === "user").length;
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: newMessages.filter((m) => m.role !== "assistant" || m.content !== WELCOME_MESSAGE.content),
           page: window.location.pathname,
+          user_turn_count: userTurnCount,
+          lead_form_visible: userTurnCount >= 2 && !leadSubmitted,
+          lead_submitted: leadSubmitted,
         }),
       });
 
@@ -213,7 +233,22 @@ export default function ChatWidget() {
 
   async function handleLeadSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    // Hard guards against duplicate submits (rapid clicks / Enter + click race):
+    if (leadSubmitted || submitting) return;
     if (!leadForm.name.trim() || !leadForm.phone.trim()) return;
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    // Build a short conversation summary so Sierra sees what the lead said in chat.
+    const chatContext = messagesRef.current
+      .filter((m) => m.role === "user")
+      .slice(0, 5)
+      .map((m) => `- ${m.content}`)
+      .join("\n");
+
+    const hours = getBusinessHoursInfo();
 
     try {
       const res = await fetch("/api/submit-form", {
@@ -222,39 +257,69 @@ export default function ChatWidget() {
         body: JSON.stringify({
           name: leadForm.name.trim(),
           phone: leadForm.phone.trim(),
-          email: "",
+          email: leadForm.email.trim(),
           source: "ai-chatbot",
           gclid: sessionStorage.getItem("gclid") || "",
           fclid: sessionStorage.getItem("fclid") || "",
           landing_page: sessionStorage.getItem("landing_page") || "",
+          chat_context: chatContext,
+          // submit-form.ts recomputes business hours server-side (source of truth),
+          // but sending the client's view is useful for log correlation.
+          submitted_during_hours: hours.isOpen,
         }),
       });
 
-      if (res.ok) {
-        setLeadSubmitted(true);
-        setShowLeadCapture(false);
-        sessionStorage.setItem("form_submitted", "1");
+      if (!res.ok) {
+        setSubmitError("Something went wrong on our end — try calling us at (540) 553-6007 and we'll get you squared away.");
+        setSubmitting(false);
+        return;
+      }
 
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: `Thanks ${leadForm.name.split(" ")[0]}! Someone from our team will call you within 24 hours to schedule your free inspection. Is there anything else I can help with?`,
-          },
-        ]);
+      // Mark submitted FIRST so any race re-entry short-circuits at the top.
+      setLeadSubmitted(true);
+      setShowLeadCapture(false);
+      sessionStorage.setItem("form_submitted", "1");
 
-        if (typeof (window as any).gtag === "function") {
-          (window as any).gtag("event", "generate_lead", {
-            event_category: "form",
-            event_label: "ai-chatbot",
-          });
-        }
-        if (typeof (window as any).fbq === "function") {
-          (window as any).fbq("track", "Lead", { content_name: "ai-chatbot" });
-        }
+      const firstName = leadForm.name.trim().split(/\s+/)[0];
+      const confirmationContent = hours.isOpen
+        ? `Got it, ${firstName} — one of our guys will call you in the next ${hours.callbackPhrase}. Anything else I can help with in the meantime?`
+        : `Got it, ${firstName} — we've got your info. Office is closed right now, so we'll call you ${hours.callbackPhrase}. Want me to send any info in the meantime?`;
+
+      // Dedupe guard: only append if the last assistant message isn't already this confirmation.
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant" && last.content === confirmationContent) return prev;
+        return [...prev, { role: "assistant", content: confirmationContent }];
+      });
+
+      // GA4 + Meta Pixel
+      if (typeof (window as any).gtag === "function") {
+        (window as any).gtag("event", "generate_lead", { event_category: "form", event_label: "ai-chatbot" });
+      }
+      if (typeof (window as any).fbq === "function") {
+        (window as any).fbq("track", "Lead", { content_name: "ai-chatbot" });
+      }
+
+      // PostHog: identify + capture
+      const ph = (window as any).posthog;
+      if (ph && typeof ph.identify === "function") {
+        ph.identify(leadForm.email.trim() || leadForm.phone.trim(), {
+          name: leadForm.name.trim(),
+          phone: leadForm.phone.trim(),
+          email: leadForm.email.trim(),
+          source: "ai-chatbot",
+        });
+        ph.capture("lead_submitted", {
+          source: "ai-chatbot",
+          landing_page: sessionStorage.getItem("landing_page") || "",
+          chat_turns: messagesRef.current.filter((m) => m.role === "user").length,
+          submitted_during_hours: hours.isOpen,
+        });
       }
     } catch {
-      // Silently fail
+      setSubmitError("Lost connection — try calling us at (540) 553-6007.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -279,8 +344,10 @@ export default function ChatWidget() {
           {/* Header */}
           <div className="px-4 py-3 flex items-center justify-between flex-shrink-0" style={{ backgroundColor: "#1B1B1B" }}>
             <div>
-              <h3 className="font-bold text-sm" style={{ color: "#FFFFFF" }}>Chat with MDR</h3>
-              <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.6)" }}>Powered by AI</span>
+              <h3 className="font-bold text-sm" style={{ color: "#FFFFFF" }}>Modern Day Roofing</h3>
+              <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.6)" }}>
+                {getBusinessHoursInfo().isOpen ? "Replying in a few minutes" : "Closed — we'll reply first thing"}
+              </span>
             </div>
             <button
               onClick={() => setIsOpen(false)}
@@ -325,9 +392,11 @@ export default function ChatWidget() {
 
             {/* Lead capture card */}
             {showLeadCapture && !leadSubmitted && (
-              <div className="bg-accent/5 border border-accent/20 rounded-xl p-3.5">
+              <div className="bg-accent/5 border border-accent/20 rounded-xl p-3.5" data-ph-mask>
                 <p className="text-xs font-semibold text-text-primary mb-2">
-                  📞 Want us to call you? Leave your info:
+                  {getBusinessHoursInfo().isOpen
+                    ? "Leave your number — we'll call you right back."
+                    : "Office is closed — leave your info and we'll call you first thing."}
                 </p>
                 <form onSubmit={handleLeadSubmit} className="flex flex-col gap-2">
                   <input
@@ -336,22 +405,51 @@ export default function ChatWidget() {
                     value={leadForm.name}
                     onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
                     required
-                    className="w-full px-3 py-2 text-xs border border-border rounded-lg bg-white text-text-primary focus:outline-none focus:border-accent"
+                    autoComplete="name"
+                    disabled={submitting}
+                    className="w-full px-3 py-2 text-xs border border-border rounded-lg bg-white text-text-primary focus:outline-none focus:border-accent disabled:opacity-50"
                   />
                   <input
                     type="tel"
-                    placeholder="Phone number"
+                    inputMode="tel"
+                    placeholder="Best number to reach you"
                     value={leadForm.phone}
-                    onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
+                    onChange={(e) => setLeadForm({ ...leadForm, phone: formatPhone(e.target.value) })}
                     required
-                    className="w-full px-3 py-2 text-xs border border-border rounded-lg bg-white text-text-primary focus:outline-none focus:border-accent"
+                    autoComplete="tel"
+                    disabled={submitting}
+                    className="w-full px-3 py-2 text-xs border border-border rounded-lg bg-white text-text-primary focus:outline-none focus:border-accent disabled:opacity-50"
+                  />
+                  <input
+                    type="email"
+                    inputMode="email"
+                    placeholder="Email (optional)"
+                    value={leadForm.email}
+                    onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
+                    autoComplete="email"
+                    disabled={submitting}
+                    className="w-full px-3 py-2 text-xs border border-border rounded-lg bg-white text-text-primary focus:outline-none focus:border-accent disabled:opacity-50"
                   />
                   <button
                     type="submit"
-                    className="w-full px-3 py-2 bg-accent text-white text-xs font-semibold rounded-lg hover:bg-accent-dark transition-colors"
+                    disabled={submitting || !leadForm.name.trim() || !leadForm.phone.trim()}
+                    className="w-full px-3 py-2 bg-accent text-white text-xs font-semibold rounded-lg hover:bg-accent-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    Request Callback
+                    {submitting ? (
+                      <>
+                        <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Call me back"
+                    )}
                   </button>
+                  {submitError && (
+                    <p className="text-[10px] text-accent text-center" role="alert">{submitError}</p>
+                  )}
+                  <p className="text-[10px] text-text-dim text-center leading-tight">
+                    By submitting, you agree we can call or text you about your roof. Msg &amp; data rates may apply. Reply STOP to opt out.
+                  </p>
                 </form>
               </div>
             )}
