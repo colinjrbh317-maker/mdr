@@ -24,6 +24,8 @@ interface Props {
   location: string;
   /** Visual density. "compact" skips the sub-line. */
   size?: "default" | "compact";
+  /** Surface appearance — "dark" uses white-on-transparent for over-video/dark backgrounds. */
+  theme?: "light" | "dark";
   /** Optional className for outer wrapper. */
   className?: string;
 }
@@ -34,8 +36,14 @@ export default function SmartCTA({
   callbackHref = "#hero-form",
   location,
   size = "default",
+  theme = "light",
   className = "",
 }: Props) {
+  const isDark = theme === "dark";
+  const secondaryBtnClass = isDark
+    ? "inline-flex items-center px-5 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold text-sm rounded-lg transition-colors"
+    : "inline-flex items-center px-5 py-3 border border-border hover:border-accent text-text-primary font-semibold text-sm rounded-lg transition-colors";
+  const subClass = isDark ? "text-xs text-white/70" : "text-xs text-text-muted";
   const [isOpen, setIsOpen] = useState<boolean | null>(null);
   const [callbackPhrase, setCallbackPhrase] = useState("a few minutes");
 
@@ -69,7 +77,7 @@ export default function SmartCTA({
             <a
               href={callbackHref}
               onClick={() => track("smart_cta_click", { location, action: "callback", state: "open" })}
-              className="inline-flex items-center px-5 py-3 border border-border hover:border-accent text-text-primary font-semibold text-sm rounded-lg transition-colors"
+              className={secondaryBtnClass}
             >
               Request Callback
             </a>
@@ -90,7 +98,7 @@ export default function SmartCTA({
               href={`tel:${phoneTel}`}
               data-source={location}
               onClick={() => track("smart_cta_click", { location, action: "call", state: "closed" })}
-              className="inline-flex items-center px-5 py-3 border border-border hover:border-accent text-text-primary font-semibold text-sm rounded-lg transition-colors"
+              className={secondaryBtnClass}
             >
               Call {phoneDisplay}
             </a>
@@ -99,7 +107,7 @@ export default function SmartCTA({
       </div>
 
       {showSub && (
-        <p className="text-xs text-text-muted">
+        <p className={subClass}>
           {openResolved ? (
             <>
               <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1.5 align-middle" />
