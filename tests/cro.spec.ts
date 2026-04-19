@@ -25,7 +25,7 @@ test.describe("CRO Features", () => {
     });
 
     // Check popup appeared — give it a bit longer in dev mode
-    const popup = page.locator('[aria-label="Special offer"]');
+    const popup = page.locator('[aria-label="$500 off special offer"]');
     await expect(popup).toBeVisible({ timeout: 5000 });
 
     // Dismiss with close button
@@ -50,7 +50,7 @@ test.describe("CRO Features", () => {
       );
     });
 
-    const popup = page.locator('[aria-label="Special offer"]');
+    const popup = page.locator('[aria-label="$500 off special offer"]');
     await expect(popup).not.toBeVisible();
   });
 
