@@ -43,17 +43,17 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
           <div className="absolute inset-0 bg-gradient-to-b from-[#2c2a26] to-[#1c1917] w-full h-full" />
         )}
         
-        {/* Dark Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-black/50" />
+        {/* Dark Overlay for Text Readability — lighter on mobile so video motion reads */}
+        <div className="absolute inset-0 bg-black/30 md:bg-black/50" />
 
         {/* Top gradient — prevents light-wash behind transparent header */}
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/70 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 md:from-black/70 to-transparent" />
 
-        {/* Left-side gradient for headline contrast */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
+        {/* Left-side gradient for headline contrast (desktop-weighted) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/20 md:from-black/40 via-black/10 md:via-black/20 to-transparent" />
 
-        {/* Bottom gradient for depth */}
-        <div className="absolute inset-0 bg-gradient-to-t from-bg-darker via-transparent to-transparent opacity-70" />
+        {/* Bottom gradient for depth — heavier on mobile to anchor CTAs over imagery */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 md:from-bg-darker via-black/20 md:via-transparent to-transparent opacity-90 md:opacity-70" />
       </motion.div>
     </div>
   );

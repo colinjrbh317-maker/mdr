@@ -247,13 +247,15 @@ test.describe("Form Pipeline — UI Form Submission", () => {
     const heroCard = page.locator(".bg-white").filter({ hasText: "Get Your Free Roof Assessment" }).first();
     const form = heroCard.locator("form").first();
 
-    // Fill out all required fields
+    // Step 1: fill name + phone, click Continue
     await form.locator('input[name="name"]').fill("Hero Form Test");
-    await form.locator('input[name="email"]').fill("herotest@gmail.com");
     await form.locator('input[name="phone"]').fill("5402556666");
-    await form.locator('input[name="address"]').fill("123 Hero St, Blacksburg, VA 24060");
+    await form.locator('button[type="submit"]').click();
 
-    // Submit
+    // Step 2: optional fields appear; fill email + address then submit
+    await expect(form.locator('input[name="email"]')).toBeVisible({ timeout: 5000 });
+    await form.locator('input[name="email"]').fill("herotest@gmail.com");
+    await form.locator('input[name="address"]').fill("123 Hero St, Blacksburg, VA 24060");
     await form.locator('button[type="submit"]').click();
 
     // Should see success message

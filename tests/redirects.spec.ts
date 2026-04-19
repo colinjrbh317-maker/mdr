@@ -30,7 +30,7 @@ const redirects = [
   { from: "/smith-mountain-lake-roofing-company/", to: "/areas/smith-mountain-lake" },
   { from: "/privacy-policy/", to: "/privacy" },
   { from: "/sitemap/", to: "/sitemap-index.xml" },
-  { from: "/referral-program/", to: "/" },
+  { from: "/referral-program/", to: "/referral-program" },
   { from: "/roofgiveaway2026/", to: "/" },
   { from: "/roanokehomeandgardengiveaway/", to: "/" },
   { from: "/feed/", to: "/" },

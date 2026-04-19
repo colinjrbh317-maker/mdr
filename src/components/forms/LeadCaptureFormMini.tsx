@@ -100,6 +100,8 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
         id={`mini-name-${source}`}
         name="name"
         required
+        autoComplete="name"
+        inputMode="text"
         className={inputClass}
         placeholder="Your Name"
       />
@@ -110,6 +112,8 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
         id={`mini-phone-${source}`}
         name="phone"
         required
+        autoComplete="tel"
+        inputMode="tel"
         className={inputClass}
         placeholder="Phone Number"
       />
@@ -136,7 +140,7 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
         )}
       </button>
 
-      <p className="text-[10px] text-text-dim leading-relaxed text-center">
+      <p className="text-xs text-text-dim leading-relaxed text-center">
         By submitting, I authorize Modern Day Roofing to contact me via phone and text.{" "}
         <a href="/privacy" className="underline hover:text-text-muted transition-colors">Privacy Policy</a>
       </p>

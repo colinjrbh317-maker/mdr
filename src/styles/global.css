@@ -97,6 +97,8 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   /* Base size */
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
@@ -105,6 +107,8 @@ body {
   /* Increased line-height for readability */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* Typography Overrides */

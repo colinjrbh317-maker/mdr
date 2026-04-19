@@ -6,24 +6,21 @@ interface LeadCaptureFormProps {
 }
 
 type FormState = "idle" | "submitting" | "success" | "error";
+type Step = 1 | 2;
 
 export default function LeadCaptureForm({ source, compact = false }: LeadCaptureFormProps) {
   const [state, setState] = useState<FormState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [step, setStep] = useState<Step>(1);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [service, setService] = useState("");
+  const [message, setMessage] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const data = new FormData(form);
-
-    const name = data.get("name") as string;
-    const email = data.get("email") as string;
-    const phone = data.get("phone") as string;
-    const address = data.get("address") as string;
-    const service = data.get("service") as string;
-    const message = data.get("message") as string;
-    const website = data.get("website") as string; // honeypot
-
+  async function submitLead() {
     if (!name.trim() || !phone.trim()) return;
 
     setState("submitting");
@@ -37,9 +34,9 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
           name: name.trim(),
           email: email.trim(),
           phone: phone.trim(),
-          address: address?.trim() || "",
-          service: service?.trim() || "",
-          message: message?.trim() || "",
+          address: address.trim(),
+          service: service.trim(),
+          message: message.trim(),
           website,
           source,
           gclid: sessionStorage.getItem("gclid") || "",
@@ -50,9 +47,7 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
 
       if (res.ok) {
         setState("success");
-        form.reset();
 
-        // Fire GA4 conversion event
         if (typeof window !== "undefined" && (window as any).gtag) {
           (window as any).gtag("event", "generate_lead", {
             event_category: "form",
@@ -60,25 +55,23 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
           });
         }
 
-        // Fire Meta Pixel conversion event
         if (typeof window !== "undefined" && (window as any).fbq) {
           (window as any).fbq("track", "Lead", { content_name: source });
         }
 
-        // PostHog: identify + capture
         const ph = typeof window !== "undefined" ? (window as any).posthog : null;
         if (ph?.capture) {
           ph.identify(email.trim() || phone.trim(), {
             name: name.trim(),
             email: email.trim() || undefined,
             phone: phone.trim(),
-            city: address?.trim() || undefined,
+            city: address.trim() || undefined,
           });
           ph.capture("form_submitted", {
             source,
-            service: service?.trim() || undefined,
+            service: service.trim() || undefined,
             has_email: !!email.trim(),
-            has_address: !!address?.trim(),
+            has_address: !!address.trim(),
             landing_page: sessionStorage.getItem("landing_page") || "",
           });
         }
@@ -91,6 +84,27 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
       setErrorMsg("Network error. Please check your connection and try again.");
       setState("error");
     }
+  }
+
+  function handleContinue(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!name.trim() || !phone.trim()) return;
+
+    const ph = typeof window !== "undefined" ? (window as any).posthog : null;
+    if (ph?.capture) {
+      ph.capture("form_step_1_completed", { source });
+    }
+
+    setStep(2);
+  }
+
+  function handleFinalSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    void submitLead();
+  }
+
+  function handleSkip() {
+    void submitLead();
   }
 
   if (state === "success") {
@@ -106,66 +120,132 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
   const inputClass =
     "w-full px-4 py-3 bg-bg-card border border-border rounded-lg text-text-primary placeholder:text-text-dim focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-sm";
 
+  const honeypot = (
+    <div className="absolute -left-[9999px]" aria-hidden="true">
+      <label htmlFor={`website-${source}`}>Website</label>
+      <input
+        type="text"
+        id={`website-${source}`}
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+      />
+    </div>
+  );
+
+  if (step === 1) {
+    return (
+      <form onSubmit={handleContinue} className="flex flex-col gap-3">
+        {honeypot}
+
+        <div>
+          <label htmlFor={`name-${source}`} className="sr-only">Full Name</label>
+          <input
+            type="text"
+            id={`name-${source}`}
+            name="name"
+            required
+            autoComplete="name"
+            inputMode="text"
+            className={inputClass}
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label htmlFor={`phone-${source}`} className="sr-only">Phone Number</label>
+          <input
+            type="tel"
+            id={`phone-${source}`}
+            name="phone"
+            required
+            autoComplete="tel"
+            inputMode="tel"
+            className={inputClass}
+            placeholder="Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full px-6 py-3.5 bg-accent hover:bg-accent-dark text-white font-bold text-sm uppercase tracking-wide rounded-lg transition-colors"
+        >
+          Continue →
+        </button>
+
+        <p className="text-center text-xs text-text-dim mt-1">
+          Or text us —{" "}
+          <a href="tel:5405536007" className="underline hover:text-accent transition-colors font-semibold">
+            (540) 553-6007
+          </a>
+        </p>
+
+        <p className="text-xs text-text-dim leading-relaxed">
+          By submitting this form, I authorize Modern Day Roofing to contact me via phone calls and text messages at the number provided above, including by using an autodialer or a prerecorded message. I understand that I am not required to give this consent as a condition of purchasing with Modern Day Roofing. I am also agreeing to Modern Day Roofing's{" "}
+          <a href="/terms" className="underline hover:text-text-muted transition-colors">Terms of Use</a>
+          {" "}and{" "}
+          <a href="/privacy" className="underline hover:text-text-muted transition-colors">Privacy Policy</a>.
+        </p>
+      </form>
+    );
+  }
+
+  // Step 2
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      {/* Honeypot — hidden from real users */}
-      <div className="absolute -left-[9999px]" aria-hidden="true">
-        <label htmlFor={`website-${source}`}>Website</label>
-        <input type="text" id={`website-${source}`} name="website" tabIndex={-1} autoComplete="off" />
+    <form onSubmit={handleFinalSubmit} className="flex flex-col gap-3">
+      {honeypot}
+
+      <div className="flex items-center justify-between mb-1">
+        <button
+          type="button"
+          onClick={() => setStep(1)}
+          className="text-sm text-text-muted hover:text-accent transition-colors inline-flex items-center gap-1"
+          aria-label="Back to step 1"
+        >
+          ← Back
+        </button>
+        <span className="text-xs font-semibold text-text-dim uppercase tracking-wide">Step 2 of 2</span>
       </div>
 
-      {/* Full Name */}
-      <div>
-        <label htmlFor={`name-${source}`} className="sr-only">Full Name</label>
-        <input
-          type="text"
-          id={`name-${source}`}
-          name="name"
-          required
-          className={inputClass}
-          placeholder="Full Name"
-        />
-      </div>
+      <p className="text-sm text-text-muted mb-1">
+        Almost done — a few optional details help us respond faster.
+      </p>
 
-      {/* Email Address */}
       <div>
         <label htmlFor={`email-${source}`} className="sr-only">Email Address</label>
         <input
           type="email"
           id={`email-${source}`}
           name="email"
-          required
+          autoComplete="email"
+          inputMode="email"
           className={inputClass}
-          placeholder="Email Address"
+          placeholder="Email Address (optional)"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </div>
 
-      {/* Phone Number */}
-      <div>
-        <label htmlFor={`phone-${source}`} className="sr-only">Phone Number</label>
-        <input
-          type="tel"
-          id={`phone-${source}`}
-          name="phone"
-          required
-          className={inputClass}
-          placeholder="Phone Number"
-        />
-      </div>
-
-      {/* Full Address */}
       <div>
         <label htmlFor={`address-${source}`} className="sr-only">Full Address</label>
         <input
           type="text"
           id={`address-${source}`}
           name="address"
+          autoComplete="street-address"
           className={inputClass}
-          placeholder="Full Address"
+          placeholder="Full Address (optional)"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
         />
       </div>
 
-      {/* Project Type */}
       <div>
         <label htmlFor={`service-${source}`} className="sr-only">Project Type</label>
         <select
@@ -173,8 +253,10 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
           name="service"
           className={inputClass}
           aria-label="Project Type"
+          value={service}
+          onChange={(e) => setService(e.target.value)}
         >
-          <option value="">Project Type</option>
+          <option value="">Project Type (optional)</option>
           <option value="Roof Replacement">Roof Replacement</option>
           <option value="Roof Repair">Roof Repair</option>
           <option value="Storm Damage">Storm Damage</option>
@@ -185,7 +267,6 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
         </select>
       </div>
 
-      {/* Project Description */}
       <div>
         <label htmlFor={`message-${source}`} className="sr-only">Project Description</label>
         <textarea
@@ -193,15 +274,14 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
           name="message"
           rows={3}
           className={`${inputClass} resize-y`}
-          placeholder="Project Description"
+          placeholder="Project Description (optional)"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
         />
       </div>
 
-      {state === "error" && (
-        <p className="text-accent-light text-sm">{errorMsg}</p>
-      )}
+      {state === "error" && <p className="text-accent-light text-sm">{errorMsg}</p>}
 
-      {/* Submit Button */}
       <button
         type="submit"
         disabled={state === "submitting"}
@@ -216,17 +296,18 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
             Sending...
           </span>
         ) : (
-          "Get A Free Quote"
+          "Get My Free Quote"
         )}
       </button>
 
-      {/* Consent Text */}
-      <p className="text-[10px] text-text-dim leading-relaxed">
-        By submitting this form, I authorize Modern Day Roofing to contact me via phone calls and text messages at the number provided above, including by using an autodialer or a prerecorded message. I understand that I am not required to give this consent as a condition of purchasing with Modern Day Roofing. I am also agreeing to Modern Day Roofing's{" "}
-        <a href="/terms" className="underline hover:text-text-muted transition-colors">Terms of Use</a>
-        {" "}and{" "}
-        <a href="/privacy" className="underline hover:text-text-muted transition-colors">Privacy Policy</a>.
-      </p>
+      <button
+        type="button"
+        onClick={handleSkip}
+        disabled={state === "submitting"}
+        className="text-center text-sm text-text-muted hover:text-accent transition-colors underline disabled:opacity-60"
+      >
+        Skip &amp; submit now →
+      </button>
     </form>
   );
 }

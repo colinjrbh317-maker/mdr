@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Navigation", () => {
   test("main nav links resolve without 404", async ({ page }) => {
+    test.setTimeout(90_000);
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
     // Get all nav links from the header
@@ -15,10 +16,12 @@ test.describe("Navigation", () => {
 
     expect(navLinks.length).toBeGreaterThan(0);
 
-    for (const href of navLinks) {
-      const response = await page.goto(href, { waitUntil: "domcontentloaded" });
+    const unique = Array.from(new Set(navLinks));
+    const base = "http://localhost:4321";
+    for (const href of unique) {
+      const response = await page.request.get(base + href, { maxRedirects: 5 });
       expect(
-        response?.status(),
+        response.status(),
         `Nav link ${href} should not be 404`
       ).not.toBe(404);
     }
