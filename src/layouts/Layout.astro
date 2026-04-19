@@ -12,6 +12,7 @@ import EngagementPopup from "@/components/cro/EngagementPopup";
 import SocialProofToast from "@/components/cro/SocialProofToast";
 import ChatWidget from "@/components/chat/ChatWidget";
 import PostHog from "@/components/analytics/PostHog.astro";
+import IntentTracker from "@/components/analytics/IntentTracker.astro";
 // StickyMobileCTA removed — phone icon in header is sufficient
 import "@/styles/global.css";
 
@@ -154,6 +155,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
 
     {/* PostHog — analytics, session recording, heatmaps, feature flags, A/B tests */}
     {!isStudio && <PostHog />}
+    {!isStudio && <IntentTracker />}
   </head>
   <body class="min-h-screen flex flex-col">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -182,7 +184,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
 
     <GclidCapture />
 
-    {/* PostHog global click tracking — phone_click + quote_cta_click (delegated, survives hydration) */}
+    {/* Global quote_cta_click tracker — phone_click is handled by IntentTracker (intent-tier.ts) */}
     {!isStudio && (
       <script is:inline>
         document.addEventListener('click', function(e) {
@@ -190,15 +192,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
           if (!el) return;
           var ph = window.posthog;
           if (!ph || !ph.capture) return;
-          var href = el.getAttribute('href') || '';
           var text = (el.textContent || '').trim();
-          if (href.indexOf('tel:') === 0) {
-            ph.capture('phone_click', {
-              number: href.replace('tel:', ''),
-              location: el.dataset.ctaLocation || window.location.pathname,
-              label: text.slice(0, 60)
-            });
-          } else if (el.dataset.cta === 'quote' || /free estimate|get.*(quote|estimate)|request.*quote/i.test(text)) {
+          var href = el.getAttribute('href') || '';
+          if (el.dataset.cta === 'quote' || /free estimate|get.*(quote|estimate)|request.*quote/i.test(text)) {
             ph.capture('quote_cta_click', {
               location: window.location.pathname,
               label: text.slice(0, 60),

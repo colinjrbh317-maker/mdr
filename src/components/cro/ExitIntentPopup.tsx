@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { getTier, recordFormStarted } from "@/lib/intent-tier";
+import { track } from "@/lib/track-events";
 
 /**
  * Desktop exit-intent popup — straight to $500 off offer + mini-form.
@@ -7,10 +9,16 @@ import { useState, useEffect, useCallback } from "react";
  * /contact, /offers/*, /lp/*. Blog, FAQ, about, warranty, etc. don't mount
  * this popup — those visitors are researching, not shopping.
  *
+ * Offer variant depends on intent tier:
+ *   - hot  → $500 off (full close)
+ *   - warm → free quote (no discount — they haven't earned it yet)
+ *   - cold → nothing (gate blocks mount; cold visitors don't see this)
+ *
  * Mobile uses MobileRetentionPopup (free-inspection messaging, no $500).
  */
 
 type Step = "offer" | "success";
+type Variant = "hot" | "warm";
 
 interface MiniFormState {
   name: string;
@@ -39,6 +47,7 @@ function pageIsHighIntent(path: string): boolean {
 export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: string }) {
   const [step, setStep] = useState<Step>("offer");
   const [visible, setVisible] = useState(false);
+  const [variant, setVariant] = useState<Variant>("hot");
   const [form, setForm] = useState<MiniFormState>({ name: "", phone: "" });
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,8 +56,13 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
     if (sessionStorage.getItem("exit_popup_shown")) return;
     if (sessionStorage.getItem("form_submitted")) return;
 
+    // Resolve variant at show-time from the current tier
+    const tier = getTier();
+    const shownVariant: Variant = tier === "hot" ? "hot" : "warm";
+    setVariant(shownVariant);
     sessionStorage.setItem("exit_popup_shown", "1");
     setVisible(true);
+    track("exit_popup_shown", { variant: shownVariant, tier, path: location.pathname });
   }, []);
 
   useEffect(() => {
@@ -96,7 +110,7 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
           name: form.name.trim(),
           phone: form.phone.trim(),
           email: "",
-          source: "exit-intent-popup",
+          source: variant === "hot" ? "exit-intent-popup" : "exit-intent-popup-warm",
           gclid: sessionStorage.getItem("gclid") || "",
           fclid: sessionStorage.getItem("fclid") || "",
           landing_page: sessionStorage.getItem("landing_page") || "",
@@ -165,14 +179,16 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
         {step === "offer" && (
           <>
             <div className="inline-flex items-center gap-1.5 bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
-              Limited-Time Offer
+              {variant === "hot" ? "Limited-Time Offer" : "Free Roof Inspection"}
             </div>
 
             <h2 className="text-3xl font-extrabold text-text-primary mb-2 leading-tight">
-              $500 Off Your Roof
+              {variant === "hot" ? "$500 Off Your Roof" : "Get a Free Quote"}
             </h2>
             <p className="text-text-muted mb-6">
-              Book a free inspection and we'll take $500 off your project. No pressure, no hidden fees.
+              {variant === "hot"
+                ? "Book a free inspection and we'll take $500 off your project. No pressure, no hidden fees."
+                : "No obligation. A local GAF Master Elite roofer will walk you through options."}
             </p>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 text-left">
@@ -181,6 +197,7 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
                 placeholder="Your Name"
                 required
                 value={form.name}
+                onFocus={() => recordFormStarted("exit-intent-popup")}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="w-full px-4 py-3 bg-bg-card border border-border rounded-lg text-text-primary placeholder:text-text-dim focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-sm"
               />
@@ -189,6 +206,7 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
                 placeholder="Phone Number"
                 required
                 value={form.phone}
+                onFocus={() => recordFormStarted("exit-intent-popup")}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 className="w-full px-4 py-3 bg-bg-card border border-border rounded-lg text-text-primary placeholder:text-text-dim focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-sm"
               />
@@ -197,7 +215,7 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
                 disabled={submitting}
                 className="w-full px-6 py-3 bg-accent hover:bg-accent-dark text-white font-bold text-sm uppercase tracking-wide rounded-lg transition-colors disabled:opacity-60"
               >
-                {submitting ? "Sending..." : "Claim $500 Off"}
+                {submitting ? "Sending..." : variant === "hot" ? "Claim $500 Off" : "Get My Free Quote"}
               </button>
             </form>
 
@@ -220,7 +238,9 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
             <div className="text-4xl mb-3">✓</div>
             <h2 className="text-xl font-bold text-text-primary mb-2">You're All Set!</h2>
             <p className="text-text-muted">
-              We'll call you within 24 hours to schedule your free inspection and apply your $500 discount.
+              {variant === "hot"
+                ? "We'll call you within 24 hours to schedule your free inspection and apply your $500 discount."
+                : "We'll call you within 24 hours to schedule your free inspection."}
             </p>
             <button
               onClick={() => setVisible(false)}

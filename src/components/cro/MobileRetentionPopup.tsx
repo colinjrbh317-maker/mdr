@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { recordFormStarted } from "@/lib/intent-tier";
 
 /**
  * Mobile exit-intent alternative using inactivity + tab-switch detection.
@@ -169,6 +170,7 @@ export default function MobileRetentionPopup() {
                 placeholder="Your Name"
                 required
                 value={form.name}
+                onFocus={() => recordFormStarted("mobile-retention")}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="w-full px-4 py-3 bg-bg-card border border-border rounded-lg text-text-primary placeholder:text-text-dim focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-sm"
               />

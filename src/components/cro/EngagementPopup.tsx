@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from "react";
+import { getTier } from "@/lib/intent-tier";
+import { track } from "@/lib/track-events";
 
 /**
  * Time + intent-based popup — fires after 5 minutes AND engagement signals.
  * Engagement signals: 3+ clicks OR scrolled past 50% of page.
  * Works on both desktop and mobile (complements exit-intent which is desktop-only).
  *
- * Surfaces financing as the next step for engaged-but-not-submitting browsers.
- * $500 promo is reserved for high-intent exit signals elsewhere.
+ * Tier-aware:
+ *   - cold / warm → financing interstitial (0% down, $89/mo)
+ *   - hot         → "$500 off if you book today" (they've already earned intent)
  *
  * Session keys used:
  *   - form_submitted: set by any form → suppresses this popup
@@ -14,8 +17,11 @@ import { useState, useEffect, useRef } from "react";
  *   - engagement_popup_shown: set when this popup fires → prevents repeat
  */
 
+type Variant = "financing" | "promo";
+
 export default function EngagementPopup() {
   const [visible, setVisible] = useState(false);
+  const [variant, setVariant] = useState<Variant>("financing");
 
   const clickCount = useRef(0);
   const scrolledDeep = useRef(false);
@@ -39,16 +45,18 @@ export default function EngagementPopup() {
       if (!hasEngagement) return;
 
       triggered = true;
+      const tier = getTier();
+      const chosen: Variant = tier === "hot" ? "promo" : "financing";
+      setVariant(chosen);
       sessionStorage.setItem("engagement_popup_shown", "1");
       setVisible(true);
 
-      const ph = (window as any).posthog;
-      if (ph?.capture) {
-        ph.capture("engagement_popup_shown", {
-          trigger: clickCount.current >= 3 ? "clicks" : "scroll",
-          landing_page: sessionStorage.getItem("landing_page") || "",
-        });
-      }
+      track("engagement_popup_shown", {
+        variant: chosen,
+        tier,
+        trigger: clickCount.current >= 3 ? "clicks" : "scroll",
+        landing_page: sessionStorage.getItem("landing_page") || "",
+      });
     }
 
     // 5-minute gate
@@ -99,16 +107,7 @@ export default function EngagementPopup() {
   }, [visible]);
 
   function trackClick(label: string) {
-    if (typeof (window as any).gtag === "function") {
-      (window as any).gtag("event", "engagement_popup_click", {
-        event_category: "cro",
-        event_label: label,
-      });
-    }
-    const ph = (window as any).posthog;
-    if (ph?.capture) {
-      ph.capture("engagement_popup_click", { cta: label });
-    }
+    track("engagement_popup_click", { cta: label, variant });
   }
 
   if (!visible) return null;
@@ -139,22 +138,24 @@ export default function EngagementPopup() {
         </button>
 
         <div className="inline-flex items-center gap-1.5 bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
-          0% Down Financing
+          {variant === "promo" ? "Limited-Time Offer" : "0% Down Financing"}
         </div>
 
         <h2 className="text-2xl font-bold text-text-primary mb-2">
-          Payments from $89/mo
+          {variant === "promo" ? "$500 Off If You Book Today" : "Payments from $89/mo"}
         </h2>
         <p className="text-text-muted text-sm mb-6 leading-relaxed">
-          A new roof doesn't have to wait. See if you qualify in 60 seconds — no credit impact, no pressure.
+          {variant === "promo"
+            ? "You've been doing your research — let's close the loop. Free inspection, $500 off your project."
+            : "A new roof doesn't have to wait. See if you qualify in 60 seconds — no credit impact, no pressure."}
         </p>
 
         <a
-          href="/financing"
-          onClick={() => trackClick("see_if_you_qualify")}
+          href={variant === "promo" ? "/offers/500-off" : "/financing"}
+          onClick={() => trackClick(variant === "promo" ? "claim_500" : "see_if_you_qualify")}
           className="block w-full px-6 py-3.5 bg-accent hover:bg-accent-dark text-white font-bold text-sm uppercase tracking-wide rounded-lg transition-colors text-center"
         >
-          See If You Qualify
+          {variant === "promo" ? "Claim $500 Off" : "See If You Qualify"}
         </a>
 
         <button

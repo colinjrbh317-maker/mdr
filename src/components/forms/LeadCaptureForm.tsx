@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { recordFormStarted } from "@/lib/intent-tier";
 
 interface LeadCaptureFormProps {
   source: string;
@@ -152,6 +153,7 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
             className={inputClass}
             placeholder="Full Name"
             value={name}
+            onFocus={() => recordFormStarted(source)}
             onChange={(e) => setName(e.target.value)}
           />
         </div>

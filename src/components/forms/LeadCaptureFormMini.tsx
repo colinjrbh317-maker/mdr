@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { recordFormStarted } from "@/lib/intent-tier";
 
 interface Props {
   source: string;
@@ -104,6 +105,7 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
         inputMode="text"
         className={inputClass}
         placeholder="Your Name"
+        onFocus={() => recordFormStarted(source)}
       />
 
       <label htmlFor={`mini-phone-${source}`} className="sr-only">Phone Number</label>

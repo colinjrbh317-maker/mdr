@@ -1,0 +1,22 @@
+---
+/**
+ * Client-side intent tracking bootstrap.
+ * Imported from Layout.astro so it runs on every page.
+ *
+ * Resolves visitor tier (cold | warm | hot) and exposes it to popups,
+ * sticky CTAs, and other CRO components via sessionStorage.
+ */
+---
+
+<script>
+  import { initIntentTracking } from "@/lib/intent-tier";
+
+  // Defer to idle so it never blocks interaction
+  if (typeof window !== "undefined") {
+    if ("requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(() => initIntentTracking(), { timeout: 2000 });
+    } else {
+      setTimeout(() => initIntentTracking(), 0);
+    }
+  }
+</script>
