@@ -74,6 +74,13 @@ export const POST: APIRoute = async ({ request }) => {
       } catch { /* non-fatal — profile just won't be in note */ }
     }
 
+    // --- Server-side PostHog: fire lead_created for every real (spam-passed) lead ---
+    // Intentionally BEFORE AccuLynx so a CRM hiccup doesn't lose the conversion event.
+    // AccuLynx status gets attached as properties after it runs below.
+    let acculynxJobId: string | number | null = null;
+    let acculynxContactId: string | number | null = null;
+    let acculynxStatus: "success" | "failed" | "skipped" = "skipped";
+
     // --- CRM + SMS + Sheets: await all before returning response ---
     // Vercel serverless kills execution after response is sent,
     // so everything must complete before we return.
@@ -94,37 +101,9 @@ export const POST: APIRoute = async ({ request }) => {
 
       if (result) {
         console.log(`[AccuLynx] Lead created: contact=${result.contactId}, job=${result.jobId}`);
-
-        // Server-side PostHog event — source of truth for "real lead passed spam + CRM"
-        const phKey = import.meta.env.PUBLIC_POSTHOG_KEY;
-        if (phKey) {
-          try {
-            const ph = new PostHog(phKey, {
-              host: "https://us.i.posthog.com",
-              flushAt: 1,
-              flushInterval: 0,
-            });
-            ph.capture({
-              distinctId: (email?.trim() || phone.trim()) as string,
-              event: "lead_created",
-              properties: {
-                source: source || "",
-                service: service?.trim() || "",
-                has_financing: isFinancingLead,
-                acculynx_job_id: result.jobId,
-                acculynx_contact_id: result.contactId,
-                gclid: gclid || "",
-                fclid: fclid || "",
-                landing_page: landing_page || "",
-                has_email: !!email?.trim(),
-                has_address: !!addressStr,
-              },
-            });
-            await ph.shutdown();
-          } catch (err) {
-            console.error("[PostHog] lead_created capture failed:", err);
-          }
-        }
+        acculynxJobId = result.jobId;
+        acculynxContactId = result.contactId;
+        acculynxStatus = "success";
 
         // Send instant SMS confirmation via Twilio
         if (result.jobId && phone) {
@@ -192,9 +171,52 @@ export const POST: APIRoute = async ({ request }) => {
         }
       } else {
         console.error("[AccuLynx] Lead creation failed — falling through to Sheets");
+        acculynxStatus = "failed";
       }
     } catch (err) {
       console.error("[AccuLynx] Lead creation error:", err);
+      acculynxStatus = "failed";
+    }
+
+    // Server-side PostHog capture — fires for every legitimate (spam-passed) lead,
+    // regardless of AccuLynx status. This is the source of truth for "real lead".
+    const phKey = import.meta.env.PUBLIC_POSTHOG_KEY;
+    if (phKey) {
+      try {
+        const ph = new PostHog(phKey, {
+          host: "https://us.i.posthog.com",
+          flushAt: 1,
+          flushInterval: 0,
+        });
+        ph.capture({
+          distinctId: (email?.trim() || phone.trim()) as string,
+          event: "lead_created",
+          properties: {
+            source: source || "",
+            service: service?.trim() || "",
+            has_financing: isFinancingLead,
+            acculynx_status: acculynxStatus,
+            acculynx_job_id: acculynxJobId,
+            acculynx_contact_id: acculynxContactId,
+            gclid: gclid || "",
+            fclid: fclid || "",
+            landing_page: landing_page || "",
+            has_email: !!email?.trim(),
+            has_address: !!addressStr,
+            $set: {
+              name: name.trim(),
+              email: email?.trim() || undefined,
+              phone: phone.trim(),
+            },
+          },
+        });
+        await ph.shutdown();
+        console.log("[PostHog] lead_created captured");
+      } catch (err) {
+        console.error("[PostHog] lead_created capture failed:", err);
+      }
+    } else {
+      console.warn("[PostHog] PUBLIC_POSTHOG_KEY missing — lead_created not captured");
     }
 
     // 2. Google Sheets webhook (backup) — await to ensure it completes
