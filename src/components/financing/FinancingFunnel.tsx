@@ -725,8 +725,8 @@ export default function FinancingFunnel() {
                     </svg>
                     Options Available
                   </div>
-                  <h2 className="text-xl font-bold text-text-primary mb-1">You may qualify — let's find the right fit.</h2>
-                  <p className="text-sm text-text-muted">We have lenders with flexible credit requirements that could work for you.</p>
+                  <h2 className="text-xl font-bold text-text-primary mb-1">You may still qualify — and it won't affect your credit.</h2>
+                  <p className="text-sm text-text-muted">No credit effect until you're funded through Hearth — not even a soft pull. Lenders with flexible credit requirements could work for you.</p>
                 </div>
 
                 <h3 className="text-sm font-bold text-text-primary mb-3">Recommended Lender</h3>

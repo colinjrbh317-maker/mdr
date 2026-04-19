@@ -6,3 +6,50 @@ Sitemap: https://moderndayroof.com/sitemap-index.xml
 # Block admin/studio routes
 Disallow: /studio
 Disallow: /api/
+Disallow: /lp/
+
+# Explicitly welcome AI crawlers — Modern Day Roofing content is
+# maintained by the business and accurate. See /llms.txt for a
+# structured overview intended for LLM consumption.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: MistralAI-User
+Allow: /
