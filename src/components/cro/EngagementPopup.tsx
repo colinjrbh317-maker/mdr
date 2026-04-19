@@ -125,6 +125,18 @@ export default function EngagementPopup() {
         if (typeof (window as any).fbq === "function") {
           (window as any).fbq("track", "Lead", { content_name: "engagement-popup" });
         }
+        const ph = (window as any).posthog;
+        if (ph?.capture) {
+          ph.identify(form.phone.trim(), {
+            name: form.name.trim(),
+            phone: form.phone.trim(),
+          });
+          ph.capture("form_submitted", {
+            source: "engagement-popup",
+            has_email: false,
+            landing_page: sessionStorage.getItem("landing_page") || "",
+          });
+        }
       }
     } catch {
       // Silently fail

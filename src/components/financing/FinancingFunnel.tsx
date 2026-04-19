@@ -214,6 +214,26 @@ export default function FinancingFunnel() {
     });
     fireMeta("Lead", { content_name: "financing-funnel" });
 
+    const ph = (window as any).posthog;
+    if (ph?.capture) {
+      ph.identify(data.email.trim() || data.phone.trim(), {
+        name: data.name.trim(),
+        email: data.email.trim() || undefined,
+        phone: data.phone.trim(),
+        city: data.address.trim() || undefined,
+      });
+      ph.capture("form_submitted", {
+        source: "financing-funnel",
+        service: data.service || "Financing Inquiry",
+        has_email: !!data.email.trim(),
+        has_address: !!data.address.trim(),
+        financing_tier: computedTier,
+        financing_budget: data.budget,
+        financing_timeline: data.timeline,
+        landing_page: sessionStorage.getItem("landing_page") || "",
+      });
+    }
+
     setSubmitting(false);
     setStep("results");
   }

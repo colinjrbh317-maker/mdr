@@ -1,7 +1,9 @@
 import type { APIRoute } from "astro";
+import { PostHog } from "posthog-node";
 import { spamCheck, getClientIP } from "@/lib/spam-filter";
 import { createLead, addJobNote, addJobMessage, formatFinancingNote } from "@/lib/acculynx";
 import { sendLeadConfirmationSMS } from "@/lib/twilio";
+import { getBusinessHoursInfo } from "@/lib/business-hours";
 
 export const prerender = false;
 
@@ -16,7 +18,7 @@ function fakeSuccess() {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, phone, email, address, service, message, website, source, gclid, fclid, landing_page, financing_data, sms_consent } = body;
+    const { name, phone, email, address, service, message, website, source, gclid, fclid, landing_page, financing_data, sms_consent, chat_context } = body;
 
     // --- Layer 1: Honeypot check ---
     if (website) {
@@ -93,6 +95,37 @@ export const POST: APIRoute = async ({ request }) => {
       if (result) {
         console.log(`[AccuLynx] Lead created: contact=${result.contactId}, job=${result.jobId}`);
 
+        // Server-side PostHog event — source of truth for "real lead passed spam + CRM"
+        const phKey = import.meta.env.PUBLIC_POSTHOG_KEY;
+        if (phKey) {
+          try {
+            const ph = new PostHog(phKey, {
+              host: "https://us.i.posthog.com",
+              flushAt: 1,
+              flushInterval: 0,
+            });
+            ph.capture({
+              distinctId: (email?.trim() || phone.trim()) as string,
+              event: "lead_created",
+              properties: {
+                source: source || "",
+                service: service?.trim() || "",
+                has_financing: isFinancingLead,
+                acculynx_job_id: result.jobId,
+                acculynx_contact_id: result.contactId,
+                gclid: gclid || "",
+                fclid: fclid || "",
+                landing_page: landing_page || "",
+                has_email: !!email?.trim(),
+                has_address: !!addressStr,
+              },
+            });
+            await ph.shutdown();
+          } catch (err) {
+            console.error("[PostHog] lead_created capture failed:", err);
+          }
+        }
+
         // Send instant SMS confirmation via Twilio
         if (result.jobId && phone) {
           const smsResult = await sendLeadConfirmationSMS(phone.trim(), firstName);
@@ -120,7 +153,42 @@ export const POST: APIRoute = async ({ request }) => {
             qualificationTier: financingProfile.qualificationTier,
             skipped: financingProfile.credit === "Skipped",
           });
-          await addJobNote(result.jobId, note);
+          await addJobNote(result.jobId, `🔔 CALL BACK REQUESTED — FINANCING LEAD\n\n${note}`);
+        } else if (result.jobId) {
+          // For all other web leads (contact form, chat widget, etc): add a
+          // concise "Call Back Requested" note so Sierra's queue surfaces it.
+          // Note: business-hours aware — no "3-min SLA" pressure on a Sunday 11pm lead.
+          const hours = getBusinessHoursInfo();
+          const sourceLabel = source === "ai-chatbot"
+            ? "AI CHATBOT LEAD"
+            : source === "contact-form" ? "CONTACT FORM LEAD"
+            : source ? `${source.toUpperCase()} LEAD`
+            : "WEB LEAD";
+
+          const urgencyLine = hours.isOpen
+            ? `⏰ SLA: Call back within 3 minutes per SOP.`
+            : `🌙 AFTER HOURS — call back ${hours.callbackPhrase} (first thing when office opens).`;
+
+          const noteLines = [
+            `🔔 CALL BACK REQUESTED — ${sourceLabel}`,
+            hours.isOpen ? null : `(${hours.crmLabel})`,
+            ``,
+            `Name: ${name.trim()}`,
+            `Phone: ${phone.trim()}`,
+            email?.trim() ? `Email: ${email.trim()}` : null,
+            addressStr ? `Address: ${addressStr}` : null,
+            service?.trim() ? `Service: ${service.trim()}` : null,
+            landing_page ? `Landed on: ${landing_page}` : null,
+            gclid ? `Google Click ID: ${gclid}` : null,
+            fclid ? `Facebook Click ID: ${fclid}` : null,
+            chat_context ? `\nWhat they said in chat:\n${chat_context}` : null,
+            message?.trim() ? `\nMessage:\n${message.trim()}` : null,
+            ``,
+            urgencyLine,
+            `Submitted: ${hours.currentET}`,
+          ].filter(Boolean).join("\n");
+
+          await addJobNote(result.jobId, noteLines);
         }
       } else {
         console.error("[AccuLynx] Lead creation failed — falling through to Sheets");

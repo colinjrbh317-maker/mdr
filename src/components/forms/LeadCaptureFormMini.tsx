@@ -53,6 +53,18 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
         if (typeof (window as any).fbq === "function") {
           (window as any).fbq("track", "Lead", { content_name: source });
         }
+        const ph = (window as any).posthog;
+        if (ph?.capture) {
+          ph.identify(phone.trim(), {
+            name: name.trim(),
+            phone: phone.trim(),
+          });
+          ph.capture("form_submitted", {
+            source,
+            has_email: false,
+            landing_page: sessionStorage.getItem("landing_page") || "",
+          });
+        }
       } else {
         setState("error");
       }

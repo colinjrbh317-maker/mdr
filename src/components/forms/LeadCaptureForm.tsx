@@ -64,6 +64,24 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
         if (typeof window !== "undefined" && (window as any).fbq) {
           (window as any).fbq("track", "Lead", { content_name: source });
         }
+
+        // PostHog: identify + capture
+        const ph = typeof window !== "undefined" ? (window as any).posthog : null;
+        if (ph?.capture) {
+          ph.identify(email.trim() || phone.trim(), {
+            name: name.trim(),
+            email: email.trim() || undefined,
+            phone: phone.trim(),
+            city: address?.trim() || undefined,
+          });
+          ph.capture("form_submitted", {
+            source,
+            service: service?.trim() || undefined,
+            has_email: !!email.trim(),
+            has_address: !!address?.trim(),
+            landing_page: sessionStorage.getItem("landing_page") || "",
+          });
+        }
       } else {
         const body = await res.json().catch(() => ({}));
         setErrorMsg(body.message || "Something went wrong. Please try again.");

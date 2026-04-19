@@ -11,7 +11,7 @@ const submitClass =
 declare const gtag: (...args: unknown[]) => void;
 declare const fbq: (...args: unknown[]) => void;
 
-function fireAnalytics(source: string) {
+function fireAnalytics(source: string, identity?: { name?: string; phone?: string; email?: string }) {
   try {
     if (typeof gtag === "function") {
       gtag("event", "generate_lead", {
@@ -23,6 +23,23 @@ function fireAnalytics(source: string) {
   try {
     if (typeof fbq === "function") {
       fbq("track", "Lead", { content_name: source });
+    }
+  } catch {}
+  try {
+    const ph = (window as any).posthog;
+    if (ph?.capture) {
+      if (identity?.email || identity?.phone) {
+        ph.identify(identity.email || identity.phone, {
+          name: identity.name,
+          email: identity.email || undefined,
+          phone: identity.phone,
+        });
+      }
+      ph.capture("form_submitted", {
+        source,
+        has_email: !!identity?.email,
+        landing_page: sessionStorage.getItem("landing_page") || "",
+      });
     }
   } catch {}
 }
@@ -70,7 +87,7 @@ export default function ReferralForm() {
 
       setState("success");
       sessionStorage.setItem("form_submitted", "1");
-      fireAnalytics("referral-outbound");
+      fireAnalytics("referral-outbound", { name, phone });
     } catch {
       setState("error");
       setErrorMsg("Something went wrong. Please try again or call us directly.");
@@ -115,7 +132,7 @@ export default function ReferralForm() {
 
       setState("success");
       sessionStorage.setItem("form_submitted", "1");
-      fireAnalytics("referral-inbound");
+      fireAnalytics("referral-inbound", { name, phone, email });
     } catch {
       setState("error");
       setErrorMsg("Something went wrong. Please try again or call us directly.");

@@ -99,6 +99,19 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
         if (typeof (window as any).fbq === "function") {
           (window as any).fbq("track", "Lead", { content_name: "exit-intent-popup" });
         }
+        const ph = (window as any).posthog;
+        if (ph?.capture) {
+          ph.identify(form.phone.trim(), {
+            name: form.name.trim(),
+            phone: form.phone.trim(),
+          });
+          ph.capture("form_submitted", {
+            source: "exit-intent-popup",
+            service: selectedService,
+            has_email: false,
+            landing_page: sessionStorage.getItem("landing_page") || "",
+          });
+        }
       }
     } catch {
       // Silently fail — don't block user
