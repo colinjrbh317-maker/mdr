@@ -1,25 +1,44 @@
 import { useState, useEffect, useCallback } from "react";
 
 /**
- * Multi-step exit-intent popup:
- * Step 1: "What's your roofing situation?" (3 options)
- * Step 2: $500 off offer with mini-form (name + phone only)
+ * Desktop exit-intent popup — straight to $500 off offer + mini-form.
  *
- * Desktop only — MobileRetentionPopup handles mobile users.
- * Page-aware: skips on /financing page, customizes headline on service pages.
+ * Gated to high-intent pages only: homepage, /services/*, /areas/*, /gallery,
+ * /contact, /offers/*, /lp/*. Blog, FAQ, about, warranty, etc. don't mount
+ * this popup — those visitors are researching, not shopping.
+ *
+ * Mobile uses MobileRetentionPopup (free-inspection messaging, no $500).
  */
 
-type Step = "situation" | "offer" | "form" | "success";
+type Step = "offer" | "success";
 
 interface MiniFormState {
   name: string;
   phone: string;
 }
 
+const HIGH_INTENT_PREFIXES = [
+  "/services/",
+  "/areas/",
+  "/offers/",
+  "/lp/",
+];
+
+const HIGH_INTENT_EXACT = new Set([
+  "/",
+  "/gallery",
+  "/contact",
+]);
+
+function pageIsHighIntent(path: string): boolean {
+  const normalized = path.replace(/\/+$/, "") || "/";
+  if (HIGH_INTENT_EXACT.has(normalized)) return true;
+  return HIGH_INTENT_PREFIXES.some((p) => path.startsWith(p));
+}
+
 export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: string }) {
-  const [step, setStep] = useState<Step>("situation");
+  const [step, setStep] = useState<Step>("offer");
   const [visible, setVisible] = useState(false);
-  const [selectedService, setSelectedService] = useState("");
   const [form, setForm] = useState<MiniFormState>({ name: "", phone: "" });
   const [submitting, setSubmitting] = useState(false);
 
@@ -35,7 +54,8 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
   useEffect(() => {
     // Desktop only
     if (window.innerWidth < 768) return;
-    // Financing page: allow exit intent (captures abandoners before funnel completion)
+    // Page gate: only mount on high-intent pages
+    if (!pageIsHighIntent(currentPage)) return;
     if (sessionStorage.getItem("exit_popup_shown")) return;
     if (sessionStorage.getItem("form_submitted")) return;
 
@@ -76,7 +96,6 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
           name: form.name.trim(),
           phone: form.phone.trim(),
           email: "",
-          service: selectedService,
           source: "exit-intent-popup",
           gclid: sessionStorage.getItem("gclid") || "",
           fclid: sessionStorage.getItem("fclid") || "",
@@ -88,14 +107,12 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
         sessionStorage.setItem("form_submitted", "1");
         setStep("success");
 
-        // Fire GA4 conversion
         if (typeof (window as any).gtag === "function") {
           (window as any).gtag("event", "generate_lead", {
             event_category: "form",
             event_label: "exit-intent-popup",
           });
         }
-        // Fire Meta Pixel conversion
         if (typeof (window as any).fbq === "function") {
           (window as any).fbq("track", "Lead", { content_name: "exit-intent-popup" });
         }
@@ -107,7 +124,6 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
           });
           ph.capture("form_submitted", {
             source: "exit-intent-popup",
-            service: selectedService,
             has_email: false,
             landing_page: sessionStorage.getItem("landing_page") || "",
           });
@@ -121,19 +137,6 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
 
   if (!visible) return null;
 
-  // Page-aware headline
-  const getHeadline = () => {
-    if (currentPage.includes("/services/")) return "Still considering your roofing project?";
-    if (currentPage.includes("/gallery")) return "Like what you see?";
-    return "Before you go...";
-  };
-
-  const situations = [
-    { label: "Roof Replacement", icon: "🏠", value: "Roof Replacement" },
-    { label: "Storm Damage", icon: "⛈️", value: "Storm Damage" },
-    { label: "Repair / Other", icon: "🔧", value: "Roof Repair" },
-  ];
-
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center"
@@ -146,7 +149,7 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Special offer"
+        aria-label="$500 off special offer"
         className="relative w-full max-w-md mx-4 bg-white border border-border rounded-2xl p-8 animate-slide-up text-center shadow-2xl"
       >
         <button
@@ -159,55 +162,17 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
           </svg>
         </button>
 
-        {step === "situation" && (
-          <>
-            <h2 className="text-2xl font-bold text-text-primary mb-2">
-              {getHeadline()}
-            </h2>
-            <p className="text-text-muted mb-6">What's your roofing situation?</p>
-
-            <div className="grid grid-cols-3 gap-3">
-              {situations.map((s) => (
-                <button
-                  key={s.value}
-                  onClick={() => {
-                    setSelectedService(s.value);
-                    setStep("offer");
-                    if (typeof (window as any).gtag === "function") {
-                      (window as any).gtag("event", "exit_popup_step1", {
-                        event_category: "cro",
-                        event_label: s.value,
-                      });
-                    }
-                  }}
-                  className="flex flex-col items-center gap-2 p-4 border border-border rounded-xl hover:border-accent hover:bg-accent/5 transition-all"
-                >
-                  <span className="text-3xl">{s.icon}</span>
-                  <span className="text-sm font-medium text-text-primary">{s.label}</span>
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setVisible(false)}
-              className="mt-4 text-sm text-text-dim hover:text-text-muted transition-colors"
-            >
-              Not right now
-            </button>
-          </>
-        )}
-
         {step === "offer" && (
           <>
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">💰</span>
+            <div className="inline-flex items-center gap-1.5 bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
+              Limited-Time Offer
             </div>
 
-            <h2 className="text-2xl font-bold text-text-primary mb-2">
-              Get a Free Quote on Your {selectedService || "Roof Project"}
+            <h2 className="text-3xl font-extrabold text-text-primary mb-2 leading-tight">
+              $500 Off Your Roof
             </h2>
             <p className="text-text-muted mb-6">
-              Schedule your free inspection — no obligation, no hidden fees.
+              Book a free inspection and we'll take $500 off your project. No pressure, no hidden fees.
             </p>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 text-left">
@@ -232,7 +197,7 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
                 disabled={submitting}
                 className="w-full px-6 py-3 bg-accent hover:bg-accent-dark text-white font-bold text-sm uppercase tracking-wide rounded-lg transition-colors disabled:opacity-60"
               >
-                {submitting ? "Sending..." : "Claim $500 Discount"}
+                {submitting ? "Sending..." : "Claim $500 Off"}
               </button>
             </form>
 
@@ -240,6 +205,13 @@ export default function ExitIntentPopup({ currentPage = "/" }: { currentPage?: s
               By submitting, I authorize Modern Day Roofing to contact me via phone and text.{" "}
               <a href="/privacy" className="underline">Privacy Policy</a>
             </p>
+
+            <button
+              onClick={() => setVisible(false)}
+              className="mt-3 text-sm text-text-dim hover:text-text-muted transition-colors"
+            >
+              No thanks
+            </button>
           </>
         )}
 

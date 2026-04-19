@@ -157,10 +157,9 @@ export default function MobileRetentionPopup() {
         {!success ? (
           <>
             <div className="text-center mb-4">
-              <span className="text-3xl">💰</span>
               <h2 className="text-xl font-bold text-text-primary mt-2">Free Roof Inspection</h2>
               <p className="text-sm text-text-muted mt-1">
-                Schedule your free inspection — we'll call to set it up.
+                20 minutes, no obligation. We'll be in and out.
               </p>
             </div>
 
@@ -186,7 +185,7 @@ export default function MobileRetentionPopup() {
                 disabled={submitting}
                 className="w-full px-6 py-3.5 bg-accent hover:bg-accent-dark text-white font-bold text-sm uppercase tracking-wide rounded-lg transition-colors disabled:opacity-60"
               >
-                {submitting ? "Sending..." : "Claim $500 Discount"}
+                {submitting ? "Sending..." : "Book My Free Inspection"}
               </button>
             </form>
 
