@@ -28,6 +28,8 @@
 </div>
 
 <script>
+  import { fetchStormAlert, formatStormDate } from "@/lib/storm-check";
+
   const bar = document.getElementById("announcement-bar");
   const container = document.getElementById("bar-messages");
   const dismissBtn = document.getElementById("bar-dismiss");
@@ -40,7 +42,7 @@
       const month = new Date().getMonth(); // 0-indexed
       const isStormSeason = month >= 2 && month <= 8; // March–September
 
-      const messages = [
+      const baseMessages = [
         {
           text: "0% Down Financing Available — Payments From $89/mo",
           cta: "See If You Qualify",
@@ -68,7 +70,9 @@
         // Spring 2026 promo removed
       ].filter((m) => m.show);
 
+      let messages = baseMessages;
       let currentIndex = 0;
+      let rotateTimer: ReturnType<typeof setInterval> | null = null;
 
       function render(index: number) {
         const msg = messages[index];
@@ -82,11 +86,10 @@
         `;
       }
 
-      render(0);
-
-      // Rotate every 6 seconds
-      if (messages.length > 1) {
-        setInterval(() => {
+      function startRotation() {
+        if (rotateTimer) clearInterval(rotateTimer);
+        if (messages.length <= 1) return;
+        rotateTimer = setInterval(() => {
           container!.style.opacity = "0";
           setTimeout(() => {
             currentIndex = (currentIndex + 1) % messages.length;
@@ -95,6 +98,28 @@
           }, 400);
         }, 6000);
       }
+
+      render(0);
+      startRotation();
+
+      // Fetch recent storm data and, if present, promote to the front of the rotation
+      fetchStormAlert().then((alert) => {
+        if (!alert.recent_storm) return;
+        const city = alert.visitor_city || "your area";
+        const when = formatStormDate(alert.date) || "recently";
+        const eventWord = alert.event_type === "wind" ? "Damaging wind" : "Hail";
+        const stormMessage = {
+          text: `⚡ ${eventWord} reported near ${city} ${when} — Free Damage Inspection`,
+          cta: "Book Now",
+          href: "/contact?source=storm-alert",
+          show: true,
+        };
+        // Prepend — storm alerts lead the rotation
+        messages = [stormMessage, ...baseMessages];
+        currentIndex = 0;
+        render(0);
+        startRotation();
+      });
 
       // GA4 tracking on CTA clicks
       container.addEventListener("click", (e) => {

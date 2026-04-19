@@ -103,12 +103,27 @@ const faqs = [
           </p>
 
           <!-- Urgency -->
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-accent/20 border border-accent/30 rounded-lg mb-8">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-accent/20 border border-accent/30 rounded-lg mb-8" data-capacity-badge>
             <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span class="font-bold text-sm" style="color: #FF6B6B;">Offer expires May 31, 2026</span>
+            <span class="font-bold text-sm" style="color: #FF6B6B;" data-capacity-text>Offer expires May 31, 2026</span>
           </div>
+
+          <script>
+            (async () => {
+              try {
+                const res = await fetch("/api/capacity");
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data.display || data.urgency === "low") return;
+                const el = document.querySelector("[data-capacity-text]");
+                if (el) el.textContent = data.display;
+              } catch {
+                // non-fatal — fallback copy stays in place
+              }
+            })();
+          </script>
 
           <!-- Trust Badges (Mobile) -->
           <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 lg:hidden">

@@ -164,6 +164,17 @@ export function recordFormStarted(formId: string): void {
   persist();
   track("form_started", { form_id: formId, path: location.pathname });
   commitTier("form_started");
+
+  // Arm form-abandonment detection — fires on pagehide if they leave without submitting
+  let fired = false;
+  function maybeFireAbandoned() {
+    if (fired) return;
+    if (sessionStorage.getItem("form_submitted")) return;
+    fired = true;
+    track("form_abandoned", { form_id: formId, path: location.pathname });
+  }
+  window.addEventListener("pagehide", maybeFireAbandoned, { once: true });
+  window.addEventListener("beforeunload", maybeFireAbandoned, { once: true });
 }
 
 /**
