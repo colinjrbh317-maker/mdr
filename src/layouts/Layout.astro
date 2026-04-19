@@ -10,6 +10,7 @@ import ExitIntentPopup from "@/components/cro/ExitIntentPopup";
 import MobileRetentionPopup from "@/components/cro/MobileRetentionPopup";
 import EngagementPopup from "@/components/cro/EngagementPopup";
 import PhoneClickRescuePopup from "@/components/cro/PhoneClickRescuePopup";
+import WelcomeBackBanner from "@/components/cro/WelcomeBackBanner";
 import SocialProofToast from "@/components/cro/SocialProofToast";
 import ChatWidget from "@/components/chat/ChatWidget";
 import PostHog from "@/components/analytics/PostHog.astro";
@@ -162,6 +163,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <Header navigation={navigation} siteSettings={siteSettings} />
+    {!isStudio && <WelcomeBackBanner client:idle currentPage={Astro.url.pathname} />}
 
     <!-- Spacer for fixed header -->
     <div id="header-spacer" class="h-[100px]" aria-hidden="true"></div>

@@ -15,6 +15,7 @@
  */
 
 import { track } from "./track-events";
+import { getEarnedTier, installSessionSnapshot, isReturningVisitor } from "./visitor-history";
 
 export type Tier = "cold" | "warm" | "hot";
 
@@ -34,8 +35,6 @@ interface SessionState {
 
 const SESSION_KEY = "mdr_session_state";
 const TIER_KEY = "mdr_intent_tier";
-const HISTORY_KEY = "mdr_visitor_history"; // Phase 5 will populate
-
 let state: SessionState | null = null;
 let initialized = false;
 
@@ -94,25 +93,15 @@ function persist(): void {
   }
 }
 
-function readPriorSessionEarnedHot(): boolean {
-  try {
-    const raw = localStorage.getItem(HISTORY_KEY);
-    if (!raw) return false;
-    const parsed = JSON.parse(raw);
-    return parsed?.earned_tier === "hot";
-  } catch {
-    return false;
-  }
-}
-
 function resolveTier(): Tier {
   const s = loadState();
+  const earned = getEarnedTier();
 
-  // HOT signals
+  // HOT signals (current session OR earned from prior sessions)
   if (s.phone_clicks > 0) return "hot";
   if (s.form_started) return "hot";
   if (s.visited_offers) return "hot";
-  if (readPriorSessionEarnedHot()) return "hot";
+  if (earned === "hot") return "hot";
 
   // WARM signals
   if (s.service_pages.size >= 2) return "warm";
@@ -120,6 +109,7 @@ function resolveTier(): Tier {
   if (s.service_pages.size + s.area_pages.size >= 2) return "warm";
   if (s.max_time_on_service_ms >= 90_000) return "warm";
   if (s.visited_financing) return "warm";
+  if (earned === "warm") return "warm";
 
   // COLD default
   return "cold";
@@ -184,6 +174,8 @@ export function initIntentTracking(): void {
   if (typeof window === "undefined") return;
   if (initialized) return;
   initialized = true;
+
+  installSessionSnapshot();
 
   const s = loadState();
   const path = location.pathname;
