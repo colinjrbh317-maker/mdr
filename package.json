@@ -16,7 +16,7 @@
     "@sanity/astro": "^3.2.11",
     "@sanity/client": "^7.14.1",
     "@sanity/image-url": "^2.0.3",
-    "astro": "^5.17.1",
+    "astro": "^6.1.8",
     "astro-portabletext": "^0.13.0",
     "dompurify": "^3.3.3",
     "framer-motion": "^12.34.1",
