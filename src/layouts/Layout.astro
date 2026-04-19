@@ -9,6 +9,7 @@ import ExitIntentPopup from "@/components/cro/ExitIntentPopup";
 // ScrollPopup removed — less intrusive CRO approach preferred
 import MobileRetentionPopup from "@/components/cro/MobileRetentionPopup";
 import EngagementPopup from "@/components/cro/EngagementPopup";
+import PhoneClickRescuePopup from "@/components/cro/PhoneClickRescuePopup";
 import SocialProofToast from "@/components/cro/SocialProofToast";
 import ChatWidget from "@/components/chat/ChatWidget";
 import PostHog from "@/components/analytics/PostHog.astro";
@@ -178,6 +179,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     {/* ScrollPopup removed — less intrusive CRO approach preferred */}
     <MobileRetentionPopup client:idle />
     <EngagementPopup client:idle />
+    <PhoneClickRescuePopup client:idle />
     <SocialProofToast client:idle />
     <ChatWidget client:idle />
     {/* StickyMobileCTA removed — phone icon in header is sufficient */}
