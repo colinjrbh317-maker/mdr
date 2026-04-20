@@ -5,7 +5,6 @@ import Button from "@/components/ui/Button.astro";
 import Breadcrumb from "@/components/common/Breadcrumb.astro";
 import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
 import FinancingFunnel from "@/components/financing/FinancingFunnel";
-import FinanceCalculator from "@/components/financing/FinanceCalculator";
 import LenderCards from "@/components/financing/LenderCards.astro";
 import FinancingTimeline from "@/components/financing/FinancingTimeline.astro";
 
@@ -210,7 +209,7 @@ const faqs = [
     </div>
   </SectionContainer>
 
-  {/* 6. Finance Calculator (light bg) */}
+  {/* 6. Hearth Payment Calculator (light bg) */}
   <SectionContainer background="light" padding="md">
     <div class="max-w-2xl mx-auto">
       <div class="text-center mb-8">
@@ -218,10 +217,17 @@ const faqs = [
           Estimate Your Monthly Payment
         </h2>
         <p class="mt-3 text-text-muted">
-          Adjust the sliders to see what your financing could look like.
+          See what your project could cost per month — click through to request financing options.
         </p>
       </div>
-      <FinanceCalculator client:load />
+      <iframe id="hearth-widget_calculator_v1" class="w-full border-0" style="min-height: 600px;"></iframe>
+      <script
+        is:inline
+        src="https://widget.gethearth.com/script.js"
+        id="hearth-script"
+        data-orgid="57208"
+        data-partner="modern-day-roofing"
+      ></script>
     </div>
   </SectionContainer>
 
