@@ -432,9 +432,9 @@ export function formatFinancingNote(data: {
   }
 
   const tierLabels: Record<string, string> = {
-    excellent: "EXCELLENT -- Strong candidate, recommend GoodLeap",
-    good: "GOOD -- Solid candidate, offer both lenders",
-    fair: "FAIR -- May qualify, recommend GreenSky (wider approval)",
+    excellent: "EXCELLENT -- Strong candidate, send Hearth application",
+    good: "GOOD -- Solid candidate, send Hearth application",
+    fair: "FAIR -- May qualify via Hearth (12+ lenders, flexible credit)",
     "needs-review": "NEEDS REVIEW -- Discuss options by phone",
     "call-us": "PHONE CONSULTATION -- Customer wants to discuss by phone",
   };
