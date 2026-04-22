@@ -41,6 +41,8 @@ export default function ReferralForm() {
   const [tab, setTab] = useState<Tab>("referring");
   const [state, setState] = useState<FormState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [referringConsent, setReferringConsent] = useState(false);
+  const [referredConsent, setReferredConsent] = useState(false);
 
   async function handleReferringSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -53,7 +55,7 @@ export default function ReferralForm() {
     const message = (data.get("message") as string || "").trim();
     const website = data.get("website") as string;
 
-    if (!referrer_name || !referrer_phone || !name || !phone) return;
+    if (!referrer_name || !referrer_phone || !name || !phone || !referringConsent) return;
 
     setState("submitting");
     setErrorMsg("");
@@ -98,7 +100,7 @@ export default function ReferralForm() {
     const address = (data.get("address") as string || "").trim();
     const website = data.get("website") as string;
 
-    if (!name || !phone || !referrer_name) return;
+    if (!name || !phone || !referrer_name || !referredConsent) return;
 
     setState("submitting");
     setErrorMsg("");
@@ -212,13 +214,26 @@ export default function ReferralForm() {
           <div className="absolute opacity-0 pointer-events-none" aria-hidden="true" tabIndex={-1}>
             <input type="text" name="website" tabIndex={-1} autoComplete="off" />
           </div>
-          <button type="submit" disabled={state === "submitting"} className={submitClass}>
+          <label htmlFor="referring-sms-consent" className="flex items-start gap-2 text-xs text-text-dim leading-relaxed cursor-pointer select-none">
+            <input
+              type="checkbox"
+              id="referring-sms-consent"
+              name="sms_consent"
+              required
+              checked={referringConsent}
+              onChange={(e) => setReferringConsent(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-accent"
+            />
+            <span>
+              I agree to receive text messages from Modern Day Roofing at the phone number provided, including referral status updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. See{" "}
+              <a href="/privacy" className="underline hover:text-accent">Privacy Policy</a>
+              {" "}and{" "}
+              <a href="/terms" className="underline hover:text-accent">Terms</a>.
+            </span>
+          </label>
+          <button type="submit" disabled={state === "submitting" || !referringConsent} className={submitClass}>
             {state === "submitting" ? "Submitting..." : "Submit My Referral"}
           </button>
-          <p className="text-xs text-text-dim text-center mt-3">
-            By submitting, I authorize Modern Day Roofing to contact me via phone and text.{" "}
-            <a href="/privacy" className="underline hover:text-accent">Privacy Policy</a>
-          </p>
         </form>
       )}
 
@@ -253,13 +268,26 @@ export default function ReferralForm() {
           <div className="absolute opacity-0 pointer-events-none" aria-hidden="true" tabIndex={-1}>
             <input type="text" name="website" tabIndex={-1} autoComplete="off" />
           </div>
-          <button type="submit" disabled={state === "submitting"} className={submitClass}>
+          <label htmlFor="referred-sms-consent" className="flex items-start gap-2 text-xs text-text-dim leading-relaxed cursor-pointer select-none">
+            <input
+              type="checkbox"
+              id="referred-sms-consent"
+              name="sms_consent"
+              required
+              checked={referredConsent}
+              onChange={(e) => setReferredConsent(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-accent"
+            />
+            <span>
+              I agree to receive text messages from Modern Day Roofing at the phone number provided, including appointment confirmations, estimate follow-ups, and service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. See{" "}
+              <a href="/privacy" className="underline hover:text-accent">Privacy Policy</a>
+              {" "}and{" "}
+              <a href="/terms" className="underline hover:text-accent">Terms</a>.
+            </span>
+          </label>
+          <button type="submit" disabled={state === "submitting" || !referredConsent} className={submitClass}>
             {state === "submitting" ? "Submitting..." : "Get My Free Inspection"}
           </button>
-          <p className="text-xs text-text-dim text-center mt-3">
-            By submitting, I authorize Modern Day Roofing to contact me via phone and text.{" "}
-            <a href="/privacy" className="underline hover:text-accent">Privacy Policy</a>
-          </p>
         </form>
       )}
     </div>
