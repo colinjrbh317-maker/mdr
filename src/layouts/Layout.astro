@@ -13,7 +13,7 @@ import PhoneClickRescuePopup from "@/components/cro/PhoneClickRescuePopup";
 import WelcomeBackBanner from "@/components/cro/WelcomeBackBanner";
 import SocialProofToast from "@/components/cro/SocialProofToast";
 import ChatWidget from "@/components/chat/ChatWidget";
-import PostHog from "@/components/analytics/PostHog.astro";
+import Hotjar from "@/components/analytics/Hotjar.astro";
 import IntentTracker from "@/components/analytics/IntentTracker.astro";
 // StickyMobileCTA removed — phone icon in header is sufficient
 import "@/styles/global.css";
@@ -155,8 +155,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
       </script>
     )}
 
-    {/* PostHog — analytics, session recording, heatmaps, feature flags, A/B tests */}
-    {!isStudio && <PostHog />}
+    {/* Hotjar — analytics, session recording, heatmaps */}
+    {!isStudio && <Hotjar />}
     {!isStudio && <IntentTracker />}
   </head>
   <body class="min-h-screen flex flex-col">
@@ -194,16 +194,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
         document.addEventListener('click', function(e) {
           var el = e.target && e.target.closest ? e.target.closest('a, button') : null;
           if (!el) return;
-          var ph = window.posthog;
-          if (!ph || !ph.capture) return;
           var text = (el.textContent || '').trim();
-          var href = el.getAttribute('href') || '';
           if (el.dataset.cta === 'quote' || /free estimate|get.*(quote|estimate)|request.*quote/i.test(text)) {
-            ph.capture('quote_cta_click', {
-              location: window.location.pathname,
-              label: text.slice(0, 60),
-              href: href.slice(0, 120)
-            });
+            if (window.hj) window.hj('event', 'quote_cta_click');
           }
         }, { passive: true });
       </script>

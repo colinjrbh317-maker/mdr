@@ -1,5 +1,5 @@
 /**
- * Unified event tracker — fans events out to PostHog, GA4, and Meta Pixel.
+ * Unified event tracker — fans events out to Hotjar, GA4, and Meta Pixel.
  *
  * Client-only. Safe to import at module top-level; all methods no-op on SSR
  * and when the target analytics library is unavailable.
@@ -35,11 +35,10 @@ const META_PIXEL_CUSTOM_EVENTS = new Set([
 export function track(event: string, props: EventProps = {}): void {
   if (typeof window === "undefined") return;
 
-  // PostHog — primary event store
+  // Hotjar — primary event store (events only; no property payloads in Hotjar)
   try {
-    const ph = (window as any).posthog;
-    if (ph?.capture) {
-      ph.capture(event, props);
+    if ((window as any).hj) {
+      (window as any).hj('event', event);
     }
   } catch {
     // non-fatal
@@ -70,20 +69,7 @@ export function track(event: string, props: EventProps = {}): void {
   }
 }
 
-/**
- * Read a PostHog feature flag. Returns null if PostHog isn't ready yet.
- * Intended for CRO A/B tests (e.g., tier-threshold experiments).
- */
-export function getFlag(key: string): string | boolean | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const ph = (window as any).posthog;
-    if (ph?.getFeatureFlag) {
-      const v = ph.getFeatureFlag(key);
-      return v ?? null;
-    }
-  } catch {
-    // non-fatal
-  }
+/** Stub — feature flags were PostHog-specific. Always returns null. */
+export function getFlag(_key: string): string | boolean | null {
   return null;
 }

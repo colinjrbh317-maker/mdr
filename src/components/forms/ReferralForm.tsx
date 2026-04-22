@@ -26,21 +26,14 @@ function fireAnalytics(source: string, identity?: { name?: string; phone?: strin
     }
   } catch {}
   try {
-    const ph = (window as any).posthog;
-    if (ph?.capture) {
-      if (identity?.email || identity?.phone) {
-        ph.identify(identity.email || identity.phone, {
-          name: identity.name,
-          email: identity.email || undefined,
-          phone: identity.phone,
-        });
-      }
-      ph.capture("form_submitted", {
-        source,
-        has_email: !!identity?.email,
-        landing_page: sessionStorage.getItem("landing_page") || "",
+    if (identity?.email || identity?.phone) {
+      (window as any).hj?.('identify', identity.email || identity.phone, {
+        name: identity.name,
+        email: identity.email || undefined,
+        phone: identity.phone,
       });
     }
+    (window as any).hj?.('event', 'form_submitted');
   } catch {}
 }
 

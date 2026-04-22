@@ -121,10 +121,7 @@ export default function PhoneClickRescuePopup() {
         sessionStorage.setItem("form_submitted", "1");
         setSuccess(true);
         track("phone_rescue_submitted", { path: location.pathname });
-        const ph = (window as any).posthog;
-        if (ph?.identify) {
-          ph.identify(form.phone.trim(), { name: form.name.trim(), phone: form.phone.trim() });
-        }
+        (window as any).hj?.('identify', form.phone.trim(), { name: form.name.trim(), phone: form.phone.trim() });
       }
     } catch {
       // non-fatal

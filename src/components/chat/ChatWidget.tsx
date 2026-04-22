@@ -101,12 +101,10 @@ export default function ChatWidget() {
     window.dispatchEvent(new CustomEvent(isOpen ? "mdr:chat-open" : "mdr:chat-close"));
     if (isOpen) {
       sessionStorage.setItem("chat_active", "1");
-      const ph = (window as any).posthog;
-      if (ph?.capture) ph.capture("chat_opened", { landing_page: sessionStorage.getItem("landing_page") || "" });
+      (window as any).hj?.('event', 'chat_opened');
     } else {
       sessionStorage.removeItem("chat_active");
-      const ph = (window as any).posthog;
-      if (ph?.capture) ph.capture("chat_closed", { user_turns: messagesRef.current.filter((m) => m.role === "user").length, lead_submitted: leadSubmitted });
+      (window as any).hj?.('event', 'chat_closed');
     }
   }, [isOpen, leadSubmitted]);
 
@@ -300,22 +298,13 @@ export default function ChatWidget() {
         (window as any).fbq("track", "Lead", { content_name: "ai-chatbot" });
       }
 
-      // PostHog: identify + capture
-      const ph = (window as any).posthog;
-      if (ph && typeof ph.identify === "function") {
-        ph.identify(leadForm.email.trim() || leadForm.phone.trim(), {
-          name: leadForm.name.trim(),
-          phone: leadForm.phone.trim(),
-          email: leadForm.email.trim(),
-          source: "ai-chatbot",
-        });
-        ph.capture("lead_submitted", {
-          source: "ai-chatbot",
-          landing_page: sessionStorage.getItem("landing_page") || "",
-          chat_turns: messagesRef.current.filter((m) => m.role === "user").length,
-          submitted_during_hours: hours.isOpen,
-        });
-      }
+      (window as any).hj?.('identify', leadForm.email.trim() || leadForm.phone.trim(), {
+        name: leadForm.name.trim(),
+        phone: leadForm.phone.trim(),
+        email: leadForm.email.trim(),
+        source: "ai-chatbot",
+      });
+      (window as any).hj?.('event', 'lead_submitted');
     } catch {
       setSubmitError("Lost connection — try calling us at (540) 553-6007.");
     } finally {

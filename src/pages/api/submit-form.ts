@@ -1,5 +1,4 @@
 import type { APIRoute } from "astro";
-import { PostHog } from "posthog-node";
 import { spamCheck, getClientIP } from "@/lib/spam-filter";
 import { createLead, addJobNote, addJobMessage, formatFinancingNote } from "@/lib/acculynx";
 import { sendLeadConfirmationSMS } from "@/lib/twilio";
@@ -176,47 +175,6 @@ export const POST: APIRoute = async ({ request }) => {
     } catch (err) {
       console.error("[AccuLynx] Lead creation error:", err);
       acculynxStatus = "failed";
-    }
-
-    // Server-side PostHog capture — fires for every legitimate (spam-passed) lead,
-    // regardless of AccuLynx status. This is the source of truth for "real lead".
-    const phKey = import.meta.env.PUBLIC_POSTHOG_KEY;
-    if (phKey) {
-      try {
-        const ph = new PostHog(phKey, {
-          host: "https://us.i.posthog.com",
-          flushAt: 1,
-          flushInterval: 0,
-        });
-        ph.capture({
-          distinctId: (email?.trim() || phone.trim()) as string,
-          event: "lead_created",
-          properties: {
-            source: source || "",
-            service: service?.trim() || "",
-            has_financing: isFinancingLead,
-            acculynx_status: acculynxStatus,
-            acculynx_job_id: acculynxJobId,
-            acculynx_contact_id: acculynxContactId,
-            gclid: gclid || "",
-            fclid: fclid || "",
-            landing_page: landing_page || "",
-            has_email: !!email?.trim(),
-            has_address: !!addressStr,
-            $set: {
-              name: name.trim(),
-              email: email?.trim() || undefined,
-              phone: phone.trim(),
-            },
-          },
-        });
-        await ph.shutdown();
-        console.log("[PostHog] lead_created captured");
-      } catch (err) {
-        console.error("[PostHog] lead_created capture failed:", err);
-      }
-    } else {
-      console.warn("[PostHog] PUBLIC_POSTHOG_KEY missing — lead_created not captured");
     }
 
     // 2. Google Sheets webhook (backup) — await to ensure it completes

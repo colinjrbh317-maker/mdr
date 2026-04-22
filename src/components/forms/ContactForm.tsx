@@ -58,21 +58,13 @@ export default function ContactForm() {
         if (typeof window !== "undefined" && (window as any).fbq) {
           (window as any).fbq("track", "Lead", { content_name: "contact-page" });
         }
-        const ph = typeof window !== "undefined" ? (window as any).posthog : null;
-        if (ph?.capture) {
-          ph.identify(email.trim() || phone.trim(), {
-            name,
-            email: email.trim() || undefined,
-            phone: phone.trim(),
-            city: city?.trim() || undefined,
-          });
-          ph.capture("form_submitted", {
-            source: "contact-page",
-            has_email: !!email.trim(),
-            has_address: !!fullAddress,
-            landing_page: sessionStorage.getItem("landing_page") || "",
-          });
-        }
+        (window as any).hj?.('identify', email.trim() || phone.trim(), {
+          name,
+          email: email.trim() || undefined,
+          phone: phone.trim(),
+          city: city?.trim() || undefined,
+        });
+        (window as any).hj?.('event', 'form_submitted');
       } else {
         const body = await res.json().catch(() => ({}));
         setErrorMsg(body.message || "Something went wrong. Please try again.");

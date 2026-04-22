@@ -107,18 +107,8 @@ export default function MobileRetentionPopup() {
         if (typeof (window as any).fbq === "function") {
           (window as any).fbq("track", "Lead", { content_name: "mobile-retention" });
         }
-        const ph = (window as any).posthog;
-        if (ph?.capture) {
-          ph.identify(form.phone.trim(), {
-            name: form.name.trim(),
-            phone: form.phone.trim(),
-          });
-          ph.capture("form_submitted", {
-            source: "mobile-retention",
-            has_email: false,
-            landing_page: sessionStorage.getItem("landing_page") || "",
-          });
-        }
+        (window as any).hj?.('identify', form.phone.trim(), { name: form.name.trim(), phone: form.phone.trim() });
+        (window as any).hj?.('event', 'form_submitted');
       }
     } catch {
       // Silently fail

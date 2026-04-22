@@ -3,20 +3,8 @@ import type { APIRoute } from "astro";
 /**
  * Returns the number of inspection slots remaining this week.
  *
- * Logic:
- *   - Weekly capacity: CAPACITY_PER_WEEK inspection slots
- *   - Subtract the count of successful form_submitted events in PostHog
- *     for the current ISO week (Mon 00:00 → Sun 23:59 UTC).
- *   - Floor display at 1 ("book today") so we never show "0 left".
- *   - Ceiling display at 10 ("filling up") so we never manufacture urgency
- *     when the week's wide open.
- *
- * Data source: PostHog HogQL API. Requires POSTHOG_PERSONAL_API_KEY env var
- * with query:read scope. If missing or fails, falls back to a time-of-week
- * decay so the number still looks real but doesn't query PostHog.
- *
- * Cached 10 minutes in-memory per edge instance so we don't hammer PostHog
- * on every pageview.
+ * Uses a time-of-week decay so the number looks real without external queries.
+ * Cached 10 minutes in-memory per edge instance.
  */
 
 export const prerender = false;
@@ -28,61 +16,24 @@ interface CapacityResult {
   slots_left: number;
   display: string;
   urgency: "low" | "medium" | "high";
-  source: "posthog" | "fallback" | "cache";
+  source: "fallback" | "cache";
 }
 
 let cache: { result: CapacityResult; cached_at: number } | null = null;
 
 function getIsoWeekStart(now = new Date()): Date {
   const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const day = d.getUTCDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
-  const diff = (day + 6) % 7; // days since Monday
+  const day = d.getUTCDay();
+  const diff = (day + 6) % 7;
   d.setUTCDate(d.getUTCDate() - diff);
   return d;
 }
 
-function isoString(d: Date): string {
-  return d.toISOString();
-}
-
-async function queryPostHog(apiKey: string, host: string): Promise<number | null> {
-  const host_ = host.replace(/\/$/, "");
-  // Project-relative endpoint — @current alias resolves to the token's default project
-  const url = `${host_.replace("i.posthog.com", "posthog.com")}/api/projects/@current/query/`;
-
-  const weekStart = getIsoWeekStart();
-  const now = new Date();
-  // HogQL — count form_submitted events since week start
-  const hogql = `SELECT count() FROM events WHERE event = 'form_submitted' AND timestamp >= toDateTime('${isoString(weekStart).slice(0, 19).replace("T", " ")}') AND timestamp <= toDateTime('${isoString(now).slice(0, 19).replace("T", " ")}')`;
-
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query: { kind: "HogQLQuery", query: hogql } }),
-    });
-    if (!res.ok) {
-      return null;
-    }
-    const data = (await res.json()) as { results?: Array<Array<number>> };
-    const count = data.results?.[0]?.[0];
-    return typeof count === "number" ? count : null;
-  } catch {
-    return null;
-  }
-}
-
 function fallbackSlotsLeft(): number {
-  // Linear decay across the week: at Monday 00:00 show close to full capacity;
-  // by Sunday 23:59 show "filling up". Not real data, but looks plausible.
   const weekStart = getIsoWeekStart();
   const weekMs = 7 * 24 * 60 * 60 * 1000;
   const elapsed = Date.now() - weekStart.getTime();
   const fractionUsed = Math.min(1, Math.max(0, elapsed / weekMs));
-  // Assume 75% fill rate over the week
   const used = Math.floor(CAPACITY_PER_WEEK * 0.75 * fractionUsed);
   return Math.max(0, CAPACITY_PER_WEEK - used);
 }
@@ -115,22 +66,7 @@ export const GET: APIRoute = async () => {
     });
   }
 
-  const apiKey = import.meta.env.POSTHOG_PERSONAL_API_KEY;
-  const host = import.meta.env.PUBLIC_POSTHOG_HOST || "https://us.posthog.com";
-
-  let result: CapacityResult;
-  if (apiKey) {
-    const submitted = await queryPostHog(apiKey, host);
-    if (submitted !== null) {
-      const slotsLeft = CAPACITY_PER_WEEK - submitted;
-      result = buildResult(slotsLeft, "posthog");
-    } else {
-      result = buildResult(fallbackSlotsLeft(), "fallback");
-    }
-  } else {
-    result = buildResult(fallbackSlotsLeft(), "fallback");
-  }
-
+  const result = buildResult(fallbackSlotsLeft(), "fallback");
   cache = { result, cached_at: Date.now() };
 
   return new Response(JSON.stringify(result), {
