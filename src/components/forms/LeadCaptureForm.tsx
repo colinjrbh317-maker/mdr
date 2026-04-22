@@ -54,6 +54,15 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
             event_category: "form",
             event_label: source,
           });
+
+          const conv = (window as any).__GADS_LEAD_CONVERSION__;
+          if (conv) {
+            (window as any).gtag("event", "conversion", {
+              send_to: conv,
+              value: 1.0,
+              currency: "USD",
+            });
+          }
         }
 
         if (typeof window !== "undefined" && (window as any).fbq) {
@@ -169,7 +178,7 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
         </button>
 
         <p className="text-center text-xs text-text-dim mt-1">
-          Or text us —{" "}
+          Or text us at{" "}
           <a href="tel:5405536007" className="underline hover:text-accent transition-colors font-semibold">
             (540) 553-6007
           </a>
@@ -203,7 +212,7 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
       </div>
 
       <p className="text-sm text-text-muted mb-1">
-        Almost done — a few optional details help us respond faster.
+        Almost done. A few optional details help us respond faster.
       </p>
 
       <div>

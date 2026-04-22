@@ -1,65 +1,95 @@
 ---
 import LandingPageLayout from "@/layouts/LandingPageLayout.astro";
 import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
+import Logo from "@/components/common/Logo.astro";
 
 export const prerender = true;
 
-const campaigns: Record<string, {
+interface CampaignConfig {
   headline: string;
   subheadline: string;
   cta: string;
+  formCardTitle: string;
   service: string;
   location?: string;
-}> = {
+  proofPoints: [string, string, string];
+  riskReversal: string;
+}
+
+const campaigns: Record<string, CampaignConfig> = {
   "roof-repair": {
-    headline: "Fast, Reliable Roof Repair in [Location]",
-    subheadline: "Book your free inspection today — most repairs diagnosed same day.",
-    cta: "Book Free Inspection",
+    headline: "Roof Leak or Storm Damage in [Location]? Same-Day Diagnosis.",
+    subheadline: "Most repairs quoted on the first visit. Honest pricing. No upselling.",
+    cta: "Get My Free Inspection",
+    formCardTitle: "Book Your Free Roof Inspection",
     service: "Roof Repair",
+    proofPoints: ["5.0 Google rating (231 reviews)", "1,000+ roofs serviced", "GAF Master Elite certified"],
+    riskReversal: "Free inspection. No pressure. No obligation. About 20 minutes.",
   },
   "roof-replacement": {
-    headline: "Full Roof Replacement in [Location]",
-    subheadline: "0% down financing available. Payments from $89/mo. Free estimate.",
-    cta: "Get Free Estimate",
+    headline: "Full Roof Replacement in [Location] from $89/mo.",
+    subheadline: "$0 down financing. Lifetime warranty. Free quote in 24 hours.",
+    cta: "Get My Free Quote",
+    formCardTitle: "Get Your Free Replacement Quote",
     service: "Roof Replacement",
+    proofPoints: ["GAF Master Elite (top 2% nationally)", "1,000+ Virginia roofs installed", "Lifetime workmanship warranty"],
+    riskReversal: "Free quote. No pressure. No obligation. About 20 minutes.",
   },
   "roof-inspection-christiansburg": {
     headline: "Free Roof Inspection in Christiansburg, VA",
     subheadline: "GAF Master Elite certified. No obligation. Honest assessment guaranteed.",
-    cta: "Book Free Inspection",
+    cta: "Book My Free Inspection",
+    formCardTitle: "Book Your Free Inspection",
     service: "Roof Inspection",
     location: "Christiansburg",
+    proofPoints: ["5.0 Google rating", "1,000+ roofs inspected", "GAF Master Elite certified"],
+    riskReversal: "Free inspection. No pressure. No obligation.",
   },
   "roof-inspection-roanoke": {
     headline: "Free Roof Inspection in Roanoke, VA",
     subheadline: "GAF Master Elite certified. No obligation. Honest assessment guaranteed.",
-    cta: "Book Free Inspection",
+    cta: "Book My Free Inspection",
+    formCardTitle: "Book Your Free Inspection",
     service: "Roof Inspection",
     location: "Roanoke",
+    proofPoints: ["5.0 Google rating", "1,000+ roofs inspected", "GAF Master Elite certified"],
+    riskReversal: "Free inspection. No pressure. No obligation.",
   },
   "roof-financing": {
-    headline: "Roof Financing in [Location] — $0 Down",
-    subheadline: "Payments from $89/mo. Apply in minutes — no credit impact to check your rate.",
-    cta: "Check If I Qualify",
+    headline: "Roof Financing in [Location] from $89/mo. Zero Down.",
+    subheadline: "Check your rate in 60 seconds. No credit impact. Real Virginia roofers.",
+    cta: "Check My Rate",
+    formCardTitle: "Check If You Qualify",
     service: "Roof Financing",
+    proofPoints: ["No credit impact to check", "Approvals in minutes", "$0 down options available"],
+    riskReversal: "Soft credit pull only. No obligation. Takes 60 seconds.",
   },
   "branded": {
-    headline: "Modern Day Roofing — [Location]'s Most Trusted Roofer",
-    subheadline: "GAF Master Elite certified. 5.0 stars. 1,000+ roofs completed.",
-    cta: "Get Free Quote",
+    headline: "Modern Day Roofing. [Location]'s 5-Star GAF Master Elite Roofer.",
+    subheadline: "231 five-star Google reviews. 1,000+ roofs completed. Locally owned.",
+    cta: "Get My Free Quote",
+    formCardTitle: "Get Your Free Quote",
     service: "General",
+    proofPoints: ["5.0 across 231 Google reviews", "GAF Master Elite (top 2% nationally)", "Locally owned in Christiansburg"],
+    riskReversal: "Free quote. No pressure. No obligation. About 20 minutes.",
   },
   "roofing-company": {
     headline: "Top-Rated Roofing Company in [Location]",
-    subheadline: "5.0 Google rating. 1,000+ roofs. GAF Master Elite certified.",
-    cta: "Get Free Estimate",
+    subheadline: "5.0 across 231 reviews. 1,000+ roofs. GAF Master Elite certified.",
+    cta: "Get My Free Quote",
+    formCardTitle: "Get Your Free Quote",
     service: "General",
+    proofPoints: ["5.0 across 231 Google reviews", "1,000+ roofs completed", "GAF Master Elite certified"],
+    riskReversal: "Free quote. No pressure. No obligation.",
   },
   "competitors": {
-    headline: "Why [Location] Homeowners Choose MDR",
-    subheadline: "5.0 stars. Lifetime warranties. GAF Master Elite. See the difference.",
-    cta: "Get Free Quote",
+    headline: "Why [Location] Homeowners Switch to Modern Day Roofing",
+    subheadline: "Lifetime warranties. GAF Master Elite. 5.0 stars. Get a second opinion.",
+    cta: "Get My Free Quote",
+    formCardTitle: "Get Your Free Second Opinion",
     service: "General",
+    proofPoints: ["5.0 across 231 Google reviews", "Lifetime workmanship warranty", "GAF Master Elite certified"],
+    riskReversal: "Free quote. No pressure. No obligation.",
   },
 };
 
@@ -84,7 +114,7 @@ if (!config) {
 }
 
 const defaultLocation = config.location || "Southwest Virginia";
-const headline = config.headline.replace("[Location]", defaultLocation);
+const headline = config.headline.replaceAll("[Location]", defaultLocation);
 const subheadline = config.subheadline;
 
 const phone = "(540) 553-6007";
@@ -95,24 +125,18 @@ const phoneTel = "5405536007";
   title={`${config.service} | Modern Day Roofing`}
   description={subheadline}
 >
-  {/* Minimal Header — logo + phone only */}
+  {/* Minimal header: logo + click-to-call */}
   <header class="bg-white border-b border-border">
-    <div class="mx-auto max-w-[1200px] px-4 md:px-6 py-4 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2" aria-label="Modern Day Roofing home">
-        <img
-          src="/assets/logos/mdr-logo-dark.svg"
-          alt="Modern Day Roofing"
-          width="180"
-          height="48"
-          class="h-10 w-auto"
-          onerror="this.onerror=null;this.alt='Modern Day Roofing';this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span class=\'font-display font-bold text-xl text-text-primary\'>Modern Day Roofing</span>');"
-        />
+    <div class="mx-auto max-w-[1200px] px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+      <a href="/" aria-label="Modern Day Roofing home">
+        <Logo size="sm" />
       </a>
       <a
         href={`tel:${phoneTel}`}
-        class="flex items-center gap-2 text-text-primary hover:text-accent transition-colors font-semibold text-sm md:text-base"
+        data-lp-phone-cta="header"
+        class="flex items-center gap-2 text-text-primary hover:text-accent transition-colors font-bold text-sm md:text-base"
       >
-        <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
         </svg>
         <span class="hidden sm:inline">{phone}</span>
@@ -121,50 +145,57 @@ const phoneTel = "5405536007";
     </div>
   </header>
 
-  {/* Hero Section */}
-  <section class="relative py-14 md:py-20 dark-section">
+  {/* Hero: form-first on mobile, side-by-side on desktop */}
+  <section class="relative">
+    {/* Background image */}
     <div class="absolute inset-0 z-0">
       <img
         src="/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG"
-        alt="Roof project by Modern Day Roofing"
+        alt=""
         class="w-full h-full object-cover"
         loading="eager"
+        fetchpriority="high"
       />
-      <div class="absolute inset-0 bg-bg-darker/90"></div>
+      <div class="absolute inset-0 bg-bg-darker/85"></div>
     </div>
-    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-        {/* Left — headline + subheadline */}
-        <div class="pt-4 md:pt-8">
+
+    <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-6 md:py-12 lg:py-16">
+      <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-12 items-center">
+        {/* Left column: headline + proof. On mobile this renders BELOW the form via order-2. */}
+        <div class="order-2 lg:order-1 pt-2 lg:pt-0 dark-section">
           <h1
-            class="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-5 leading-tight lp-headline"
+            class="text-2xl md:text-4xl lg:text-5xl font-display font-bold mb-3 md:mb-5 leading-[1.15] lp-headline"
             style="color: #fff;"
             data-location-template={config.headline}
           >
             {headline}
           </h1>
-          <p class="text-lg md:text-xl leading-relaxed mb-8" style="color: rgba(255,255,255,0.85);">
+          <p
+            class="text-base md:text-lg lg:text-xl leading-relaxed mb-4 md:mb-6 lp-subheadline"
+            style="color: rgba(255,255,255,0.9);"
+            data-location-template={config.subheadline}
+          >
             {subheadline}
           </p>
-          {/* Trust signals under headline on desktop */}
-          <div class="hidden lg:flex flex-wrap gap-x-6 gap-y-3 text-sm" style="color: rgba(255,255,255,0.7);">
-            <span class="flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-              5.0 Google Rating
-            </span>
-            <span>1,000+ Roofs Completed</span>
-            <span>GAF Master Elite Certified</span>
-            <span>$0 Down Financing</span>
-          </div>
+          <ul class="flex flex-col gap-2 md:gap-2.5 text-sm md:text-base" style="color: rgba(255,255,255,0.85);">
+            {config.proofPoints.map((point) => (
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Right — form */}
-        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-          <h2 class="text-xl font-display font-bold text-text-primary mb-1 text-center">
-            {config.cta}
+        {/* Right column: form. On mobile renders FIRST via order-1. */}
+        <div class="order-1 lg:order-2 bg-white rounded-2xl shadow-2xl p-5 md:p-7">
+          <h2 class="text-lg md:text-xl font-display font-bold text-text-primary mb-1 text-center">
+            {config.formCardTitle}
           </h2>
-          <p class="text-sm text-text-muted mb-5 text-center">
-            Free, no-obligation — takes 30 seconds.
+          <p class="text-xs md:text-sm text-text-muted mb-4 text-center">
+            Free, no obligation. Takes 30 seconds.
           </p>
           <LeadCaptureForm client:load source={`lp-${campaign}`} />
         </div>
@@ -172,111 +203,114 @@ const phoneTel = "5405536007";
     </div>
   </section>
 
-  {/* Trust Bar — visible on all screens */}
-  <section class="bg-bg-light border-b border-border py-5">
-    <div class="mx-auto max-w-[1200px] px-4 md:px-6">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div class="flex flex-col items-center gap-1">
-          <div class="flex items-center gap-1">
-            <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-            <span class="font-bold text-text-primary">5.0</span>
-          </div>
-          <span class="text-xs text-text-muted">Google Rating</span>
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <span class="font-bold text-text-primary">1,000+</span>
-          <span class="text-xs text-text-muted">Roofs Completed</span>
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <span class="font-bold text-text-primary text-sm">GAF Master Elite</span>
-          <span class="text-xs text-text-muted">Top 2% of Roofers</span>
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <span class="font-bold text-text-primary">$0 Down</span>
-          <span class="text-xs text-text-muted">Financing Available</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* What to Expect — builds trust */}
-  <section class="bg-white py-12 md:py-16">
+  {/* Risk reversal + 3-step trust block (below the fold, supporting copy) */}
+  <section class="bg-white py-10 md:py-16">
     <div class="mx-auto max-w-[900px] px-4 md:px-6">
-      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary text-center mb-10">
-        What Happens After You Reach Out
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <p class="text-center text-text-muted text-sm md:text-base mb-8 md:mb-10">
+        {config.riskReversal}
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         <div class="text-center">
-          <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-accent text-white flex items-center justify-center text-lg font-bold">1</div>
-          <h3 class="font-bold text-text-primary mb-2">We Call Within 24 Hours</h3>
-          <p class="text-sm text-text-muted">A real person from our team reaches out to discuss your project and answer any questions.</p>
+          <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 rounded-full bg-accent text-white flex items-center justify-center text-lg font-bold">1</div>
+          <h3 class="font-bold text-text-primary mb-1.5">We Call Within 24 Hours</h3>
+          <p class="text-sm text-text-muted">A real person answers. No call center.</p>
         </div>
         <div class="text-center">
-          <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-accent text-white flex items-center justify-center text-lg font-bold">2</div>
-          <h3 class="font-bold text-text-primary mb-2">Free On-Site Inspection</h3>
-          <p class="text-sm text-text-muted">Our certified inspector checks your roof thoroughly with photos and an honest assessment.</p>
+          <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 rounded-full bg-accent text-white flex items-center justify-center text-lg font-bold">2</div>
+          <h3 class="font-bold text-text-primary mb-1.5">Free Roof Inspection</h3>
+          <p class="text-sm text-text-muted">Drone photos and a written assessment.</p>
         </div>
         <div class="text-center">
-          <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-accent text-white flex items-center justify-center text-lg font-bold">3</div>
-          <h3 class="font-bold text-text-primary mb-2">Transparent Quote</h3>
-          <p class="text-sm text-text-muted">You get a detailed, itemized estimate. No surprises, no pressure, no obligation.</p>
+          <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 rounded-full bg-accent text-white flex items-center justify-center text-lg font-bold">3</div>
+          <h3 class="font-bold text-text-primary mb-1.5">Honest, Itemized Quote</h3>
+          <p class="text-sm text-text-muted">No surprises. No pressure. No obligation.</p>
         </div>
       </div>
     </div>
   </section>
 
-  {/* Minimal Footer */}
-  <footer class="bg-bg-darker py-8 dark-section">
+  {/* Minimal footer */}
+  <footer class="bg-bg-darker py-6 md:py-8 dark-section">
     <div class="mx-auto max-w-[1200px] px-4 md:px-6 text-center">
-      <p class="text-sm mb-2" style="color: rgba(255,255,255,0.7);">
-        Modern Day Roofing &mdash; 80 College St. STE R, Christiansburg, VA 24073
+      <p class="text-xs md:text-sm mb-2" style="color: rgba(255,255,255,0.7);">
+        Modern Day Roofing. 80 College St. STE R, Christiansburg, VA 24073
       </p>
       <a
         href={`tel:${phoneTel}`}
-        class="text-lg font-bold hover:text-accent transition-colors"
+        data-lp-phone-cta="footer"
+        class="text-base md:text-lg font-bold hover:text-accent transition-colors"
         style="color: #fff;"
       >
         {phone}
       </a>
-      <p class="text-xs mt-4" style="color: rgba(255,255,255,0.4);">
+      <p class="text-[11px] md:text-xs mt-3" style="color: rgba(255,255,255,0.4);">
         &copy; {new Date().getFullYear()} Modern Day Roofing. All rights reserved.
       </p>
     </div>
   </footer>
 
-  {/* Sticky Bottom Bar — Mobile Only */}
-  <div
-    id="lp-sticky-bar"
-    class="fixed bottom-0 left-0 right-0 z-50 bg-accent text-white py-3 px-4 text-center lg:hidden shadow-[0_-2px_10px_rgba(0,0,0,0.15)]"
+  {/* Sticky mobile call bar: single line, ~56px */}
+  <a
+    href={`tel:${phoneTel}`}
+    data-lp-phone-cta="sticky"
+    class="fixed bottom-0 left-0 right-0 z-50 bg-accent hover:bg-accent-dark text-white py-3.5 px-4 text-center font-bold lg:hidden shadow-[0_-2px_10px_rgba(0,0,0,0.2)] flex items-center justify-center gap-2"
   >
-    <p class="text-sm font-bold mb-1">$500 Off Any Roofing Project</p>
-    <p class="text-xs opacity-90">Limited time — mention this offer when you call</p>
-    <a
-      href={`tel:${phoneTel}`}
-      class="inline-block mt-2 px-5 py-2 bg-white text-accent font-bold text-sm rounded-lg hover:bg-gray-100 transition-colors"
-    >
-      Call Now: {phone}
-    </a>
-  </div>
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+    </svg>
+    <span>Call Now: {phone}</span>
+  </a>
+  <div class="h-14 lg:hidden" aria-hidden="true"></div>
 
-  {/* Bottom padding on mobile so content isn't hidden behind sticky bar */}
-  <div class="h-28 lg:hidden" aria-hidden="true"></div>
-
-  {/* Client-side location replacement script */}
+  {/* Dynamic location: ?city= ValueTrack > Vercel geo cookie > sessionStorage > default */}
   <script is:inline>
     (function() {
       try {
-        var location = sessionStorage.getItem("mdr_location");
-        if (location) {
-          var el = document.querySelector(".lp-headline");
-          if (el) {
+        var params = new URLSearchParams(window.location.search);
+        var city = params.get("city") || params.get("loc");
+
+        if (!city) {
+          var match = document.cookie.match(/(?:^|;\s*)mdr_geo_city=([^;]+)/);
+          if (match) city = decodeURIComponent(match[1]);
+        }
+
+        if (!city) {
+          city = sessionStorage.getItem("mdr_location") || "";
+        }
+
+        if (city) {
+          city = city.replace(/[^a-zA-Z .'-]/g, "").trim().slice(0, 40);
+        }
+
+        if (city) {
+          sessionStorage.setItem("mdr_location", city);
+          document.querySelectorAll(".lp-headline, .lp-subheadline").forEach(function(el) {
             var template = el.getAttribute("data-location-template");
             if (template && template.indexOf("[Location]") !== -1) {
-              el.textContent = template.replace(/\[Location\]/g, location);
+              el.textContent = template.replace(/\[Location\]/g, city);
             }
-          }
+          });
         }
-      } catch(e) {}
+      } catch (e) {}
     })();
+  </script>
+
+  {/* Phone click conversion tracking (header + footer + sticky bar) */}
+  <script is:inline>
+    document.querySelectorAll("[data-lp-phone-cta]").forEach(function(el) {
+      el.addEventListener("click", function() {
+        var source = el.getAttribute("data-lp-phone-cta") || "lp";
+        try { window.hj && window.hj("event", "phone_click_lp"); } catch (e) {}
+        try { window.gtag && window.gtag("event", "phone_click", { event_category: "cro", event_label: source }); } catch (e) {}
+        try {
+          var conv = "PUBLIC_GOOGLE_ADS_CALL_CONVERSION";
+          var convVal = (window.__GADS_CALL_CONVERSION__ || "");
+          if (window.gtag && convVal) {
+            window.gtag("event", "conversion", { send_to: convVal });
+          }
+        } catch (e) {}
+        try { window.fbq && window.fbq("trackCustom", "phone_click", { source: source }); } catch (e) {}
+      });
+    });
   </script>
 </LandingPageLayout>

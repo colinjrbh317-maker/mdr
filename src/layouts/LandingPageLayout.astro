@@ -1,5 +1,6 @@
 ---
 import GclidCapture from "@/components/common/GclidCapture.astro";
+import Hotjar from "@/components/analytics/Hotjar.astro";
 import "@/styles/global.css";
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
 
 const {
   title,
-  description = "Modern Day Roofing — Southwest Virginia's trusted roofing contractor. GAF Master Elite certified. Free inspections.",
+  description = "Modern Day Roofing. Southwest Virginia's trusted roofing contractor. GAF Master Elite certified. Free inspections.",
 } = Astro.props;
 
 const siteTitle = title.includes("Modern Day Roofing") ? title : `${title} | Modern Day Roofing`;
@@ -70,6 +71,31 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
         fbq('init', pixelId);
         fbq('track', 'PageView');
       </script>
+    )}
+
+    {/* Hotjar */}
+    <Hotjar />
+
+    {/* Google Ads (loads if PUBLIC_GOOGLE_ADS_ID is set; conversion IDs read by form + phone tracking) */}
+    {import.meta.env.PUBLIC_GOOGLE_ADS_ID && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.PUBLIC_GOOGLE_ADS_ID}`}></script>
+        <script
+          is:inline
+          define:vars={{
+            adsId: import.meta.env.PUBLIC_GOOGLE_ADS_ID,
+            leadConv: import.meta.env.PUBLIC_GOOGLE_ADS_LEAD_CONVERSION || "",
+            callConv: import.meta.env.PUBLIC_GOOGLE_ADS_CALL_CONVERSION || "",
+          }}
+        >
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', adsId);
+          if (leadConv) window.__GADS_LEAD_CONVERSION__ = leadConv;
+          if (callConv) window.__GADS_CALL_CONVERSION__ = callConv;
+        </script>
+      </>
     )}
   </head>
   <body class="min-h-screen flex flex-col bg-white">
