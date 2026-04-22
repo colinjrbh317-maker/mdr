@@ -129,7 +129,7 @@ const phoneTel = "5405536007";
   <header class="bg-white border-b border-border">
     <div class="mx-auto max-w-[1200px] px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
       <a href="/" aria-label="Modern Day Roofing home">
-        <Logo size="sm" />
+        <Logo size="md" />
       </a>
       <a
         href={`tel:${phoneTel}`}
@@ -262,35 +262,44 @@ const phoneTel = "5405536007";
   </a>
   <div class="h-14 lg:hidden" aria-hidden="true"></div>
 
-  {/* Dynamic location: ?city= ValueTrack > Vercel geo cookie > sessionStorage > default */}
+  {/* Dynamic location: ?city= ValueTrack > sessionStorage > /api/geo (Vercel IP) > default */}
   <script is:inline>
     (function() {
+      function sanitize(s) {
+        return (s || "").replace(/[^a-zA-Z .'-]/g, "").trim().slice(0, 40);
+      }
+
+      function applyCity(city) {
+        if (!city) return;
+        sessionStorage.setItem("mdr_location", city);
+        document.querySelectorAll(".lp-headline, .lp-subheadline").forEach(function(el) {
+          var template = el.getAttribute("data-location-template");
+          if (template && template.indexOf("[Location]") !== -1) {
+            el.textContent = template.replace(/\[Location\]/g, city);
+          }
+        });
+      }
+
       try {
         var params = new URLSearchParams(window.location.search);
-        var city = params.get("city") || params.get("loc");
+        var city = sanitize(params.get("city") || params.get("loc"));
 
         if (!city) {
-          var match = document.cookie.match(/(?:^|;\s*)mdr_geo_city=([^;]+)/);
-          if (match) city = decodeURIComponent(match[1]);
-        }
-
-        if (!city) {
-          city = sessionStorage.getItem("mdr_location") || "";
+          city = sanitize(sessionStorage.getItem("mdr_location"));
         }
 
         if (city) {
-          city = city.replace(/[^a-zA-Z .'-]/g, "").trim().slice(0, 40);
+          applyCity(city);
+          return;
         }
 
-        if (city) {
-          sessionStorage.setItem("mdr_location", city);
-          document.querySelectorAll(".lp-headline, .lp-subheadline").forEach(function(el) {
-            var template = el.getAttribute("data-location-template");
-            if (template && template.indexOf("[Location]") !== -1) {
-              el.textContent = template.replace(/\[Location\]/g, city);
-            }
-          });
-        }
+        // Fallback: fetch Vercel edge geolocation via API endpoint
+        fetch("/api/geo", { cache: "force-cache" })
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .then(function(data) {
+            if (data && data.city) applyCity(sanitize(data.city));
+          })
+          .catch(function() {});
       } catch (e) {}
     })();
   </script>
