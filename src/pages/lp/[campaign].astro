@@ -262,7 +262,14 @@ const phoneTel = "5405536007";
   </a>
   <div class="h-14 lg:hidden" aria-hidden="true"></div>
 
-  {/* Dynamic location: ?city= ValueTrack > sessionStorage > /api/geo (Vercel IP) > default */}
+  {/* Dynamic location resolution:
+       1. ?city= URL param (Google Ads ValueTrack)  -> stored with source=param
+       2. sessionStorage (only if source was explicit param, for PPC continuity)
+       3. /api/geo (Vercel edge IP, service-area whitelisted)
+       4. Default "Southwest Virginia"
+
+     IP geolocation is NEVER trusted across page loads (fresh fetch each time)
+     so stale carrier-gateway results like "Leesburg" never stick. */}
   <script is:inline>
     (function() {
       function sanitize(s) {
@@ -271,7 +278,6 @@ const phoneTel = "5405536007";
 
       function applyCity(city) {
         if (!city) return;
-        sessionStorage.setItem("mdr_location", city);
         document.querySelectorAll(".lp-headline, .lp-subheadline").forEach(function(el) {
           var template = el.getAttribute("data-location-template");
           if (template && template.indexOf("[Location]") !== -1) {
@@ -282,19 +288,32 @@ const phoneTel = "5405536007";
 
       try {
         var params = new URLSearchParams(window.location.search);
-        var city = sanitize(params.get("city") || params.get("loc"));
+        var paramCity = sanitize(params.get("city") || params.get("loc"));
 
-        if (!city) {
-          city = sanitize(sessionStorage.getItem("mdr_location"));
-        }
-
-        if (city) {
-          applyCity(city);
+        // Explicit ?city= always wins; persist with source so we can restore it
+        if (paramCity) {
+          sessionStorage.setItem("mdr_location", paramCity);
+          sessionStorage.setItem("mdr_location_src", "param");
+          applyCity(paramCity);
           return;
         }
 
-        // Fallback: fetch Vercel edge geolocation via API endpoint
-        fetch("/api/geo", { cache: "force-cache" })
+        // Only restore sessionStorage if it was set from an explicit param
+        // (prevents stale IP-geo results like "Leesburg" from sticking)
+        if (sessionStorage.getItem("mdr_location_src") === "param") {
+          var stored = sanitize(sessionStorage.getItem("mdr_location"));
+          if (stored) {
+            applyCity(stored);
+            return;
+          }
+        }
+
+        // Clear any stale non-param values before fetching fresh geo
+        sessionStorage.removeItem("mdr_location");
+        sessionStorage.removeItem("mdr_location_src");
+
+        // Fetch Vercel edge geolocation (service-area whitelisted server-side)
+        fetch("/api/geo", { cache: "no-store" })
           .then(function(r) { return r.ok ? r.json() : null; })
           .then(function(data) {
             if (data && data.city) applyCity(sanitize(data.city));
