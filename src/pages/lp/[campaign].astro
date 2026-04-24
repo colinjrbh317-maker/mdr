@@ -2,7 +2,6 @@
 import LandingPageLayout from "@/layouts/LandingPageLayout.astro";
 import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
 import Logo from "@/components/common/Logo.astro";
-import CertificationStrip from "@/components/home/CertificationStrip.astro";
 import GoogleReviews from "@/components/home/GoogleReviews.astro";
 
 export const prerender = true;
@@ -58,30 +57,102 @@ const PROCESS_STEPS = [
   { n: 5, t: "Install + lifetime warranty activated", b: "Yard cleaned after the job. GAF Golden Pledge warranty activated." },
 ];
 
-// Real job-site photos from MDR-Assets Google Drive, stored in /public/assets/drive/ and /public/assets/projects/.
-const JOB_PHOTOS = [
-  { src: "/assets/drive/mdr-crew-a.jpg", caption: "Modern Day Roofing truck on site" },
-  { src: "/assets/drive/mdr-jobsite-a.jpg", caption: "Crew installing synthetic underlayment" },
-  { src: "/assets/drive/mdr-roof-install-a.jpg", caption: "Roof replacement in progress" },
-  { src: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG", caption: "Finished roof, Christiansburg, VA" },
-  { src: "/assets/drive/mdr-jobsite-b.jpg", caption: "On site, Southwest Virginia" },
-  { src: "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG", caption: "Architectural shingle install, Roanoke" },
-  { src: "/assets/drive/mdr-crew-b.jpg", caption: "Modern Day Roofing crew" },
-  { src: "/assets/drive/mdr-roof-install-b.jpg", caption: "Replacement in progress" },
-  { src: "/assets/drive/mdr-jobsite-c.jpg", caption: "On site, New River Valley" },
-  { src: "/assets/projects/dji_fly_20251105_160008_416_1762439005458_photo.JPG", caption: "Drone inspection view" },
-  { src: "/assets/drive/mdr-jobsite-d.jpg", caption: "Finished job" },
-];
+// Per-campaign photo sets. Every photo within a single LP must be unique and relevant to its section.
+// Sourced from MDR-Assets Google Drive (1K9A* shoot and IMG_* library).
+interface PhotoSet {
+  benefits: string[];  // 6 photos, one per benefit card, relevant to the benefit
+  details: string[];   // 6 photos, one per service-detail card, relevant to the detail
+  carousel: { src: string; caption: string }[]; // 6-10 photos for horizontal swipe strip
+}
 
-// Benefit card photos. Only real MDR photos from Drive + drone set.
-const BENEFIT_PHOTOS = [
-  "/assets/drive/mdr-crew-a.jpg",
-  "/assets/drive/mdr-roof-install-a.jpg",
-  "/assets/drive/mdr-jobsite-a.jpg",
-  "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG",
-  "/assets/drive/mdr-jobsite-b.jpg",
-  "/assets/drive/mdr-crew-b.jpg",
-];
+const PHOTO_SETS: Record<string, PhotoSet> = {
+  "roof-replacement": {
+    benefits: [
+      "/assets/drive/mdr-shingle-gray-countryside.jpg",    // Top 1% of roofers (finished premium shingle roof)
+      "/assets/drive/mdr-home-colonial-new-roof.jpg",      // $0 down financing (nice home with new roof)
+      "/assets/drive/mdr-shingle-ridge-view.jpg",          // GAF Golden Pledge Lifetime Warranty (ridge detail)
+      "/assets/drive/mdr-storm-damage-tree.jpg",           // 24/7 Storm Response (tree on house)
+      "/assets/drive/mdr-jobsite-a.jpg",                   // Insurance claim assistance (crew on damaged roof)
+      "/assets/drive/mdr-crew-a.jpg",                      // Locally owned since 2013 (MDR truck)
+    ],
+    details: [
+      "/assets/drive/mdr-home-cape-cod.jpg",               // Free written estimate (home exterior)
+      "/assets/drive/mdr-shingle-brown-wooded.jpg",        // GAF roofing system (brown shingle)
+      "/assets/drive/mdr-roof-install-a.jpg",              // Full system replacement (install in progress)
+      "/assets/drive/mdr-jobsite-b.jpg",                   // Insurance work (jobsite)
+      "/assets/drive/mdr-home-colonial-porch.jpg",         // $0 down financing (home exterior)
+      "/assets/drive/mdr-shingle-mountain-view.jpg",       // GAF Golden Pledge Warranty (finished roof w/ mountains)
+    ],
+    carousel: [
+      { src: "/assets/drive/mdr-home-dormers.jpg", caption: "Replacement with dormers" },
+      { src: "/assets/drive/mdr-shingle-finished-neighborhood.jpg", caption: "Architectural shingle replacement" },
+      { src: "/assets/drive/mdr-roof-install-b.jpg", caption: "Install in progress" },
+      { src: "/assets/drive/mdr-jobsite-c.jpg", caption: "On site, Southwest Virginia" },
+      { src: "/assets/drive/mdr-crew-b.jpg", caption: "Modern Day Roofing crew" },
+      { src: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG", caption: "Drone view of a finished roof" },
+      { src: "/assets/drive/mdr-jobsite-d.jpg", caption: "Finished job" },
+      { src: "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG", caption: "Aerial of completed install" },
+    ],
+  },
+  "roof-repair": {
+    benefits: [
+      "/assets/drive/mdr-storm-damage-tree.jpg",           // GAF Master Elite (storm + roofer)
+      "/assets/drive/mdr-jobsite-a.jpg",                   // 24/7 Storm Response (crew tarping-adjacent)
+      "/assets/drive/mdr-jobsite-b.jpg",                   // Insurance claim assistance
+      "/assets/drive/mdr-crew-a.jpg",                      // Locally owned since 2013 (MDR truck)
+      "/assets/drive/mdr-shingle-ridge-view.jpg",          // Free inspection, no obligation (inspecting roof)
+    ],
+    details: [
+      "/assets/drive/mdr-shingle-brown-wooded.jpg",        // Active leaks (roof close-up)
+      "/assets/drive/mdr-storm-damage-tree.jpg",           // Storm and wind damage
+      "/assets/drive/mdr-home-cape-cod.jpg",               // Flashing and penetrations
+      "/assets/drive/mdr-shingle-finished-neighborhood.jpg", // Pipe boots and vent boots
+      "/assets/drive/mdr-shingle-mountain-view.jpg",       // Valley repair
+      "/assets/drive/mdr-home-colonial-porch.jpg",         // Gutters (home exterior w/ gutters)
+    ],
+    carousel: [
+      { src: "/assets/drive/mdr-jobsite-c.jpg", caption: "On site, Southwest Virginia" },
+      { src: "/assets/drive/mdr-roof-install-a.jpg", caption: "Repair in progress" },
+      { src: "/assets/drive/mdr-home-colonial-new-roof.jpg", caption: "Repaired and restored" },
+      { src: "/assets/drive/mdr-crew-b.jpg", caption: "Modern Day Roofing crew" },
+      { src: "/assets/drive/mdr-home-dormers.jpg", caption: "Repair on a multi-dormer roof" },
+      { src: "/assets/drive/mdr-shingle-gray-countryside.jpg", caption: "Completed repair, Southwest VA" },
+      { src: "/assets/projects/dji_fly_20251105_160008_416_1762439005458_photo.JPG", caption: "Drone inspection view" },
+      { src: "/assets/drive/mdr-jobsite-d.jpg", caption: "Finished repair" },
+    ],
+  },
+  "branded": {
+    benefits: [
+      "/assets/drive/mdr-crew-b.jpg",                      // Top 1% of roofers (MDR crew)
+      "/assets/drive/mdr-shingle-mountain-view.jpg",       // GAF 3-Star President's Club (scenic roof)
+      "/assets/drive/mdr-home-colonial-porch.jpg",         // $0 Down Financing (home exterior)
+      "/assets/drive/mdr-storm-damage-tree.jpg",           // 24/7 Storm Response
+      "/assets/drive/mdr-shingle-ridge-view.jpg",          // Lifetime Warranty (premium shingles)
+      "/assets/drive/mdr-crew-a.jpg",                      // Locally owned since 2013 (MDR truck)
+    ],
+    details: [
+      "/assets/drive/mdr-home-dormers.jpg",                // Roof Replacement
+      "/assets/drive/mdr-shingle-brown-wooded.jpg",        // Roof Repair
+      "/assets/drive/mdr-shingle-gray-countryside.jpg",    // Roof Inspection
+      "/assets/drive/mdr-jobsite-b.jpg",                   // Storm Damage and Insurance Claims
+      "/assets/drive/mdr-home-cape-cod.jpg",               // Gutters (home w/ gutters)
+      "/assets/drive/mdr-home-colonial-new-roof.jpg",      // Financing (home)
+    ],
+    carousel: [
+      { src: "/assets/drive/mdr-shingle-finished-neighborhood.jpg", caption: "Finished neighborhood install" },
+      { src: "/assets/drive/mdr-jobsite-a.jpg", caption: "Crew on site" },
+      { src: "/assets/drive/mdr-roof-install-a.jpg", caption: "Install in progress" },
+      { src: "/assets/drive/mdr-roof-install-b.jpg", caption: "Replacement in progress" },
+      { src: "/assets/drive/mdr-jobsite-c.jpg", caption: "On site, New River Valley" },
+      { src: "/assets/drive/mdr-jobsite-d.jpg", caption: "Finished job" },
+      { src: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG", caption: "Drone view, Christiansburg" },
+      { src: "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG", caption: "Aerial, Roanoke area" },
+    ],
+  },
+};
+
+// Default set for non-primary campaigns (inspection, financing, roofing-company, competitors).
+PHOTO_SETS["default"] = PHOTO_SETS["branded"];
 
 const campaigns: Record<string, CampaignConfig> = {
   "roof-repair": {
@@ -206,7 +277,7 @@ const campaigns: Record<string, CampaignConfig> = {
       { q: "Are you licensed and insured in Virginia?", a: "VA Class A contractor, fully insured. We send certificates before work begins." },
       ...SHARED_FAQS_END,
     ],
-    finalCtaHeadline: "Get a free, written estimate for your roof replacement.",
+    finalCtaHeadline: "Ready for a new roof?",
     finalCtaSubhead: "GAF Master Elite. $0 down financing. Lifetime warranty. No obligation.",
   },
 
@@ -480,6 +551,7 @@ if (urlChannel === "meta" || urlChannel === "google") {
 const phone = "(540) 553-6007";
 const phoneTel = "5405536007";
 const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG";
+const photoSet = PHOTO_SETS[campaign as string] || PHOTO_SETS["default"];
 ---
 
 <LandingPageLayout
@@ -555,33 +627,35 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
     </div>
   </section>
 
-  {/* GAF 3-Star President's Club featured badge */}
-  <section class="bg-white py-6 md:py-8 border-b border-border">
-    <div class="mx-auto max-w-[1100px] px-4 md:px-6">
-      <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-center md:text-left">
+  {/* GAF 3-Star President's Club featured badge + inline secondary logos (no duplicates) */}
+  <section class="bg-white py-6 md:py-10 border-b border-border">
+    <div class="mx-auto max-w-[1200px] px-4 md:px-6">
+      <div class="grid grid-cols-1 md:grid-cols-[auto_1fr_auto] items-center gap-6 md:gap-8">
         <img
           src="/assets/logos/Presidents-Club_3-Star_Residential-with-Year_2026.webp"
           alt="GAF President's Club 3-Star Residential 2026"
-          class="h-24 md:h-28 w-auto flex-shrink-0"
+          class="h-24 md:h-28 w-auto mx-auto md:mx-0 flex-shrink-0"
           width="140"
           height="140"
           loading="lazy"
         />
-        <div>
-          <p class="text-xs md:text-sm font-bold text-accent uppercase tracking-widest mb-1">GAF 3-Star President's Club 2026</p>
+        <div class="text-center md:text-left">
+          <p class="text-xs md:text-sm font-semibold text-accent uppercase tracking-widest mb-1">GAF 3-Star President's Club 2026</p>
           <h2 class="text-lg md:text-xl font-display font-bold text-text-primary mb-1">
             Top 1% of roofers. Top 2% of U.S. GAF contractors.
           </h2>
           <p class="text-sm md:text-base text-text-muted">
-            GAF Master Elite certified and a 3-Star President's Club member. Fewer than 3% of U.S. contractors earn this level.
+            GAF Master Elite certified. Fewer than 3% of U.S. contractors earn this level.
           </p>
+        </div>
+        <div class="flex items-center justify-center md:justify-end gap-4 md:gap-5 flex-wrap">
+          <img src="/assets/logos/gallery_Triple-Excellence-Award-1-_1693320411-1.webp" alt="GAF Triple Excellence Award" class="h-14 md:h-16 w-auto" loading="lazy" width="64" height="64" />
+          <img src="/assets/logos/bbb-button.webp" alt="BBB Accredited A+" class="h-10 md:h-12 w-auto" loading="lazy" width="96" height="48" />
+          <img src="/assets/logos/nahb-logo-color-1153x808.webp" alt="NAHB Member" class="h-10 md:h-12 w-auto" loading="lazy" width="96" height="48" />
         </div>
       </div>
     </div>
   </section>
-
-  {/* Authority / certification row */}
-  <CertificationStrip />
 
   {/* Risk reversal + 3-step (kept from original) */}
   <section class="bg-white py-8 md:py-12">
@@ -618,7 +692,9 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
           <div class="text-xs md:text-sm text-text-muted uppercase tracking-wide mt-1">Roofs Completed</div>
         </div>
         <div>
-          <div class="text-2xl md:text-4xl font-display font-bold text-text-primary">5.0 ★</div>
+          <div class="text-2xl md:text-4xl font-display font-bold text-text-primary">
+            5.0 <span class="text-yellow-400">★</span>
+          </div>
           <div class="text-xs md:text-sm text-text-muted uppercase tracking-wide mt-1">231 Google Reviews</div>
         </div>
         <div>
@@ -647,8 +723,8 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
           <div class={`grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10 items-center ${i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""}`}>
             <div class="order-1 md:order-none aspect-[4/3] md:aspect-[5/4] rounded-xl overflow-hidden bg-bg-light">
               <img
-                src={BENEFIT_PHOTOS[i % BENEFIT_PHOTOS.length]}
-                alt={`Modern Day Roofing, ${b.title}`}
+                src={photoSet.benefits[i % photoSet.benefits.length]}
+                alt={b.title}
                 class="w-full h-full object-cover"
                 loading="lazy"
                 width="600"
@@ -683,7 +759,7 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
     </div>
     <div class="lp-photo-carousel relative">
       <div class="flex gap-3 md:gap-5 overflow-x-auto snap-x snap-mandatory scroll-px-4 pb-4 px-4 md:px-8 scrollbar-thin" style="scrollbar-width: thin;">
-        {JOB_PHOTOS.map((p) => (
+        {photoSet.carousel.map((p) => (
           <figure class="snap-start flex-shrink-0 w-[82%] sm:w-[60%] md:w-[42%] lg:w-[30%] xl:w-[24%]">
             <div class="aspect-[4/3] rounded-xl overflow-hidden bg-bg-darker shadow-md">
               <img src={p.src} alt={p.caption} class="w-full h-full object-cover" loading="lazy" width="600" height="450" />
@@ -738,8 +814,8 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
           <div class="bg-white rounded-xl overflow-hidden border border-border shadow-sm flex flex-col">
             <div class="aspect-[16/9] bg-bg-warm">
               <img
-                src={BENEFIT_PHOTOS[(i + 2) % BENEFIT_PHOTOS.length]}
-                alt={`${d.title}, Modern Day Roofing`}
+                src={photoSet.details[i % photoSet.details.length]}
+                alt={d.title}
                 class="w-full h-full object-cover"
                 loading="lazy"
                 width="480"
@@ -795,7 +871,7 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
         {config.faqs.map((f) => (
           <details class="group bg-bg-light rounded-xl border border-border overflow-hidden">
             <summary class="cursor-pointer list-none px-5 md:px-6 py-4 md:py-5 flex items-center justify-between gap-4 hover:bg-bg-warm transition-colors">
-              <span class="font-display font-bold text-base md:text-lg text-text-primary" data-location-template={f.q}>{f.q.replaceAll("[Location]", defaultLocation)}</span>
+              <span class="font-display font-semibold text-base md:text-lg text-text-primary" data-location-template={f.q}>{f.q.replaceAll("[Location]", defaultLocation)}</span>
               <svg class="w-5 h-5 flex-shrink-0 text-accent transition-transform group-open:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
@@ -819,7 +895,7 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
         {config.finalCtaSubhead}
       </p>
       <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 md:gap-6 items-start max-w-[700px] mx-auto">
-        <div class="bg-white rounded-2xl shadow-2xl p-5 md:p-6">
+        <div class="lp-form-light bg-white rounded-2xl shadow-2xl p-5 md:p-6">
           <LeadCaptureForm client:visible source={`lp-${campaign}-bottom`} channel={channel} />
         </div>
         <a
@@ -834,7 +910,7 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
         </a>
       </div>
       <p class="text-xs md:text-sm mt-6" style="color: rgba(255,255,255,0.6);">
-        Open Monday–Saturday. Real humans answer.
+        Open Monday to Friday, 8:30am to 5:00pm. 24/7 emergency storm damage service.
       </p>
     </div>
   </section>
@@ -945,4 +1021,15 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
       });
     });
   </script>
+
+  <style is:global>
+    /* Prevent .dark-section cascade from whitening the final-CTA form card */
+    .dark-section .lp-form-light,
+    .dark-section .lp-form-light * { color: #1B1B1B; }
+    .dark-section .lp-form-light .text-text-muted { color: #6B7280; }
+    .dark-section .lp-form-light .text-text-dim { color: #9CA3AF; }
+    .dark-section .lp-form-light a { color: #1B1B1B; }
+    .dark-section .lp-form-light a:hover { color: #C0392B; }
+    .dark-section .lp-form-light button { color: #FFFFFF; }
+  </style>
 </LandingPageLayout>
