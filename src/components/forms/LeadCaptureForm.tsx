@@ -133,8 +133,9 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
     );
   }
 
+  // iOS Safari auto-zooms on inputs under 16px, so force 16px on mobile (text-base) and restore tighter styling at md+.
   const inputClass =
-    "w-full px-4 py-3 bg-bg-card border border-border rounded-lg text-text-primary placeholder:text-text-dim focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-sm";
+    "w-full px-4 py-3 bg-bg-card border border-border rounded-lg text-text-primary placeholder:text-text-dim focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-base md:text-sm";
 
   const honeypot = (
     <div className="absolute -left-[9999px]" aria-hidden="true">
@@ -189,7 +190,7 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
           />
         </div>
 
-        <label htmlFor={`sms-consent-${source}`} className="flex items-start gap-2 text-xs text-text-dim leading-relaxed cursor-pointer select-none">
+        <label htmlFor={`sms-consent-${source}`} className="flex items-start gap-2 text-sm text-text-muted leading-snug cursor-pointer select-none">
           <input
             type="checkbox"
             id={`sms-consent-${source}`}
@@ -197,13 +198,19 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
             required
             checked={smsConsent}
             onChange={(e) => setSmsConsent(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-accent"
+            className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-accent"
           />
           <span>
-            I agree to receive text messages from Modern Day Roofing at the phone number provided, including appointment confirmations, inspection scheduling, estimate follow-ups, and service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase. See{" "}
-            <a href="/privacy" className="underline hover:text-text-muted transition-colors">Privacy Policy</a>
-            {" "}and{" "}
-            <a href="/terms" className="underline hover:text-text-muted transition-colors">Terms</a>.
+            Text me to schedule. Reply STOP anytime.{" "}
+            <a href="/privacy" className="underline hover:text-text-primary">Privacy</a>
+            {" · "}
+            <a href="/terms" className="underline hover:text-text-primary">Terms</a>.
+            <details className="mt-1 text-xs text-text-dim">
+              <summary className="cursor-pointer hover:text-text-muted">Full disclosure</summary>
+              <span className="block mt-1">
+                I agree to receive text messages from Modern Day Roofing at the number provided — appointment confirmations, inspection scheduling, estimate follow-ups, service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase.
+              </span>
+            </details>
           </span>
         </label>
 
