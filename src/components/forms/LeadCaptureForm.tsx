@@ -4,12 +4,13 @@ import { recordFormStarted } from "@/lib/intent-tier";
 interface LeadCaptureFormProps {
   source: string;
   compact?: boolean;
+  channel?: "google" | "meta" | "direct";
 }
 
 type FormState = "idle" | "submitting" | "success" | "error";
 type Step = 1 | 2;
 
-export default function LeadCaptureForm({ source, compact = false }: LeadCaptureFormProps) {
+export default function LeadCaptureForm({ source, compact = false, channel = "direct" }: LeadCaptureFormProps) {
   const [state, setState] = useState<FormState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [step, setStep] = useState<Step>(1);
@@ -50,6 +51,15 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
       if (res.ok) {
         setState("success");
 
+        // Determine thank-you destination: explicit channel prop, or URL ?channel=, or default.
+        let dest: string = "/thank-you";
+        try {
+          const urlChannel = new URLSearchParams(window.location.search).get("channel");
+          const resolved = (urlChannel || channel) as string;
+          if (resolved === "google") dest = "/thank-you/google";
+          else if (resolved === "meta") dest = "/thank-you/meta";
+        } catch {}
+
         if (typeof window !== "undefined" && (window as any).gtag) {
           (window as any).gtag("event", "generate_lead", {
             event_category: "form",
@@ -77,6 +87,14 @@ export default function LeadCaptureForm({ source, compact = false }: LeadCapture
           city: address.trim() || undefined,
         });
         (window as any).hj?.('event', 'form_submitted');
+
+        // Redirect to channel-specific thank-you page for Brian's conversion tracking
+        const firstName = name.trim().split(/\s+/)[0] || "";
+        const url = `${dest}?name=${encodeURIComponent(firstName)}`;
+        // Small delay so pixel/conversion events fire before navigation
+        setTimeout(() => {
+          window.location.href = url;
+        }, 400);
       } else {
         const body = await res.json().catch(() => ({}));
         setErrorMsg(body.message || "Something went wrong. Please try again.");

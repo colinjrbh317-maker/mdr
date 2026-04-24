@@ -1,7 +1,27 @@
 {
   "rewrites": [
     { "source": "/ingest/static/:path*", "destination": "https://us-assets.i.posthog.com/static/:path*" },
-    { "source": "/ingest/:path*", "destination": "https://us.i.posthog.com/:path*" }
+    { "source": "/ingest/:path*", "destination": "https://us.i.posthog.com/:path*" },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "go.moderndayroof.com" }],
+      "destination": "/lp/branded?channel=meta"
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "lp.moderndayroof.com" }],
+      "destination": "/lp/branded?channel=google"
+    },
+    {
+      "source": "/:campaign",
+      "has": [{ "type": "host", "value": "go.moderndayroof.com" }],
+      "destination": "/lp/:campaign?channel=meta"
+    },
+    {
+      "source": "/:campaign",
+      "has": [{ "type": "host", "value": "lp.moderndayroof.com" }],
+      "destination": "/lp/:campaign?channel=google"
+    }
   ],
   "headers": [
     {

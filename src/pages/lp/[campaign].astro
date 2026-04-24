@@ -2,8 +2,25 @@
 import LandingPageLayout from "@/layouts/LandingPageLayout.astro";
 import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
 import Logo from "@/components/common/Logo.astro";
+import CertificationStrip from "@/components/home/CertificationStrip.astro";
+import GoogleReviews from "@/components/home/GoogleReviews.astro";
 
 export const prerender = true;
+
+interface Benefit {
+  title: string;
+  body: string;
+}
+
+interface ServiceDetail {
+  title: string;
+  body: string;
+}
+
+interface Faq {
+  q: string;
+  a: string;
+}
 
 interface CampaignConfig {
   headline: string;
@@ -14,47 +31,282 @@ interface CampaignConfig {
   location?: string;
   proofPoints: [string, string, string];
   riskReversal: string;
+  heroImage?: string;
+  // Long-form body content
+  socialProofLine: string;
+  benefits: Benefit[];
+  detailsTitle: string;
+  details: ServiceDetail[];
+  processIntro: string;
+  faqs: Faq[];
+  finalCtaHeadline: string;
+  finalCtaSubhead: string;
 }
+
+const SHARED_FAQS_END: Faq[] = [
+  {
+    q: "Are you licensed and insured in Virginia?",
+    a: "Class A Virginia contractor's license. $2M general liability. Workers comp on every crew member. We'll send the certificates before we start.",
+  },
+];
+
+const PROCESS_STEPS = [
+  { n: 1, t: "Call or submit the form", b: "A real person from our team picks up. Not a call center." },
+  { n: 2, t: "Free inspection — about 20 minutes", b: "Drone photos of the roof. Written assessment. No high-pressure sales." },
+  { n: 3, t: "Written quote within 24 hours", b: "Itemized. Honest. No mystery numbers or 'call for pricing.'" },
+  { n: 4, t: "Schedule your install", b: "Most jobs booked within 2–3 weeks. Emergency leaks move faster." },
+  { n: 5, t: "Install + lifetime warranty activated", b: "Most replacements done in 1–2 days. Yard cleaned. Magnetic-sweep for nails." },
+];
 
 const campaigns: Record<string, CampaignConfig> = {
   "roof-repair": {
-    headline: "Roof Leak or Storm Damage in [Location]? Same-Day Diagnosis.",
-    subheadline: "Most repairs quoted on the first visit. Honest pricing. No upselling.",
+    headline: "Roof Leak in [Location]? Diagnosed Today.",
+    subheadline: "Most repairs quoted on the first visit. Honest pricing. No 'you need a whole new roof' upsell.",
     cta: "Get My Free Inspection",
     formCardTitle: "Book Your Free Roof Inspection",
     service: "Roof Repair",
-    proofPoints: ["5.0 Google rating (231 reviews)", "1,000+ roofs serviced", "GAF Master Elite certified"],
-    riskReversal: "Free inspection. No pressure. No obligation. About 20 minutes.",
+    proofPoints: [
+      "Same-day inspection for active leaks",
+      "5.0 stars across 231 Google reviews",
+      "GAF certified · Licensed · Insured · Local",
+    ],
+    riskReversal:
+      "Free inspection. No pushy sales. If it's a simple repair, we'll tell you. If it's something bigger, we'll show you the photos.",
+    heroImage: "/assets/projects/dji_fly_20241016_130220_454_1729098189810_photo-1.JPG",
+    socialProofLine:
+      "231 five-star reviews · 983 roofs serviced · zero unpaid warranty claims.",
+    benefits: [
+      {
+        title: "Same-day diagnosis on active leaks",
+        body: "Water inside your house isn't a \"we'll get to it next week\" problem. Call before 2pm and we're usually there the same day.",
+      },
+      {
+        title: "We don't upsell you into a new roof",
+        body: "If it's a $400 flashing repair, you get a $400 flashing repair. 983 roofs in, we know the difference between a fix and a replacement.",
+      },
+      {
+        title: "Written report with drone photos",
+        body: "You see what we see. No \"trust me, it's bad up there.\" PDF in your inbox before we leave your driveway.",
+      },
+      {
+        title: "Emergency tarping if we can't fix it today",
+        body: "Active storm damage? We'll get a tarp on it to stop the bleeding, then quote the permanent fix.",
+      },
+      {
+        title: "1-year workmanship warranty on every repair",
+        body: "If what we fix fails in the next 12 months, we come back. No fight. No re-invoicing.",
+      },
+    ],
+    detailsTitle: "What we repair",
+    details: [
+      { title: "Active leaks", body: "Trace the source (it's usually not where the ceiling stain is), fix the flashing, shingle, or penetration." },
+      { title: "Storm & wind damage", body: "Missing shingles, lifted ridge caps, damaged valleys. Works with your insurance if there's a claim." },
+      { title: "Flashing repairs", body: "Chimney, skylight, sidewall, step flashing. 80% of leaks we diagnose are flashing, not shingles." },
+      { title: "Pipe boots & vent boots", body: "The rubber cracks in ~10 years. Easy fix. Catches most people off-guard." },
+      { title: "Valley repair", body: "Ice damming, debris damage, failed underlayment. Fix it before it rots the decking." },
+      { title: "Emergency tarping", body: "Same-day response if you're actively getting water inside." },
+    ],
+    processIntro: "From your first call to a dry roof:",
+    faqs: [
+      { q: "Can you come today?", a: "If you call before 2pm on a weekday and you're within our service area (New River Valley + Roanoke region), usually yes. Same-day during storm events depends on volume — we prioritize active leaks." },
+      { q: "How much does a roof repair cost?", a: "Most repairs we do run $300–$900. Flashing fixes, pipe boot replacements, small patches. Bigger repairs (large storm damage, valley rebuilds) can run $1,500–$3,500. Free quote before any work starts." },
+      { q: "Will you tarp my roof if you can't fix it today?", a: "Yes. Emergency tarping on active leaks buys you time to schedule the real repair without more water damage inside." },
+      { q: "Another company told me I need a whole new roof. Is that true?", a: "Sometimes. Usually not. We're happy to give you a second opinion with drone photos. If it's really a replacement situation, we'll say so. If it's a $500 fix, we'll tell you that too." },
+      { q: "Do you handle insurance claims for storm damage?", a: "Yes. We'll meet the adjuster on-roof, document with drone photos, and help navigate depreciation and supplements. No charge for the adjuster meeting." },
+      { q: "Is there a warranty on repairs?", a: "1-year workmanship warranty on every repair we do. If it fails, we come back on our dime." },
+      { q: "My insurance denied my storm claim. Can you still help?", a: "Yes. We'll still quote the repair direct. If you want to appeal the claim, we can provide documentation that supports a reopen." },
+      ...SHARED_FAQS_END,
+    ],
+    finalCtaHeadline: "Every day that leak sits is more drywall you'll have to replace.",
+    finalCtaSubhead: "Free inspection. Same-day diagnosis available. Written quote before we leave.",
   },
+
   "roof-replacement": {
-    headline: "Full Roof Replacement in [Location] from $89/mo.",
-    subheadline: "$0 down financing. Lifetime warranty. Free quote in 24 hours.",
+    headline: "Get a New Roof in [Location] — $0 Down, $89/mo, Lifetime Warranty.",
+    subheadline: "Quote in 24 hours. Install in days. 231 five-star reviews from your neighbors.",
     cta: "Get My Free Quote",
     formCardTitle: "Get Your Free Replacement Quote",
     service: "Roof Replacement",
-    proofPoints: ["GAF Master Elite (top 2% nationally)", "1,000+ Virginia roofs installed", "Lifetime workmanship warranty"],
-    riskReversal: "Free quote. No pressure. No obligation. About 20 minutes.",
+    proofPoints: [
+      "5.0 stars across 231 Google reviews",
+      "983 roofs completed in Southwest Virginia",
+      "GAF 3-Star President's Club (top contractors in the U.S.)",
+    ],
+    riskReversal:
+      "Free quote. No pressure. No pushy sales guy at your kitchen table. About 20 minutes.",
+    heroImage: "/assets/projects/dji_fly_20241016_130454_466_1729098374266_photo-1.JPG",
+    socialProofLine:
+      "5.0 stars · 231 Google reviews · 983 roofs · GAF 3-Star President's Club.",
+    benefits: [
+      {
+        title: "Lifetime workmanship warranty",
+        body: "If a shingle we installed lifts in 30 years, we fix it. Not our installer — us. That's the 3-Star Difference.",
+      },
+      {
+        title: "$0 down financing through Hearth",
+        body: "Soft credit pull. 60-second rate check. Payments from $89/mo on a full replacement.",
+      },
+      {
+        title: "Real drone photos. Written report. No drama.",
+        body: "Every inspection gets a PDF with photos you can actually read. No scare tactics. No \"your whole roof is failing.\"",
+      },
+      {
+        title: "Done in 1–2 days on most homes",
+        body: "Crews that actually show up when they say they will. Yard cleaner than when they started.",
+      },
+      {
+        title: "983 roofs deep in Southwest Virginia",
+        body: "We've been on roofs in Roanoke, Blacksburg, Radford, Salem, Floyd, Smith Mountain Lake, and everywhere in between.",
+      },
+      {
+        title: "GAF 3-Star President's Club",
+        body: "Only a few hundred contractors in the country hit this. It's the highest tier GAF offers — and it's why we can back our work for life.",
+      },
+    ],
+    detailsTitle: "What a replacement actually looks like with us",
+    details: [
+      { title: "Tear-off, not overlay", body: "We strip to the deck, inspect every board, and replace rotten plywood before the new roof goes on." },
+      { title: "GAF Timberline HDZ shingles (standard)", body: "Architectural, StainGuard Plus algae protection, LayerLock for high-wind nailing." },
+      { title: "Full system — not just shingles", body: "Underlayment, ice & water shield in the valleys, new drip edge, new pipe boots, new ridge vent." },
+      { title: "Warranty tiers", body: "Legacy Warranty (lifetime workmanship + 50-year material) or 3-Star Difference (adds transferable coverage + accidental damage + theft)." },
+      { title: "Insurance claims handled", body: "If storm damage hit you, we handle the adjuster conversation. You don't have to learn depreciation math." },
+      { title: "Financing from $89/mo", body: "Hearth partnership. Soft credit pull. Approvals in minutes. $0 down on qualifying projects." },
+    ],
+    processIntro: "From your first call to a new roof:",
+    faqs: [
+      { q: "How much does a new roof cost in [Location]?", a: "Depends on square footage, pitch, and current condition. Most full replacements in Southwest Virginia run between $9,000 and $18,000. That's why we quote in writing after seeing it — not over the phone." },
+      { q: "Can I finance it?", a: "Yes. We partner with Hearth. Soft credit check takes 60 seconds, doesn't touch your score. Most customers land in the $89–$189/mo range with $0 down." },
+      { q: "How long does install take?", a: "Most homes: 1–2 days. Bigger or steeper roofs: 3. We don't spread jobs over a week because \"the weather might turn.\"" },
+      { q: "Do you handle insurance claims?", a: "Yes. If storm damage is part of the picture, we'll meet the adjuster on the roof, document everything, and help you navigate depreciation and supplements." },
+      { q: "Tear-off or overlay — which do I need?", a: "Almost always tear-off. Overlays hide rotten decking, void some warranties, and usually cost you more in 10 years than they save you today." },
+      { q: "What warranty comes with a Modern Day Roofing replacement?", a: "Lifetime workmanship. 50-year material warranty on the shingles. Upgrade to our 3-Star Difference for accidental damage + theft coverage that transfers to the next owner." },
+      { q: "How fast can you start?", a: "Quote in 24 hours. Most installs scheduled 2–3 weeks out. If you've got active leaks or storm damage, we move faster." },
+      ...SHARED_FAQS_END,
+    ],
+    finalCtaHeadline: "Your roof won't fix itself. And winter doesn't care about your calendar.",
+    finalCtaSubhead: "Free quote. 24-hour turnaround. $89/mo financing if you need it. Zero obligation, zero pressure.",
   },
+
+  "branded": {
+    headline: "The Roofing Company [Location] Neighbors Actually Recommend.",
+    subheadline: "231 five-star Google reviews. 983 roofs installed. Locally owned and insured in Virginia.",
+    cta: "Get My Free Quote",
+    formCardTitle: "Get Your Free Quote",
+    service: "General",
+    proofPoints: [
+      "GAF 3-Star President's Club (top few hundred contractors in the U.S.)",
+      "5.0 stars across 231 Google reviews",
+      "983 Southwest Virginia roofs completed",
+    ],
+    riskReversal: "Free quote. No pressure. No out-of-state salesmen.",
+    heroImage: "/assets/hero/hero-main.webp",
+    socialProofLine: "Locally owned. Locally installed. Locally trusted.",
+    benefits: [
+      { title: "We answer our own phone", body: "Alicia's team — not a call center. Usually back to you within the hour." },
+      { title: "983 local roofs deep", body: "We know what Southwest Virginia weather does to a roof because we're up on them every week." },
+      { title: "GAF 3-Star President's Club", body: "Only a few hundred contractors in the country. Top tier. It's why we can warranty workmanship for life." },
+      { title: "Honest quotes, in writing, within 24 hours", body: "No \"call for pricing.\" No $30k estimates that magically drop to $12k when you push back." },
+      { title: "Financing from $89/mo", body: "Hearth partnership. $0 down. Soft credit check. Most approvals in minutes." },
+      { title: "Full-service", body: "Replacement, repair, inspection, storm damage, gutters, insurance claims. One company, start to finish." },
+    ],
+    detailsTitle: "Everything we do",
+    details: [
+      { title: "Roof Replacement", body: "GAF Timberline, tear-off, lifetime warranty." },
+      { title: "Roof Repair", body: "Leaks, flashing, storm damage. Same-day diagnosis." },
+      { title: "Roof Inspection", body: "Free, written, drone photos included." },
+      { title: "Storm Damage & Insurance Claims", body: "We meet the adjuster on-roof." },
+      { title: "Gutters & Gutter Guards", body: "Full system replacement and leaf protection." },
+      { title: "Financing", body: "$0 down, from $89/mo through Hearth." },
+    ],
+    processIntro: "Whether it's a repair, a replacement, or just a second opinion:",
+    faqs: [
+      { q: "Where is Modern Day Roofing based?", a: "Christiansburg, VA. We service the New River Valley + Roanoke Valley and surrounding areas — Blacksburg, Radford, Salem, Floyd, Wytheville, Smith Mountain Lake, and everywhere between." },
+      { q: "What's GAF 3-Star President's Club?", a: "Highest certification tier GAF offers. Only a few hundred contractors in the U.S. have it. It requires training, craftsmanship standards, and customer satisfaction benchmarks most contractors can't hit." },
+      { q: "Do you offer financing?", a: "Yes. Through Hearth. Soft credit pull, no score impact to check. $0 down options. Most customers pay $89–$189/mo on a full replacement." },
+      { q: "Do you repair or just replace?", a: "Both. Plenty of roofs just need a repair — we'd rather tell you that than sell you a replacement you don't need." },
+      { q: "What's the warranty?", a: "Lifetime workmanship on replacements. 50-year material warranty. Optional upgrade to our 3-Star Difference warranty (transferable + accidental damage coverage). 1-year workmanship on repairs." },
+      { q: "How quickly can you get out for a quote?", a: "Usually within 48 hours for non-emergency. Same-day or next-day for active leaks." },
+      { q: "Why should I pick Modern Day over a national brand or franchise?", a: "We live here. When your roof leaks in 2035, we'll still be the same phone number. National brands and storm chasers won't." },
+      ...SHARED_FAQS_END,
+    ],
+    finalCtaHeadline: "You only replace a roof two or three times in a lifetime. Pick carefully.",
+    finalCtaSubhead: "Free quote. No obligation. Written in 24 hours. 231 neighbors have already left a review.",
+  },
+
   "roof-inspection-christiansburg": {
     headline: "Free Roof Inspection in Christiansburg, VA",
-    subheadline: "GAF Master Elite certified. No obligation. Honest assessment guaranteed.",
+    subheadline: "GAF 3-Star President's Club. Drone photos + written report. No obligation.",
     cta: "Book My Free Inspection",
     formCardTitle: "Book Your Free Inspection",
     service: "Roof Inspection",
     location: "Christiansburg",
-    proofPoints: ["5.0 Google rating", "1,000+ roofs inspected", "GAF Master Elite certified"],
-    riskReversal: "Free inspection. No pressure. No obligation.",
+    proofPoints: ["5.0 stars · 231 reviews", "983 roofs inspected in SW Virginia", "GAF 3-Star President's Club"],
+    riskReversal: "Free inspection. No pressure. No obligation. About 20 minutes.",
+    heroImage: "/assets/projects/dji_fly_20241016_130454_466_1729098374266_photo-1.JPG",
+    socialProofLine: "231 five-star reviews · 983 roofs inspected · zero pushy sales.",
+    benefits: [
+      { title: "Drone photos — you see what we see", body: "Every inspection gets a PDF with photos you can actually read." },
+      { title: "No high-pressure sales", body: "We'll tell you if it's fine, if it's a repair, or if it's time for a replacement. No games." },
+      { title: "Written report in your inbox", body: "Before we leave your driveway." },
+      { title: "Insurance-claim ready", body: "If there's storm damage, our report is what your adjuster needs." },
+    ],
+    detailsTitle: "What a Modern Day inspection covers",
+    details: [
+      { title: "Drone aerial photos", body: "High-resolution photos of every slope, valley, and penetration." },
+      { title: "Attic check", body: "Look for ventilation issues, water stains, and insulation damage." },
+      { title: "Flashing + penetrations", body: "Chimney, skylights, pipe boots, vents — where 80% of leaks start." },
+      { title: "Gutters + downspouts", body: "Integrity check and whether they're contributing to roof issues." },
+      { title: "Written recommendations", body: "Honest assessment of remaining roof life and whether anything needs immediate attention." },
+    ],
+    processIntro: "From inspection request to written report:",
+    faqs: [
+      { q: "Is it really free?", a: "Yes. No fee, no obligation, no hidden cost." },
+      { q: "How long does it take?", a: "About 20 minutes on-roof. Written report emailed within 24 hours." },
+      { q: "Will you pressure me into a replacement?", a: "No. We'll tell you what we see and what (if anything) needs attention. Many inspections end with \"your roof is fine, see you in 5 years.\"" },
+      { q: "Do you work with insurance adjusters?", a: "Yes. If there's storm damage, we can meet the adjuster with you and provide documentation." },
+      ...SHARED_FAQS_END,
+    ],
+    finalCtaHeadline: "Know what's on your roof before you need to.",
+    finalCtaSubhead: "Free. 20 minutes. Drone photos + written report. Zero pressure.",
   },
+
   "roof-inspection-roanoke": {
     headline: "Free Roof Inspection in Roanoke, VA",
-    subheadline: "GAF Master Elite certified. No obligation. Honest assessment guaranteed.",
+    subheadline: "GAF 3-Star President's Club. Drone photos + written report. No obligation.",
     cta: "Book My Free Inspection",
     formCardTitle: "Book Your Free Inspection",
     service: "Roof Inspection",
     location: "Roanoke",
-    proofPoints: ["5.0 Google rating", "1,000+ roofs inspected", "GAF Master Elite certified"],
-    riskReversal: "Free inspection. No pressure. No obligation.",
+    proofPoints: ["5.0 stars · 231 reviews", "983 roofs inspected in SW Virginia", "GAF 3-Star President's Club"],
+    riskReversal: "Free inspection. No pressure. No obligation. About 20 minutes.",
+    heroImage: "/assets/projects/dji_fly_20241016_130454_466_1729098374266_photo-1.JPG",
+    socialProofLine: "231 five-star reviews · 983 roofs inspected · zero pushy sales.",
+    benefits: [
+      { title: "Drone photos — you see what we see", body: "Every inspection gets a PDF with photos you can actually read." },
+      { title: "No high-pressure sales", body: "We'll tell you if it's fine, if it's a repair, or if it's time for a replacement." },
+      { title: "Written report in your inbox", body: "Before we leave your driveway." },
+      { title: "Insurance-claim ready", body: "If there's storm damage, our report is what your adjuster needs." },
+    ],
+    detailsTitle: "What a Modern Day inspection covers",
+    details: [
+      { title: "Drone aerial photos", body: "High-resolution photos of every slope, valley, and penetration." },
+      { title: "Attic check", body: "Look for ventilation issues, water stains, and insulation damage." },
+      { title: "Flashing + penetrations", body: "Chimney, skylights, pipe boots, vents — where 80% of leaks start." },
+      { title: "Gutters + downspouts", body: "Integrity check and whether they're contributing to roof issues." },
+      { title: "Written recommendations", body: "Honest assessment of remaining roof life." },
+    ],
+    processIntro: "From inspection request to written report:",
+    faqs: [
+      { q: "Is it really free?", a: "Yes. No fee, no obligation, no hidden cost." },
+      { q: "How long does it take?", a: "About 20 minutes on-roof. Written report emailed within 24 hours." },
+      { q: "Will you pressure me into a replacement?", a: "No. We'll tell you what we see and what (if anything) needs attention." },
+      { q: "Do you work with insurance adjusters?", a: "Yes. If there's storm damage, we can meet the adjuster with you and provide documentation." },
+      ...SHARED_FAQS_END,
+    ],
+    finalCtaHeadline: "Know what's on your roof before you need to.",
+    finalCtaSubhead: "Free. 20 minutes. Drone photos + written report. Zero pressure.",
   },
+
   "roof-financing": {
     headline: "Roof Financing in [Location] from $89/mo. Zero Down.",
     subheadline: "Check your rate in 60 seconds. No credit impact. Real Virginia roofers.",
@@ -63,33 +315,107 @@ const campaigns: Record<string, CampaignConfig> = {
     service: "Roof Financing",
     proofPoints: ["No credit impact to check", "Approvals in minutes", "$0 down options available"],
     riskReversal: "Soft credit pull only. No obligation. Takes 60 seconds.",
+    heroImage: "/assets/projects/dji_fly_20241016_130454_466_1729098374266_photo-1.JPG",
+    socialProofLine: "983 roofs financed and installed · $0 down options · Hearth partnership.",
+    benefits: [
+      { title: "60-second rate check", body: "Soft credit pull. Doesn't touch your score." },
+      { title: "$0 down on qualifying projects", body: "Pay nothing out of pocket to get started." },
+      { title: "Payments from $89/mo", body: "On a full replacement. Approvals in minutes." },
+      { title: "GAF 3-Star President's Club contractor", body: "Top tier workmanship backed by lifetime warranty." },
+    ],
+    detailsTitle: "How Hearth financing works",
+    details: [
+      { title: "Step 1: Fill out the form", body: "Takes 60 seconds. Basic info only." },
+      { title: "Step 2: Soft credit pull", body: "No impact on your credit score. Multiple lenders compete." },
+      { title: "Step 3: See your rate", body: "Pre-qualified offers in minutes. Choose the one that fits your budget." },
+      { title: "Step 4: Schedule your roof", body: "Free quote. Then financing finalizes at signing — not before." },
+    ],
+    processIntro: "From rate check to new roof:",
+    faqs: [
+      { q: "Will this affect my credit score?", a: "No. The initial rate check is a soft pull only. Your score isn't touched unless you move forward with a lender." },
+      { q: "What's the minimum credit score?", a: "Varies by lender. Hearth works with multiple lenders across the credit spectrum." },
+      { q: "How long does approval take?", a: "Usually minutes. Some lenders respond instantly." },
+      { q: "Is there a prepayment penalty?", a: "Depends on the lender. Many Hearth partners offer no-prepay-penalty loans." },
+      ...SHARED_FAQS_END,
+    ],
+    finalCtaHeadline: "See if you qualify in 60 seconds. No credit impact.",
+    finalCtaSubhead: "Soft pull only. No obligation. See real rates before you commit.",
   },
-  "branded": {
-    headline: "Modern Day Roofing. [Location]'s 5-Star GAF Master Elite Roofer.",
-    subheadline: "231 five-star Google reviews. 1,000+ roofs completed. Locally owned.",
-    cta: "Get My Free Quote",
-    formCardTitle: "Get Your Free Quote",
-    service: "General",
-    proofPoints: ["5.0 across 231 Google reviews", "GAF Master Elite (top 2% nationally)", "Locally owned in Christiansburg"],
-    riskReversal: "Free quote. No pressure. No obligation. About 20 minutes.",
-  },
+
   "roofing-company": {
     headline: "Top-Rated Roofing Company in [Location]",
-    subheadline: "5.0 across 231 reviews. 1,000+ roofs. GAF Master Elite certified.",
+    subheadline: "5.0 across 231 reviews. 983 roofs completed. GAF 3-Star President's Club.",
     cta: "Get My Free Quote",
     formCardTitle: "Get Your Free Quote",
     service: "General",
-    proofPoints: ["5.0 across 231 Google reviews", "1,000+ roofs completed", "GAF Master Elite certified"],
+    proofPoints: ["5.0 across 231 Google reviews", "983 roofs completed", "GAF 3-Star President's Club"],
     riskReversal: "Free quote. No pressure. No obligation.",
+    heroImage: "/assets/hero/hero-main.webp",
+    socialProofLine: "Locally owned in Christiansburg · 983 roofs deep · zero BBB complaints.",
+    benefits: [
+      { title: "We answer our own phone", body: "Not a call center. Usually back to you within the hour." },
+      { title: "983 local roofs completed", body: "We're up on Southwest Virginia roofs every week of the year." },
+      { title: "GAF 3-Star President's Club", body: "Top-tier national certification. Backs our lifetime workmanship warranty." },
+      { title: "Written quotes in 24 hours", body: "Itemized. Honest. No \"call for pricing.\"" },
+      { title: "Financing from $89/mo", body: "Hearth partnership. $0 down. Soft credit check only." },
+      { title: "Full service", body: "Replacement, repair, storm damage, gutters, insurance claims." },
+    ],
+    detailsTitle: "Why homeowners pick Modern Day",
+    details: [
+      { title: "We live here", body: "Based in Christiansburg. When your roof leaks in 2035, we'll still be the same phone number." },
+      { title: "Lifetime workmanship warranty", body: "If something we installed fails in 30 years, we fix it — not the subcontractor, us." },
+      { title: "Drone-photo inspections", body: "You see what we see. Every time." },
+      { title: "Honest pricing", body: "We don't do $30k estimates that drop to $12k when you push back." },
+      { title: "Real crews, on time", body: "We show up when we say we will. Yard cleaned. Magnetic-sweep for nails." },
+    ],
+    processIntro: "From first call to done:",
+    faqs: [
+      { q: "Where is Modern Day Roofing based?", a: "Christiansburg, VA. We service the New River Valley + Roanoke Valley and surrounding areas." },
+      { q: "What's GAF 3-Star President's Club?", a: "Highest certification tier GAF offers. Only a few hundred contractors in the U.S. have it." },
+      { q: "Do you offer financing?", a: "Yes. Through Hearth. Soft credit pull, $0 down options, payments from $89/mo." },
+      { q: "What's the warranty?", a: "Lifetime workmanship on replacements. 50-year material warranty." },
+      { q: "How quickly can you get out for a quote?", a: "Usually within 48 hours for non-emergency. Same-day or next-day for active leaks." },
+      ...SHARED_FAQS_END,
+    ],
+    finalCtaHeadline: "You only replace a roof two or three times in a lifetime. Pick carefully.",
+    finalCtaSubhead: "Free quote. No obligation. Written in 24 hours.",
   },
+
   "competitors": {
     headline: "Why [Location] Homeowners Switch to Modern Day Roofing",
-    subheadline: "Lifetime warranties. GAF Master Elite. 5.0 stars. Get a second opinion.",
-    cta: "Get My Free Quote",
+    subheadline: "Lifetime workmanship warranty. GAF 3-Star President's Club. 5.0 stars. Get a second opinion.",
+    cta: "Get My Free Second Opinion",
     formCardTitle: "Get Your Free Second Opinion",
     service: "General",
-    proofPoints: ["5.0 across 231 Google reviews", "Lifetime workmanship warranty", "GAF Master Elite certified"],
-    riskReversal: "Free quote. No pressure. No obligation.",
+    proofPoints: ["5.0 across 231 reviews", "Lifetime workmanship warranty", "GAF 3-Star President's Club"],
+    riskReversal: "Free quote. No pressure. Just an honest look at what you've been quoted.",
+    heroImage: "/assets/projects/dji_fly_20241016_130454_466_1729098374266_photo-1.JPG",
+    socialProofLine: "983 roofs · 231 reviews · zero BBB complaints · locally owned.",
+    benefits: [
+      { title: "We review other contractors' quotes", body: "Bring us what you've been quoted. We'll tell you if it's fair — and show you the photos we'd take." },
+      { title: "Lifetime workmanship warranty", body: "Not 1 year. Not 10. Lifetime. That's the 3-Star Difference." },
+      { title: "Locally owned and here long-term", body: "When your roof leaks in 2035, we'll still be the same phone number." },
+      { title: "Drone-photo documentation", body: "You see what's actually up there. No fear-based sales tactics." },
+      { title: "Honest pricing", body: "Itemized quotes. No $30k estimates that drop to $12k when you push back." },
+      { title: "No storm-chaser nonsense", body: "We're not here for 6 months and gone. Christiansburg is home." },
+    ],
+    detailsTitle: "Common things we see on second opinions",
+    details: [
+      { title: "Overquoted tear-offs", body: "Some companies quote a full tear-off when a repair would fix it. We'll tell you the truth." },
+      { title: "Missing insurance supplements", body: "If your adjuster underpaid, we can document what's missing and help you reopen the claim." },
+      { title: "Inflated sq ft or pitch calculations", body: "We measure from drone photos. If the other quote's math is off, we'll show you." },
+      { title: "Subpar material upgrades", body: "Some quotes upsell premium shingles that don't add real warranty. We'll explain the differences." },
+    ],
+    processIntro: "Getting a second opinion takes 20 minutes:",
+    faqs: [
+      { q: "Is the second opinion really free?", a: "Yes. Bring us the quote, we'll inspect the roof, and give you an honest written comparison." },
+      { q: "What if the other quote is fair?", a: "We'll tell you. We'd rather be honest than win every comparison." },
+      { q: "Do you handle insurance claims?", a: "Yes. If storm damage is in play, we'll meet the adjuster on-roof and help document supplements." },
+      { q: "What's the warranty?", a: "Lifetime workmanship. 50-year material. Transferable upgrade available." },
+      ...SHARED_FAQS_END,
+    ],
+    finalCtaHeadline: "A roof is a 30-year decision. Pick a roofer who'll still be here in 30 years.",
+    finalCtaSubhead: "Free second opinion. No obligation. Written comparison.",
   },
 };
 
@@ -116,14 +442,29 @@ if (!config) {
 const defaultLocation = config.location || "Southwest Virginia";
 const headline = config.headline.replaceAll("[Location]", defaultLocation);
 const subheadline = config.subheadline;
+const finalCtaHeadline = config.finalCtaHeadline.replaceAll("[Location]", defaultLocation);
+
+// Channel detection: ?channel=google|meta, or hostname-based (go.* = meta, lp.* = google)
+const hostname = Astro.request.headers.get("host") || "";
+const urlChannel = Astro.url.searchParams.get("channel");
+let channel: "google" | "meta" | "direct" = "direct";
+if (urlChannel === "meta" || urlChannel === "google") {
+  channel = urlChannel;
+} else if (hostname.startsWith("go.")) {
+  channel = "meta";
+} else if (hostname.startsWith("lp.")) {
+  channel = "google";
+}
 
 const phone = "(540) 553-6007";
 const phoneTel = "5405536007";
+const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG";
 ---
 
 <LandingPageLayout
   title={`${config.service} | Modern Day Roofing`}
   description={subheadline}
+  channel={channel}
 >
   {/* Minimal header: logo + click-to-call */}
   <header class="bg-white border-b border-border">
@@ -145,23 +486,15 @@ const phoneTel = "5405536007";
     </div>
   </header>
 
-  {/* Hero: form-first on mobile, side-by-side on desktop */}
+  {/* Hero */}
   <section class="relative">
-    {/* Background image */}
     <div class="absolute inset-0 z-0">
-      <img
-        src="/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG"
-        alt=""
-        class="w-full h-full object-cover"
-        loading="eager"
-        fetchpriority="high"
-      />
+      <img src={heroImg} alt="" class="w-full h-full object-cover" loading="eager" fetchpriority="high" />
       <div class="absolute inset-0 bg-bg-darker/85"></div>
     </div>
 
     <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-6 md:py-12 lg:py-16">
       <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-12 items-center">
-        {/* Left column: headline + proof. On mobile this renders BELOW the form via order-2. */}
         <div class="order-2 lg:order-1 pt-2 lg:pt-0 dark-section">
           <h1
             class="text-2xl md:text-4xl lg:text-5xl font-display font-bold mb-3 md:mb-5 leading-[1.15] lp-headline"
@@ -189,7 +522,6 @@ const phoneTel = "5405536007";
           </ul>
         </div>
 
-        {/* Right column: form. On mobile renders FIRST via order-1. */}
         <div class="order-1 lg:order-2 bg-white rounded-2xl shadow-2xl p-5 md:p-7">
           <h2 class="text-lg md:text-xl font-display font-bold text-text-primary mb-1 text-center">
             {config.formCardTitle}
@@ -197,16 +529,19 @@ const phoneTel = "5405536007";
           <p class="text-xs md:text-sm text-text-muted mb-4 text-center">
             Free, no obligation. Takes 30 seconds.
           </p>
-          <LeadCaptureForm client:load source={`lp-${campaign}`} />
+          <LeadCaptureForm client:load source={`lp-${campaign}`} channel={channel} />
         </div>
       </div>
     </div>
   </section>
 
-  {/* Risk reversal + 3-step trust block (below the fold, supporting copy) */}
-  <section class="bg-white py-10 md:py-16">
+  {/* Authority / certification row */}
+  <CertificationStrip />
+
+  {/* Risk reversal + 3-step (kept from original) */}
+  <section class="bg-white py-8 md:py-12">
     <div class="mx-auto max-w-[900px] px-4 md:px-6">
-      <p class="text-center text-text-muted text-sm md:text-base mb-8 md:mb-10">
+      <p class="text-center text-text-muted text-sm md:text-base mb-6 md:mb-8">
         {config.riskReversal}
       </p>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
@@ -229,11 +564,142 @@ const phoneTel = "5405536007";
     </div>
   </section>
 
+  {/* Social proof strip */}
+  <section class="bg-bg-warm py-6 md:py-8">
+    <div class="mx-auto max-w-[1200px] px-4 md:px-6 text-center">
+      <p class="text-sm md:text-base font-semibold text-text-primary">{config.socialProofLine}</p>
+    </div>
+  </section>
+
+  {/* Benefits grid */}
+  <section class="bg-white py-12 md:py-20">
+    <div class="mx-auto max-w-[1200px] px-4 md:px-6">
+      <div class="text-center mb-8 md:mb-12">
+        <h2 class="text-2xl md:text-4xl font-display font-bold text-text-primary mb-3">
+          Why <span data-location-template={`[Location]`}>{defaultLocation}</span> homeowners pick Modern Day Roofing
+        </h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        {config.benefits.map((b) => (
+          <div class="bg-bg-light rounded-xl p-5 md:p-6 border-t-4 border-t-accent">
+            <h3 class="font-display font-bold text-lg text-text-primary mb-2">{b.title}</h3>
+            <p class="text-sm md:text-base text-text-muted leading-relaxed">{b.body}</p>
+          </div>
+        ))}
+      </div>
+      <div class="text-center mt-8 md:mt-10">
+        <a href="#top" class="inline-flex items-center justify-center px-7 py-3.5 bg-accent hover:bg-accent-dark text-white font-bold rounded-lg transition-colors text-sm md:text-base">
+          {config.cta} →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {/* Service details */}
+  <section class="bg-bg-light py-12 md:py-20">
+    <div class="mx-auto max-w-[1000px] px-4 md:px-6">
+      <h2 class="text-2xl md:text-4xl font-display font-bold text-text-primary mb-6 md:mb-10 text-center">
+        {config.detailsTitle}
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        {config.details.map((d) => (
+          <div class="bg-white rounded-xl p-5 md:p-6 border border-border shadow-sm">
+            <h3 class="font-display font-bold text-base md:text-lg text-text-primary mb-2">{d.title}</h3>
+            <p class="text-sm md:text-base text-text-muted leading-relaxed">{d.body}</p>
+          </div>
+        ))}
+      </div>
+      <div class="text-center mt-8 md:mt-10">
+        <a href="#top" class="inline-flex items-center justify-center px-7 py-3.5 bg-accent hover:bg-accent-dark text-white font-bold rounded-lg transition-colors text-sm md:text-base">
+          {config.cta} →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {/* Process */}
+  <section class="bg-white py-12 md:py-20">
+    <div class="mx-auto max-w-[1000px] px-4 md:px-6">
+      <div class="text-center mb-8 md:mb-12">
+        <h2 class="text-2xl md:text-4xl font-display font-bold text-text-primary mb-2">How it works</h2>
+        <p class="text-sm md:text-base text-text-muted">{config.processIntro}</p>
+      </div>
+      <ol class="space-y-4 md:space-y-6">
+        {PROCESS_STEPS.map((s) => (
+          <li class="flex gap-4 md:gap-6 items-start">
+            <div class="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-accent text-white font-bold text-base md:text-lg flex items-center justify-center">{s.n}</div>
+            <div>
+              <h3 class="font-display font-bold text-base md:text-lg text-text-primary mb-1">{s.t}</h3>
+              <p class="text-sm md:text-base text-text-muted leading-relaxed">{s.b}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  {/* Testimonials — reuse real reviews from GoogleReviews */}
+  <GoogleReviews />
+
+  {/* FAQ */}
+  <section class="bg-white py-12 md:py-20">
+    <div class="mx-auto max-w-[900px] px-4 md:px-6">
+      <h2 class="text-2xl md:text-4xl font-display font-bold text-text-primary mb-6 md:mb-10 text-center">
+        Frequently asked questions
+      </h2>
+      <div class="flex flex-col gap-3">
+        {config.faqs.map((f) => (
+          <details class="group bg-bg-light rounded-xl border border-border overflow-hidden">
+            <summary class="cursor-pointer list-none px-5 md:px-6 py-4 md:py-5 flex items-center justify-between gap-4 hover:bg-bg-warm transition-colors">
+              <span class="font-display font-bold text-base md:text-lg text-text-primary" data-location-template={f.q}>{f.q.replaceAll("[Location]", defaultLocation)}</span>
+              <svg class="w-5 h-5 flex-shrink-0 text-accent transition-transform group-open:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 text-sm md:text-base text-text-muted leading-relaxed">
+              {f.a}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Final CTA */}
+  <section class="bg-bg-darker py-12 md:py-20 dark-section">
+    <div class="mx-auto max-w-[900px] px-4 md:px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-display font-bold mb-3 md:mb-5 leading-tight" style="color: #fff;">
+        {finalCtaHeadline}
+      </h2>
+      <p class="text-base md:text-lg mb-8" style="color: rgba(255,255,255,0.85);">
+        {config.finalCtaSubhead}
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 md:gap-6 items-start max-w-[700px] mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl p-5 md:p-6">
+          <LeadCaptureForm client:visible source={`lp-${campaign}-bottom`} channel={channel} />
+        </div>
+        <a
+          href={`tel:${phoneTel}`}
+          data-lp-phone-cta="final"
+          class="inline-flex items-center justify-center gap-2 px-6 py-4 md:px-7 md:py-5 bg-accent hover:bg-accent-dark text-white font-bold rounded-lg transition-colors text-base md:text-lg whitespace-nowrap"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+          </svg>
+          Call {phone}
+        </a>
+      </div>
+      <p class="text-xs md:text-sm mt-6" style="color: rgba(255,255,255,0.6);">
+        Open Monday–Saturday. Real humans answer.
+      </p>
+    </div>
+  </section>
+
   {/* Minimal footer */}
-  <footer class="bg-bg-darker py-6 md:py-8 dark-section">
+  <footer class="bg-bg-dark py-6 md:py-8 dark-section">
     <div class="mx-auto max-w-[1200px] px-4 md:px-6 text-center">
       <p class="text-xs md:text-sm mb-2" style="color: rgba(255,255,255,0.7);">
-        Modern Day Roofing. 80 College St. STE R, Christiansburg, VA 24073
+        Modern Day Roofing · 80 College St. STE R, Christiansburg, VA 24073 · VA Class A Contractor · Fully insured
       </p>
       <a
         href={`tel:${phoneTel}`}
@@ -249,7 +715,7 @@ const phoneTel = "5405536007";
     </div>
   </footer>
 
-  {/* Sticky mobile call bar: single line, ~56px */}
+  {/* Sticky mobile call bar */}
   <a
     href={`tel:${phoneTel}`}
     data-lp-phone-cta="sticky"
@@ -262,26 +728,29 @@ const phoneTel = "5405536007";
   </a>
   <div class="h-14 lg:hidden" aria-hidden="true"></div>
 
-  {/* Dynamic location resolution:
-       1. ?city= URL param (Google Ads ValueTrack)  -> stored with source=param
-       2. sessionStorage (only if source was explicit param, for PPC continuity)
-       3. /api/geo (Vercel edge IP, service-area whitelisted)
-       4. Default "Southwest Virginia"
-
-     IP geolocation is NEVER trusted across page loads (fresh fetch each time)
-     so stale carrier-gateway results like "Leesburg" never stick. */}
+  {/* Dynamic location + keyword insertion */}
   <script is:inline>
     (function() {
-      function sanitize(s) {
-        return (s || "").replace(/[^a-zA-Z .'-]/g, "").trim().slice(0, 40);
-      }
+      function sanitize(s) { return (s || "").replace(/[^a-zA-Z .'\-+]/g, "").trim().slice(0, 60); }
 
       function applyCity(city) {
         if (!city) return;
-        document.querySelectorAll(".lp-headline, .lp-subheadline").forEach(function(el) {
+        document.querySelectorAll("[data-location-template]").forEach(function(el) {
           var template = el.getAttribute("data-location-template");
           if (template && template.indexOf("[Location]") !== -1) {
-            el.textContent = template.replace(/\[Location\]/g, city);
+            var filled = template.replace(/\[Location\]/g, city);
+            // If the element already has [Keyword] placeholders too, preserve them to be filled below
+            el.textContent = filled;
+          }
+        });
+      }
+
+      function applyKeyword(kw) {
+        if (!kw) return;
+        var pretty = kw.replace(/\+/g, " ").replace(/\s+/g, " ").trim();
+        document.querySelectorAll("[data-location-template]").forEach(function(el) {
+          if (el.textContent && el.textContent.indexOf("[Keyword]") !== -1) {
+            el.textContent = el.textContent.replace(/\[Keyword\]/g, pretty);
           }
         });
       }
@@ -289,41 +758,33 @@ const phoneTel = "5405536007";
       try {
         var params = new URLSearchParams(window.location.search);
         var paramCity = sanitize(params.get("city") || params.get("loc"));
+        var paramKw = sanitize(params.get("kw") || params.get("keyword"));
 
-        // Explicit ?city= always wins; persist with source so we can restore it
         if (paramCity) {
           sessionStorage.setItem("mdr_location", paramCity);
           sessionStorage.setItem("mdr_location_src", "param");
           applyCity(paramCity);
-          return;
-        }
-
-        // Only restore sessionStorage if it was set from an explicit param
-        // (prevents stale IP-geo results like "Leesburg" from sticking)
-        if (sessionStorage.getItem("mdr_location_src") === "param") {
+        } else if (sessionStorage.getItem("mdr_location_src") === "param") {
           var stored = sanitize(sessionStorage.getItem("mdr_location"));
-          if (stored) {
-            applyCity(stored);
-            return;
-          }
+          if (stored) applyCity(stored);
+        } else {
+          sessionStorage.removeItem("mdr_location");
+          sessionStorage.removeItem("mdr_location_src");
+          fetch("/api/geo", { cache: "no-store" })
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(data) {
+              if (data && data.city) applyCity(sanitize(data.city));
+              if (paramKw) applyKeyword(paramKw);
+            })
+            .catch(function() {});
         }
 
-        // Clear any stale non-param values before fetching fresh geo
-        sessionStorage.removeItem("mdr_location");
-        sessionStorage.removeItem("mdr_location_src");
-
-        // Fetch Vercel edge geolocation (service-area whitelisted server-side)
-        fetch("/api/geo", { cache: "no-store" })
-          .then(function(r) { return r.ok ? r.json() : null; })
-          .then(function(data) {
-            if (data && data.city) applyCity(sanitize(data.city));
-          })
-          .catch(function() {});
+        if (paramKw) applyKeyword(paramKw);
       } catch (e) {}
     })();
   </script>
 
-  {/* Phone click conversion tracking (header + footer + sticky bar) */}
+  {/* Phone click conversion tracking */}
   <script is:inline>
     document.querySelectorAll("[data-lp-phone-cta]").forEach(function(el) {
       el.addEventListener("click", function() {
@@ -331,7 +792,6 @@ const phoneTel = "5405536007";
         try { window.hj && window.hj("event", "phone_click_lp"); } catch (e) {}
         try { window.gtag && window.gtag("event", "phone_click", { event_category: "cro", event_label: source }); } catch (e) {}
         try {
-          var conv = "PUBLIC_GOOGLE_ADS_CALL_CONVERSION";
           var convVal = (window.__GADS_CALL_CONVERSION__ || "");
           if (window.gtag && convVal) {
             window.gtag("event", "conversion", { send_to: convVal });

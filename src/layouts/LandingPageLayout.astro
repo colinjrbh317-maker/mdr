@@ -6,12 +6,23 @@ import "@/styles/global.css";
 interface Props {
   title: string;
   description?: string;
+  channel?: "google" | "meta" | "direct";
 }
 
 const {
   title,
   description = "Modern Day Roofing. Southwest Virginia's trusted roofing contractor. GAF Master Elite certified. Free inspections.",
+  channel = "direct",
 } = Astro.props;
+
+const gtmId =
+  channel === "meta"
+    ? import.meta.env.PUBLIC_GTM_ID_META
+    : channel === "google"
+      ? import.meta.env.PUBLIC_GTM_ID_GOOGLE
+      : import.meta.env.PUBLIC_GTM_ID;
+
+const callrailId = import.meta.env.PUBLIC_CALLRAIL_ID;
 
 const siteTitle = title.includes("Modern Day Roofing") ? title : `${title} | Modern Day Roofing`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://moderndayroof.com");
@@ -97,9 +108,34 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
         </script>
       </>
     )}
+
+    {/* Google Tag Manager (per-channel container, provided by Brian) */}
+    {gtmId && (
+      <script is:inline define:vars={{ id: gtmId }}>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',id);
+      </script>
+    )}
+
+    {/* CallRail Dynamic Number Insertion */}
+    {callrailId && (
+      <script is:inline async src={`https://cdn.callrail.com/companies/${callrailId}/swap.js`}></script>
+    )}
   </head>
   <body class="min-h-screen flex flex-col bg-white">
-    <main class="flex-1">
+    {gtmId && (
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+          height="0"
+          width="0"
+          style="display:none;visibility:hidden"
+          title="gtm-noscript"
+        ></iframe>
+      </noscript>
+    )}
+    <main class="flex-1" data-channel={channel}>
       <slot />
     </main>
 
