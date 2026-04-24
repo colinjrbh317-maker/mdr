@@ -52,207 +52,207 @@ const SHARED_FAQS_END: Faq[] = [
 
 const PROCESS_STEPS = [
   { n: 1, t: "Call or submit the form", b: "A real person from our team picks up. Not a call center." },
-  { n: 2, t: "Free inspection — about 20 minutes", b: "Drone photos of the roof. Written assessment. No high-pressure sales." },
+  { n: 2, t: "Free inspection. About 20 minutes", b: "We look at the roof, show you what we see, and answer your questions." },
   { n: 3, t: "Written quote within 24 hours", b: "Itemized. Honest. No mystery numbers or 'call for pricing.'" },
   { n: 4, t: "Schedule your install", b: "Most jobs booked within 2–3 weeks. Emergency leaks move faster." },
-  { n: 5, t: "Install + lifetime warranty activated", b: "Most replacements done in 1–2 days. Yard cleaned. Magnetic-sweep for nails." },
+  { n: 5, t: "Install + lifetime warranty activated", b: "Yard cleaned after the job. GAF Golden Pledge warranty activated." },
 ];
 
-// Real job-site photos from /public/assets/projects/ — used in the horizontal photo carousel.
+// Real job-site photos from MDR-Assets Google Drive, stored in /public/assets/drive/ and /public/assets/projects/.
 const JOB_PHOTOS = [
-  { src: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG", caption: "Full replacement · Christiansburg, VA" },
-  { src: "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG", caption: "Architectural shingle install · Roanoke, VA" },
-  { src: "/assets/branding/crew-working-harness-1.png", caption: "Our crew on-roof" },
-  { src: "/assets/projects/dji_fly_20250630_140008_753_1751306421832_photo.JPG", caption: "Tear-off complete · Blacksburg, VA" },
-  { src: "/assets/branding/truck-jobsite.png", caption: "On-site, Southwest Virginia" },
-  { src: "/assets/projects/dji_fly_20250711_160906_985_1752264556293_photo.JPG", caption: "Finished roof · Salem, VA" },
+  { src: "/assets/drive/mdr-crew-a.jpg", caption: "Modern Day Roofing truck on site" },
+  { src: "/assets/drive/mdr-jobsite-a.jpg", caption: "Crew installing synthetic underlayment" },
+  { src: "/assets/drive/mdr-roof-install-a.jpg", caption: "Roof replacement in progress" },
+  { src: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG", caption: "Finished roof, Christiansburg, VA" },
+  { src: "/assets/drive/mdr-jobsite-b.jpg", caption: "On site, Southwest Virginia" },
+  { src: "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG", caption: "Architectural shingle install, Roanoke" },
+  { src: "/assets/drive/mdr-crew-b.jpg", caption: "Modern Day Roofing crew" },
+  { src: "/assets/drive/mdr-roof-install-b.jpg", caption: "Replacement in progress" },
+  { src: "/assets/drive/mdr-jobsite-c.jpg", caption: "On site, New River Valley" },
   { src: "/assets/projects/dji_fly_20251105_160008_416_1762439005458_photo.JPG", caption: "Drone inspection view" },
-  { src: "/assets/branding/crew-working-harness-2.png", caption: "Harnessed + insured" },
+  { src: "/assets/drive/mdr-jobsite-d.jpg", caption: "Finished job" },
 ];
 
-// Photos paired with benefit cards — rotates through drone + crew shots.
+// Benefit card photos. Only real MDR photos from Drive + drone set.
 const BENEFIT_PHOTOS = [
+  "/assets/drive/mdr-crew-a.jpg",
+  "/assets/drive/mdr-roof-install-a.jpg",
+  "/assets/drive/mdr-jobsite-a.jpg",
   "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG",
-  "/assets/branding/crew-working-harness-1.png",
-  "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG",
-  "/assets/branding/truck-jobsite.png",
-  "/assets/projects/dji_fly_20250630_140008_753_1751306421832_photo.JPG",
-  "/assets/projects/dji_fly_20250711_160906_985_1752264556293_photo.JPG",
+  "/assets/drive/mdr-jobsite-b.jpg",
+  "/assets/drive/mdr-crew-b.jpg",
 ];
 
 const campaigns: Record<string, CampaignConfig> = {
   "roof-repair": {
-    headline: "Roof Leak in [Location]? Diagnosed Today.",
-    subheadline: "Most repairs quoted on the first visit. Honest pricing. No 'you need a whole new roof' upsell.",
+    headline: "Roof Repair in [Location]. Free Inspection.",
+    subheadline: "GAF Master Elite. 24/7 emergency storm damage service. Free inspection before any work starts.",
     cta: "Get My Free Inspection",
     formCardTitle: "Book Your Free Roof Inspection",
     service: "Roof Repair",
     proofPoints: [
-      "Same-day inspection for active leaks",
+      "GAF 3-Star President's Club (top 2% of U.S. roofers)",
       "5.0 stars across 231 Google reviews",
-      "GAF certified · Licensed · Insured · Local",
+      "Licensed, insured, locally owned since 2013",
     ],
     riskReversal:
-      "Free inspection. No pushy sales. If it's a simple repair, we'll tell you. If it's something bigger, we'll show you the photos.",
+      "Free inspection. No obligation. If we can repair it, we will. If we can't, we will explain why.",
     heroImage: "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG",
     socialProofLine:
-      "231 five-star reviews · 983 roofs serviced · zero unpaid warranty claims.",
+      "5.0 stars across 231 Google reviews. 1,000+ roofs. Christiansburg and Roanoke.",
     benefits: [
       {
-        title: "Same-day diagnosis on active leaks",
-        body: "Water inside your house isn't a \"we'll get to it next week\" problem. Call before 2pm and we're usually there the same day.",
+        title: "GAF Master Elite",
+        body: "Fewer than 3% of contractors nationwide earn GAF Master Elite certification. We did.",
       },
       {
-        title: "We don't upsell you into a new roof",
-        body: "If it's a $400 flashing repair, you get a $400 flashing repair. 983 roofs in, we know the difference between a fix and a replacement.",
+        title: "24/7 Storm Response",
+        body: "Emergency tarping and insurance claim assistance when you need it most.",
       },
       {
-        title: "Written report with drone photos",
-        body: "You see what we see. No \"trust me, it's bad up there.\" PDF in your inbox before we leave your driveway.",
+        title: "Insurance claim assistance",
+        body: "We work directly with your insurance company from inspection through final payment.",
       },
       {
-        title: "Emergency tarping if we can't fix it today",
-        body: "Active storm damage? We'll get a tarp on it to stop the bleeding, then quote the permanent fix.",
+        title: "Locally owned since 2013",
+        body: "Based in Christiansburg with a second office in Roanoke. We live here.",
       },
       {
-        title: "1-year workmanship warranty on every repair",
-        body: "If what we fix fails in the next 12 months, we come back. No fight. No re-invoicing.",
+        title: "Free inspection, no obligation",
+        body: "We look at the roof, walk the attic where needed, and tell you what we see.",
       },
     ],
     detailsTitle: "What we repair",
     details: [
-      { title: "Active leaks", body: "Trace the source (it's usually not where the ceiling stain is), fix the flashing, shingle, or penetration." },
-      { title: "Storm & wind damage", body: "Missing shingles, lifted ridge caps, damaged valleys. Works with your insurance if there's a claim." },
-      { title: "Flashing repairs", body: "Chimney, skylight, sidewall, step flashing. 80% of leaks we diagnose are flashing, not shingles." },
-      { title: "Pipe boots & vent boots", body: "The rubber cracks in ~10 years. Easy fix. Catches most people off-guard." },
-      { title: "Valley repair", body: "Ice damming, debris damage, failed underlayment. Fix it before it rots the decking." },
-      { title: "Emergency tarping", body: "Same-day response if you're actively getting water inside." },
+      { title: "Active leaks", body: "We trace the source, which is often not where the ceiling stain is, and fix the flashing, shingle, or penetration." },
+      { title: "Storm and wind damage", body: "Missing shingles, lifted ridge caps, damaged valleys. We work directly with your insurance company." },
+      { title: "Flashing repairs", body: "Chimney, skylight, sidewall, and step flashing. A common source of leaks." },
+      { title: "Pipe boots and vent boots", body: "The rubber gasket cracks over time and becomes a leak point. Straightforward fix." },
+      { title: "Valley repair", body: "Ice damming, debris damage, failed underlayment. Fix it before it damages the decking." },
+      { title: "Gutters", body: "Gutter repair, replacement, and gutter guards. See Gutters." },
     ],
     processIntro: "From your first call to a dry roof:",
     faqs: [
-      { q: "Can you come today?", a: "If you call before 2pm on a weekday and you're within our service area (New River Valley + Roanoke region), usually yes. Same-day during storm events depends on volume — we prioritize active leaks." },
-      { q: "How much does a roof repair cost?", a: "Most repairs we do run $300–$900. Flashing fixes, pipe boot replacements, small patches. Bigger repairs (large storm damage, valley rebuilds) can run $1,500–$3,500. Free quote before any work starts." },
-      { q: "Will you tarp my roof if you can't fix it today?", a: "Yes. Emergency tarping on active leaks buys you time to schedule the real repair without more water damage inside." },
-      { q: "Another company told me I need a whole new roof. Is that true?", a: "Sometimes. Usually not. We're happy to give you a second opinion with drone photos. If it's really a replacement situation, we'll say so. If it's a $500 fix, we'll tell you that too." },
-      { q: "Do you handle insurance claims for storm damage?", a: "Yes. We'll meet the adjuster on-roof, document with drone photos, and help navigate depreciation and supplements. No charge for the adjuster meeting." },
-      { q: "Is there a warranty on repairs?", a: "1-year workmanship warranty on every repair we do. If it fails, we come back on our dime." },
-      { q: "My insurance denied my storm claim. Can you still help?", a: "Yes. We'll still quote the repair direct. If you want to appeal the claim, we can provide documentation that supports a reopen." },
+      { q: "How much does a roof repair cost?", a: "It depends on the scope. We give you a written quote before any work starts. Free inspections, no obligation." },
+      { q: "Do you offer emergency service?", a: "Yes. We offer 24/7 emergency storm damage service. For active leaks during business hours (Mon to Fri, 8:30am to 5pm), call us and we will route you." },
+      { q: "Will you tarp my roof after storm damage?", a: "Yes. Emergency tarping is part of our 24/7 storm response." },
+      { q: "Another company told me I need a whole new roof. Can I get a second opinion?", a: "Yes. Free inspections, no obligation. We will tell you what we see and let you decide." },
+      { q: "Do you handle insurance claims for storm damage?", a: "Yes. We work directly with your insurance company from inspection through final payment. Our team documents the damage, meets with adjusters on site, and handles the paperwork." },
+      { q: "Are you licensed and insured in Virginia?", a: "VA Class A contractor, fully insured. We send certificates before work begins." },
       ...SHARED_FAQS_END,
     ],
-    finalCtaHeadline: "Every day that leak sits is more drywall you'll have to replace.",
-    finalCtaSubhead: "Free inspection. Same-day diagnosis available. Written quote before we leave.",
+    finalCtaHeadline: "Get a free inspection. Written quote before any work starts.",
+    finalCtaSubhead: "No obligation. No pressure. We will tell you what we see.",
   },
 
   "roof-replacement": {
-    headline: "Get a New Roof in [Location] — $0 Down, $89/mo, Lifetime Warranty.",
-    subheadline: "Quote in 24 hours. Install in days. 231 five-star reviews from your neighbors.",
+    headline: "Roof Replacement in [Location]. $0 Down Financing.",
+    subheadline: "GAF Master Elite. Lifetime warranty. Free, written estimates. Locally owned since 2013.",
     cta: "Get My Free Quote",
     formCardTitle: "Get Your Free Replacement Quote",
     service: "Roof Replacement",
     proofPoints: [
       "5.0 stars across 231 Google reviews",
-      "983 roofs completed in Southwest Virginia",
-      "GAF 3-Star President's Club (top contractors in the U.S.)",
+      "GAF 3-Star President's Club (top 2% of U.S. roofers)",
+      "$0 down financing with flexible monthly payments",
     ],
     riskReversal:
-      "Free quote. No pressure. No pushy sales guy at your kitchen table. About 20 minutes.",
-    heroImage: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG",
+      "Free, no obligation. We show you what we see and give you a written estimate.",
+    heroImage: "/assets/drive/mdr-crew-a.jpg",
     socialProofLine:
-      "5.0 stars · 231 Google reviews · 983 roofs · GAF 3-Star President's Club.",
+      "GAF Master Elite. 1,000+ roofs. 231 five star Google reviews. Since 2013.",
     benefits: [
       {
-        title: "Lifetime workmanship warranty",
-        body: "If a shingle we installed lifts in 30 years, we fix it. Not our installer — us. That's the 3-Star Difference.",
+        title: "Top 1% of roofers",
+        body: "GAF Master Elite certified. Fewer than 3% of contractors nationwide earn this distinction.",
       },
       {
-        title: "$0 down financing through Hearth",
-        body: "Soft credit pull. 60-second rate check. Payments from $89/mo on a full replacement.",
+        title: "$0 down financing",
+        body: "Get your roof now and pay over time. Flexible plans that fit your monthly budget.",
       },
       {
-        title: "Real drone photos. Written report. No drama.",
-        body: "Every inspection gets a PDF with photos you can actually read. No scare tactics. No \"your whole roof is failing.\"",
+        title: "GAF Golden Pledge Lifetime Warranty",
+        body: "Covers materials, labor, and tear off, for life.",
       },
       {
-        title: "Done in 1–2 days on most homes",
-        body: "Crews that actually show up when they say they will. Yard cleaner than when they started.",
+        title: "24/7 Storm Response",
+        body: "Emergency tarping and insurance claim assistance when you need it most.",
       },
       {
-        title: "983 roofs deep in Southwest Virginia",
-        body: "We've been on roofs in Roanoke, Blacksburg, Radford, Salem, Floyd, Smith Mountain Lake, and everywhere in between.",
+        title: "Insurance claim assistance",
+        body: "We work directly with your insurance company from inspection through final payment.",
       },
       {
-        title: "GAF 3-Star President's Club",
-        body: "Only a few hundred contractors in the country hit this. It's the highest tier GAF offers — and it's why we can back our work for life.",
+        title: "Locally owned since 2013",
+        body: "Based in Christiansburg with a second office in Roanoke. We live here.",
       },
     ],
-    detailsTitle: "What a replacement actually looks like with us",
+    detailsTitle: "What a Modern Day replacement includes",
     details: [
-      { title: "Tear-off, not overlay", body: "We strip to the deck, inspect every board, and replace rotten plywood before the new roof goes on." },
-      { title: "GAF Timberline HDZ shingles (standard)", body: "Architectural, StainGuard Plus algae protection, LayerLock for high-wind nailing." },
-      { title: "Full system — not just shingles", body: "Underlayment, ice & water shield in the valleys, new drip edge, new pipe boots, new ridge vent." },
-      { title: "Warranty tiers", body: "Legacy Warranty (lifetime workmanship + 50-year material) or 3-Star Difference (adds transferable coverage + accidental damage + theft)." },
-      { title: "Insurance claims handled", body: "If storm damage hit you, we handle the adjuster conversation. You don't have to learn depreciation math." },
-      { title: "Financing from $89/mo", body: "Hearth partnership. Soft credit pull. Approvals in minutes. $0 down on qualifying projects." },
+      { title: "Free, written estimate", body: "We inspect the roof, show you what we see, and give you an itemized estimate in writing." },
+      { title: "GAF roofing system", body: "We install a full GAF roofing system. We are GAF Master Elite certified and a 3-Star President's Club member." },
+      { title: "Full system replacement", body: "Underlayment, ice and water shield, drip edge, pipe boots, and ridge vent are all replaced as part of the system." },
+      { title: "Insurance work", body: "We work directly with your insurance company from inspection through final payment. We meet the adjuster on site." },
+      { title: "$0 down financing", body: "Flexible monthly payments. We walk you through options during your free estimate." },
+      { title: "GAF Golden Pledge Warranty", body: "Covers materials, labor, and tear off, for life." },
     ],
     processIntro: "From your first call to a new roof:",
     faqs: [
-      { q: "How much does a new roof cost in [Location]?", a: "Depends on square footage, pitch, and current condition. Most full replacements in Southwest Virginia run between $9,000 and $18,000. That's why we quote in writing after seeing it — not over the phone." },
-      { q: "Can I finance it?", a: "Yes. We partner with Hearth. Soft credit check takes 60 seconds, doesn't touch your score. Most customers land in the $89–$189/mo range with $0 down." },
-      { q: "How long does install take?", a: "Most homes: 1–2 days. Bigger or steeper roofs: 3. We don't spread jobs over a week because \"the weather might turn.\"" },
-      { q: "Do you handle insurance claims?", a: "Yes. If storm damage is part of the picture, we'll meet the adjuster on the roof, document everything, and help you navigate depreciation and supplements." },
-      { q: "Tear-off or overlay — which do I need?", a: "Almost always tear-off. Overlays hide rotten decking, void some warranties, and usually cost you more in 10 years than they save you today." },
-      { q: "What warranty comes with a Modern Day Roofing replacement?", a: "Lifetime workmanship. 50-year material warranty on the shingles. Upgrade to our 3-Star Difference for accidental damage + theft coverage that transfers to the next owner." },
-      { q: "How fast can you start?", a: "Quote in 24 hours. Most installs scheduled 2–3 weeks out. If you've got active leaks or storm damage, we move faster." },
+      { q: "How much does a new roof cost in [Location]?", a: "Most roof replacements in the New River Valley and Roanoke area range from $8,000 to $25,000 depending on size, materials, and complexity. We provide free inspections and a detailed written estimate, so you know exactly what to expect." },
+      { q: "Can I finance it?", a: "Yes. We offer $0 down financing with flexible monthly payments. Most homeowners qualify, and we will walk you through the options during your free estimate." },
+      { q: "What is a GAF Master Elite contractor?", a: "Only the top 1% of roofing contractors in the country earn GAF Master Elite certification. It means we have met rigorous standards for training, insurance, and customer satisfaction. It also qualifies us to offer GAF's strongest warranty, the Golden Pledge." },
+      { q: "Do you help with insurance claims for storm damage?", a: "Yes. We work directly with your insurance company from inspection through final payment. Our team documents the damage, meets with adjusters on site, and handles the paperwork." },
+      { q: "What warranty comes with a Modern Day Roofing replacement?", a: "The GAF Golden Pledge covers materials, labor, and tear off, for life. This is GAF's strongest warranty and is available because we are GAF Master Elite certified." },
+      { q: "Are you licensed and insured in Virginia?", a: "VA Class A contractor, fully insured. We send certificates before work begins." },
       ...SHARED_FAQS_END,
     ],
-    finalCtaHeadline: "Your roof won't fix itself. And winter doesn't care about your calendar.",
-    finalCtaSubhead: "Free quote. 24-hour turnaround. $89/mo financing if you need it. Zero obligation, zero pressure.",
+    finalCtaHeadline: "Get a free, written estimate for your roof replacement.",
+    finalCtaSubhead: "GAF Master Elite. $0 down financing. Lifetime warranty. No obligation.",
   },
 
   "branded": {
-    headline: "The Roofing Company [Location] Neighbors Actually Recommend.",
-    subheadline: "231 five-star Google reviews. 983 roofs installed. Locally owned and insured in Virginia.",
+    headline: "Modern Day Roofing. Southwest Virginia's Most Trusted Roofers.",
+    subheadline: "GAF Master Elite. 1,000+ roofs. 231 five star Google reviews. Locally owned since 2013.",
     cta: "Get My Free Quote",
     formCardTitle: "Get Your Free Quote",
     service: "General",
     proofPoints: [
-      "GAF 3-Star President's Club (top few hundred contractors in the U.S.)",
+      "GAF 3-Star President's Club (top 2% of U.S. roofers)",
       "5.0 stars across 231 Google reviews",
-      "983 Southwest Virginia roofs completed",
+      "Locally owned. Christiansburg and Roanoke offices",
     ],
-    riskReversal: "Free quote. No pressure. No out-of-state salesmen.",
-    heroImage: "/assets/hero/hero-main.webp",
-    socialProofLine: "Locally owned. Locally installed. Locally trusted.",
+    riskReversal: "Free, no obligation. Written estimates. We work directly with your insurance company.",
+    heroImage: "/assets/drive/mdr-crew-a.jpg",
+    socialProofLine: "GAF Master Elite. 1,000+ roofs. Since 2013.",
     benefits: [
-      { title: "We answer our own phone", body: "Alicia's team — not a call center. Usually back to you within the hour." },
-      { title: "983 local roofs deep", body: "We know what Southwest Virginia weather does to a roof because we're up on them every week." },
-      { title: "GAF 3-Star President's Club", body: "Only a few hundred contractors in the country. Top tier. It's why we can warranty workmanship for life." },
-      { title: "Honest quotes, in writing, within 24 hours", body: "No \"call for pricing.\" No $30k estimates that magically drop to $12k when you push back." },
-      { title: "Financing from $89/mo", body: "Hearth partnership. $0 down. Soft credit check. Most approvals in minutes." },
-      { title: "Full-service", body: "Replacement, repair, inspection, storm damage, gutters, insurance claims. One company, start to finish." },
+      { title: "Top 1% of roofers", body: "GAF Master Elite certified. Fewer than 3% of contractors nationwide earn this distinction." },
+      { title: "GAF 3-Star President's Club", body: "GAF's highest honor for Master Elite contractors. Recognizes training, craftsmanship, and customer satisfaction." },
+      { title: "$0 Down Financing", body: "Flexible monthly payments. We walk you through options during your free estimate." },
+      { title: "24/7 Storm Response", body: "Emergency tarping and insurance claim assistance when you need it most." },
+      { title: "Lifetime Warranty", body: "GAF Golden Pledge warranty covers materials, labor, and tear off, for life." },
+      { title: "Locally owned since 2013", body: "Based in Christiansburg with a second office in Roanoke." },
     ],
     detailsTitle: "Everything we do",
     details: [
-      { title: "Roof Replacement", body: "GAF Timberline, tear-off, lifetime warranty." },
-      { title: "Roof Repair", body: "Leaks, flashing, storm damage. Same-day diagnosis." },
-      { title: "Roof Inspection", body: "Free, written, drone photos included." },
-      { title: "Storm Damage & Insurance Claims", body: "We meet the adjuster on-roof." },
-      { title: "Gutters & Gutter Guards", body: "Full system replacement and leaf protection." },
-      { title: "Financing", body: "$0 down, from $89/mo through Hearth." },
+      { title: "Roof Replacement", body: "Full GAF roofing systems with the Golden Pledge lifetime warranty." },
+      { title: "Roof Repair", body: "Leaks, flashing, storm damage, pipe boots, valleys." },
+      { title: "Roof Inspection", body: "Free inspection, written estimate, no obligation." },
+      { title: "Storm Damage and Insurance Claims", body: "We work directly with your insurance company from inspection through final payment." },
+      { title: "Gutters", body: "Gutter repair, replacement, and gutter guards." },
+      { title: "Financing", body: "$0 down financing with flexible monthly payments." },
     ],
-    processIntro: "Whether it's a repair, a replacement, or just a second opinion:",
+    processIntro: "Whether it is a repair, a replacement, or an inspection:",
     faqs: [
-      { q: "Where is Modern Day Roofing based?", a: "Christiansburg, VA. We service the New River Valley + Roanoke Valley and surrounding areas — Blacksburg, Radford, Salem, Floyd, Wytheville, Smith Mountain Lake, and everywhere between." },
-      { q: "What's GAF 3-Star President's Club?", a: "Highest certification tier GAF offers. Only a few hundred contractors in the U.S. have it. It requires training, craftsmanship standards, and customer satisfaction benchmarks most contractors can't hit." },
-      { q: "Do you offer financing?", a: "Yes. Through Hearth. Soft credit pull, no score impact to check. $0 down options. Most customers pay $89–$189/mo on a full replacement." },
-      { q: "Do you repair or just replace?", a: "Both. Plenty of roofs just need a repair — we'd rather tell you that than sell you a replacement you don't need." },
-      { q: "What's the warranty?", a: "Lifetime workmanship on replacements. 50-year material warranty. Optional upgrade to our 3-Star Difference warranty (transferable + accidental damage coverage). 1-year workmanship on repairs." },
-      { q: "How quickly can you get out for a quote?", a: "Usually within 48 hours for non-emergency. Same-day or next-day for active leaks." },
-      { q: "Why should I pick Modern Day over a national brand or franchise?", a: "We live here. When your roof leaks in 2035, we'll still be the same phone number. National brands and storm chasers won't." },
+      { q: "Where is Modern Day Roofing based?", a: "Christiansburg, VA (80 College St. STE R) with a second office in Roanoke (2740 Franklin Rd SW). We serve the New River Valley, Roanoke Valley, and surrounding areas including Blacksburg, Radford, Salem, Floyd, Wytheville, and Smith Mountain Lake." },
+      { q: "What is GAF 3-Star President's Club?", a: "GAF's highest honor for Master Elite contractors. It recognizes contractors who lead in training, craftsmanship, and customer satisfaction." },
+      { q: "Do you offer financing?", a: "Yes. $0 down financing with flexible monthly payments. Most homeowners qualify, and we walk you through the options during your free estimate." },
+      { q: "Do you repair or just replace?", a: "Both. If a repair is the right answer, we will tell you that." },
+      { q: "What is the warranty?", a: "For replacements, we install a full GAF system backed by the GAF Golden Pledge Lifetime Warranty, which covers materials, labor, and tear off, for life. This is available because we are GAF Master Elite certified." },
+      { q: "What are your hours?", a: "Monday through Friday, 8:30am to 5:00pm. We also offer 24/7 emergency storm damage service." },
       ...SHARED_FAQS_END,
     ],
-    finalCtaHeadline: "You only replace a roof two or three times in a lifetime. Pick carefully.",
-    finalCtaSubhead: "Free quote. No obligation. Written in 24 hours. 231 neighbors have already left a review.",
+    finalCtaHeadline: "Get a free, written estimate. No obligation.",
+    finalCtaSubhead: "GAF Master Elite. Locally owned since 2013. Christiansburg and Roanoke.",
   },
 
   "roof-inspection-christiansburg": {
@@ -262,12 +262,12 @@ const campaigns: Record<string, CampaignConfig> = {
     formCardTitle: "Book Your Free Inspection",
     service: "Roof Inspection",
     location: "Christiansburg",
-    proofPoints: ["5.0 stars · 231 reviews", "983 roofs inspected in SW Virginia", "GAF 3-Star President's Club"],
+    proofPoints: ["5.0 stars · 231 reviews", "1,000+ roofs completed in SW Virginia", "GAF 3-Star President's Club"],
     riskReversal: "Free inspection. No pressure. No obligation. About 20 minutes.",
     heroImage: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG",
-    socialProofLine: "231 five-star reviews · 983 roofs inspected · zero pushy sales.",
+    socialProofLine: "231 five star Google reviews. GAF Master Elite. Locally owned since 2013.",
     benefits: [
-      { title: "Drone photos — you see what we see", body: "Every inspection gets a PDF with photos you can actually read." },
+      { title: "Written estimate", body: "We inspect the roof, show you what we see, and give you an itemized estimate in writing." },
       { title: "No high-pressure sales", body: "We'll tell you if it's fine, if it's a repair, or if it's time for a replacement. No games." },
       { title: "Written report in your inbox", body: "Before we leave your driveway." },
       { title: "Insurance-claim ready", body: "If there's storm damage, our report is what your adjuster needs." },
@@ -276,7 +276,7 @@ const campaigns: Record<string, CampaignConfig> = {
     details: [
       { title: "Drone aerial photos", body: "High-resolution photos of every slope, valley, and penetration." },
       { title: "Attic check", body: "Look for ventilation issues, water stains, and insulation damage." },
-      { title: "Flashing + penetrations", body: "Chimney, skylights, pipe boots, vents — where 80% of leaks start." },
+      { title: "Flashing and penetrations", body: "Chimney, skylights, pipe boots, and vents. A common source of leaks." },
       { title: "Gutters + downspouts", body: "Integrity check and whether they're contributing to roof issues." },
       { title: "Written recommendations", body: "Honest assessment of remaining roof life and whether anything needs immediate attention." },
     ],
@@ -299,12 +299,12 @@ const campaigns: Record<string, CampaignConfig> = {
     formCardTitle: "Book Your Free Inspection",
     service: "Roof Inspection",
     location: "Roanoke",
-    proofPoints: ["5.0 stars · 231 reviews", "983 roofs inspected in SW Virginia", "GAF 3-Star President's Club"],
+    proofPoints: ["5.0 stars · 231 reviews", "1,000+ roofs completed in SW Virginia", "GAF 3-Star President's Club"],
     riskReversal: "Free inspection. No pressure. No obligation. About 20 minutes.",
     heroImage: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG",
-    socialProofLine: "231 five-star reviews · 983 roofs inspected · zero pushy sales.",
+    socialProofLine: "231 five star Google reviews. GAF Master Elite. Locally owned since 2013.",
     benefits: [
-      { title: "Drone photos — you see what we see", body: "Every inspection gets a PDF with photos you can actually read." },
+      { title: "Written estimate", body: "We inspect the roof, show you what we see, and give you an itemized estimate in writing." },
       { title: "No high-pressure sales", body: "We'll tell you if it's fine, if it's a repair, or if it's time for a replacement." },
       { title: "Written report in your inbox", body: "Before we leave your driveway." },
       { title: "Insurance-claim ready", body: "If there's storm damage, our report is what your adjuster needs." },
@@ -313,7 +313,7 @@ const campaigns: Record<string, CampaignConfig> = {
     details: [
       { title: "Drone aerial photos", body: "High-resolution photos of every slope, valley, and penetration." },
       { title: "Attic check", body: "Look for ventilation issues, water stains, and insulation damage." },
-      { title: "Flashing + penetrations", body: "Chimney, skylights, pipe boots, vents — where 80% of leaks start." },
+      { title: "Flashing and penetrations", body: "Chimney, skylights, pipe boots, and vents. A common source of leaks." },
       { title: "Gutters + downspouts", body: "Integrity check and whether they're contributing to roof issues." },
       { title: "Written recommendations", body: "Honest assessment of remaining roof life." },
     ],
@@ -330,7 +330,7 @@ const campaigns: Record<string, CampaignConfig> = {
   },
 
   "roof-financing": {
-    headline: "Roof Financing in [Location] from $89/mo. Zero Down.",
+    headline: "$0 Down Roof Financing in [Location].",
     subheadline: "Check your rate in 60 seconds. No credit impact. Real Virginia roofers.",
     cta: "Check My Rate",
     formCardTitle: "Check If You Qualify",
@@ -338,26 +338,25 @@ const campaigns: Record<string, CampaignConfig> = {
     proofPoints: ["No credit impact to check", "Approvals in minutes", "$0 down options available"],
     riskReversal: "Soft credit pull only. No obligation. Takes 60 seconds.",
     heroImage: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG",
-    socialProofLine: "983 roofs financed and installed · $0 down options · Hearth partnership.",
+    socialProofLine: "$0 down financing. Flexible monthly payments. GAF Master Elite.",
     benefits: [
       { title: "60-second rate check", body: "Soft credit pull. Doesn't touch your score." },
       { title: "$0 down on qualifying projects", body: "Pay nothing out of pocket to get started." },
-      { title: "Payments from $89/mo", body: "On a full replacement. Approvals in minutes." },
-      { title: "GAF 3-Star President's Club contractor", body: "Top tier workmanship backed by lifetime warranty." },
+      { title: "Flexible monthly payments", body: "We walk you through options during your free estimate." },
+      { title: "GAF Master Elite contractor", body: "Top 1% of U.S. roofers. Workmanship backed by the GAF Golden Pledge." },
     ],
-    detailsTitle: "How Hearth financing works",
+    detailsTitle: "How financing works",
     details: [
       { title: "Step 1: Fill out the form", body: "Takes 60 seconds. Basic info only." },
-      { title: "Step 2: Soft credit pull", body: "No impact on your credit score. Multiple lenders compete." },
-      { title: "Step 3: See your rate", body: "Pre-qualified offers in minutes. Choose the one that fits your budget." },
-      { title: "Step 4: Schedule your roof", body: "Free quote. Then financing finalizes at signing — not before." },
+      { title: "Step 2: Soft credit check", body: "Does not impact your credit score." },
+      { title: "Step 3: See your options", body: "Pre-qualified offers. Choose one that fits your budget." },
+      { title: "Step 4: Schedule your roof", body: "Free estimate. Financing finalizes at signing, not before." },
     ],
     processIntro: "From rate check to new roof:",
     faqs: [
-      { q: "Will this affect my credit score?", a: "No. The initial rate check is a soft pull only. Your score isn't touched unless you move forward with a lender." },
-      { q: "What's the minimum credit score?", a: "Varies by lender. Hearth works with multiple lenders across the credit spectrum." },
+      { q: "Will this affect my credit score?", a: "The initial check is a soft pull only. Your score is not touched unless you move forward with a lender." },
       { q: "How long does approval take?", a: "Usually minutes. Some lenders respond instantly." },
-      { q: "Is there a prepayment penalty?", a: "Depends on the lender. Many Hearth partners offer no-prepay-penalty loans." },
+      { q: "Do you offer $0 down?", a: "Yes. $0 down financing with flexible monthly payments is available on qualifying projects." },
       ...SHARED_FAQS_END,
     ],
     finalCtaHeadline: "See if you qualify in 60 seconds. No credit impact.",
@@ -366,26 +365,26 @@ const campaigns: Record<string, CampaignConfig> = {
 
   "roofing-company": {
     headline: "Top-Rated Roofing Company in [Location]",
-    subheadline: "5.0 across 231 reviews. 983 roofs completed. GAF 3-Star President's Club.",
+    subheadline: "5.0 stars across 231 Google reviews. GAF Master Elite. Since 2013.",
     cta: "Get My Free Quote",
     formCardTitle: "Get Your Free Quote",
     service: "General",
-    proofPoints: ["5.0 across 231 Google reviews", "983 roofs completed", "GAF 3-Star President's Club"],
+    proofPoints: ["5.0 stars across 231 Google reviews", "GAF 3-Star President's Club", "Locally owned since 2013"],
     riskReversal: "Free quote. No pressure. No obligation.",
     heroImage: "/assets/hero/hero-main.webp",
-    socialProofLine: "Locally owned in Christiansburg · 983 roofs deep · zero BBB complaints.",
+    socialProofLine: "GAF Master Elite. Locally owned in Christiansburg since 2013.",
     benefits: [
       { title: "We answer our own phone", body: "Not a call center. Usually back to you within the hour." },
-      { title: "983 local roofs completed", body: "We're up on Southwest Virginia roofs every week of the year." },
+      { title: "1,000+ roofs completed", body: "We install, inspect, and repair roofs across Southwest Virginia every week." },
       { title: "GAF 3-Star President's Club", body: "Top-tier national certification. Backs our lifetime workmanship warranty." },
       { title: "Written quotes in 24 hours", body: "Itemized. Honest. No \"call for pricing.\"" },
-      { title: "Financing from $89/mo", body: "Hearth partnership. $0 down. Soft credit check only." },
+      { title: "$0 down financing", body: "Flexible monthly payments. Most homeowners qualify." },
       { title: "Full service", body: "Replacement, repair, storm damage, gutters, insurance claims." },
     ],
     detailsTitle: "Why homeowners pick Modern Day",
     details: [
       { title: "We live here", body: "Based in Christiansburg. When your roof leaks in 2035, we'll still be the same phone number." },
-      { title: "Lifetime workmanship warranty", body: "If something we installed fails in 30 years, we fix it — not the subcontractor, us." },
+      { title: "GAF Golden Pledge Lifetime Warranty", body: "Covers materials, labor, and tear off, for life. Available because we are GAF Master Elite certified." },
       { title: "Drone-photo inspections", body: "You see what we see. Every time." },
       { title: "Honest pricing", body: "We don't do $30k estimates that drop to $12k when you push back." },
       { title: "Real crews, on time", body: "We show up when we say we will. Yard cleaned. Magnetic-sweep for nails." },
@@ -394,7 +393,7 @@ const campaigns: Record<string, CampaignConfig> = {
     faqs: [
       { q: "Where is Modern Day Roofing based?", a: "Christiansburg, VA. We service the New River Valley + Roanoke Valley and surrounding areas." },
       { q: "What's GAF 3-Star President's Club?", a: "Highest certification tier GAF offers. Only a few hundred contractors in the U.S. have it." },
-      { q: "Do you offer financing?", a: "Yes. Through Hearth. Soft credit pull, $0 down options, payments from $89/mo." },
+      { q: "Do you offer financing?", a: "Yes. $0 down financing with flexible monthly payments. Most homeowners qualify." },
       { q: "What's the warranty?", a: "Lifetime workmanship on replacements. 50-year material warranty." },
       { q: "How quickly can you get out for a quote?", a: "Usually within 48 hours for non-emergency. Same-day or next-day for active leaks." },
       ...SHARED_FAQS_END,
@@ -412,9 +411,9 @@ const campaigns: Record<string, CampaignConfig> = {
     proofPoints: ["5.0 across 231 reviews", "Lifetime workmanship warranty", "GAF 3-Star President's Club"],
     riskReversal: "Free quote. No pressure. Just an honest look at what you've been quoted.",
     heroImage: "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG",
-    socialProofLine: "983 roofs · 231 reviews · zero BBB complaints · locally owned.",
+    socialProofLine: "GAF Master Elite. Locally owned since 2013. 231 five star reviews.",
     benefits: [
-      { title: "We review other contractors' quotes", body: "Bring us what you've been quoted. We'll tell you if it's fair — and show you the photos we'd take." },
+      { title: "We review other contractors' quotes", body: "Bring us what you've been quoted. We will give you an honest written comparison." },
       { title: "Lifetime workmanship warranty", body: "Not 1 year. Not 10. Lifetime. That's the 3-Star Difference." },
       { title: "Locally owned and here long-term", body: "When your roof leaks in 2035, we'll still be the same phone number." },
       { title: "Drone-photo documentation", body: "You see what's actually up there. No fear-based sales tactics." },
@@ -556,6 +555,31 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
     </div>
   </section>
 
+  {/* GAF 3-Star President's Club featured badge */}
+  <section class="bg-white py-6 md:py-8 border-b border-border">
+    <div class="mx-auto max-w-[1100px] px-4 md:px-6">
+      <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-center md:text-left">
+        <img
+          src="/assets/logos/Presidents-Club_3-Star_Residential-with-Year_2026.webp"
+          alt="GAF President's Club 3-Star Residential 2026"
+          class="h-24 md:h-28 w-auto flex-shrink-0"
+          width="140"
+          height="140"
+          loading="lazy"
+        />
+        <div>
+          <p class="text-xs md:text-sm font-bold text-accent uppercase tracking-widest mb-1">GAF 3-Star President's Club 2026</p>
+          <h2 class="text-lg md:text-xl font-display font-bold text-text-primary mb-1">
+            Top 1% of roofers. Top 2% of U.S. GAF contractors.
+          </h2>
+          <p class="text-sm md:text-base text-text-muted">
+            GAF Master Elite certified and a 3-Star President's Club member. Fewer than 3% of U.S. contractors earn this level.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   {/* Authority / certification row */}
   <CertificationStrip />
 
@@ -590,7 +614,7 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
     <div class="mx-auto max-w-[1200px] px-4 md:px-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center">
         <div>
-          <div class="text-2xl md:text-4xl font-display font-bold text-text-primary">983</div>
+          <div class="text-2xl md:text-4xl font-display font-bold text-text-primary">1,000+</div>
           <div class="text-xs md:text-sm text-text-muted uppercase tracking-wide mt-1">Roofs Completed</div>
         </div>
         <div>
@@ -624,7 +648,7 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
             <div class="order-1 md:order-none aspect-[4/3] md:aspect-[5/4] rounded-xl overflow-hidden bg-bg-light">
               <img
                 src={BENEFIT_PHOTOS[i % BENEFIT_PHOTOS.length]}
-                alt={`Modern Day Roofing — ${b.title}`}
+                alt={`Modern Day Roofing, ${b.title}`}
                 class="w-full h-full object-cover"
                 loading="lazy"
                 width="600"
@@ -654,7 +678,7 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
     <div class="mx-auto max-w-[1400px] px-4 md:px-6">
       <div class="text-center mb-6 md:mb-8">
         <p class="text-xs md:text-sm font-bold text-accent uppercase tracking-widest mb-2">Real jobs, real roofs</p>
-        <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">983 roofs completed across Southwest Virginia</h2>
+        <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">1,000+ roofs completed across Southwest Virginia</h2>
       </div>
     </div>
     <div class="lp-photo-carousel relative">
@@ -715,7 +739,7 @@ const heroImg = config.heroImage || "/assets/projects/dji_fly_20251105_160154_42
             <div class="aspect-[16/9] bg-bg-warm">
               <img
                 src={BENEFIT_PHOTOS[(i + 2) % BENEFIT_PHOTOS.length]}
-                alt={`${d.title} — Modern Day Roofing`}
+                alt={`${d.title}, Modern Day Roofing`}
                 class="w-full h-full object-cover"
                 loading="lazy"
                 width="480"

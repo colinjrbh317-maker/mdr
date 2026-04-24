@@ -190,7 +190,7 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
           />
         </div>
 
-        <label htmlFor={`sms-consent-${source}`} className="flex items-start gap-2 text-sm text-text-muted leading-snug cursor-pointer select-none">
+        <label htmlFor={`sms-consent-${source}`} className="flex items-start gap-2 text-xs text-text-muted leading-snug cursor-pointer select-none">
           <input
             type="checkbox"
             id={`sms-consent-${source}`}
@@ -201,16 +201,10 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
             className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-accent"
           />
           <span>
-            Text me to schedule. Reply STOP anytime.{" "}
-            <a href="/privacy" className="underline hover:text-text-primary">Privacy</a>
-            {" · "}
+            I agree to receive text messages from Modern Day Roofing at the phone number provided for appointment confirmations, scheduling, and service updates. Message frequency varies. Msg and data rates may apply. Reply STOP to opt out. Consent is not a condition of purchase. See{" "}
+            <a href="/privacy" className="underline hover:text-text-primary">Privacy Policy</a>
+            {" and "}
             <a href="/terms" className="underline hover:text-text-primary">Terms</a>.
-            <details className="mt-1 text-xs text-text-dim">
-              <summary className="cursor-pointer hover:text-text-muted">Full disclosure</summary>
-              <span className="block mt-1">
-                I agree to receive text messages from Modern Day Roofing at the number provided — appointment confirmations, inspection scheduling, estimate follow-ups, service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase.
-              </span>
-            </details>
           </span>
         </label>
 
