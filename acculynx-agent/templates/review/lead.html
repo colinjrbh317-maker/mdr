@@ -1,0 +1,28 @@
+{% extends "review/base.html" %}
+{% block title %}{{ lead.contact_name }} · Cadence Review{% endblock %}
+{% block content %}
+<h1>{{ lead.contact_name or "Homeowner" }}</h1>
+<div class="lead-meta">
+  <b>Email:</b> {{ lead.contact_email or "—" }} ·
+  <b>Phone:</b> {{ lead.contact_phone or "—" }} ·
+  <b>Address:</b> {{ lead.address or "—" }}<br>
+  <b>Milestone:</b> {{ lead.milestone or "—" }} ·
+  <b>Current layer:</b> {{ lead.layer_name or "—" }} ·
+  <b>Job:</b> {{ lead.job_number or lead.id[:8] }}
+</div>
+
+<h2>Walk through every layer</h2>
+<p class="subtitle">Pick a layer from the sidebar to see every touch with a generated draft. Drafts are cached after the first generation.</p>
+
+<div class="row">
+  {% for L in layers %}
+    <a class="card col" href="/review/{{ lead.id }}/{{ L.name }}" style="text-decoration: none; color: inherit;">
+      <h3>{{ L.name.replace('_', ' ') }}</h3>
+      <div class="lead-meta">
+        {{ L.touches }} touches<br>
+        <i>{{ L.tone }}</i>
+      </div>
+    </a>
+  {% endfor %}
+</div>
+{% endblock %}

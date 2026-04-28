@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Sales Agent — How It Works</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0A0A0A;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 60px 40px;
+  }
+
+  .container {
+    max-width: 1100px;
+    width: 100%;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.3em;
+    background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: 1.05rem;
+    color: #666;
+    margin-bottom: 60px;
+    font-weight: 400;
+  }
+
+  .steps {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .step {
+    flex: 1;
+    max-width: 300px;
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 20px;
+    padding: 44px 32px 40px;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+
+  .step:hover {
+    border-color: #333;
+  }
+
+  .step-number {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 36px;
+    background: #fff;
+    color: #0A0A0A;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.95rem;
+  }
+
+  .icon {
+    font-size: 2.6rem;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .step h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+
+  .step p {
+    font-size: 0.92rem;
+    color: #888;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .step ul {
+    list-style: none;
+    margin-top: 18px;
+    padding: 0;
+    text-align: left;
+  }
+
+  .step ul li {
+    font-size: 0.85rem;
+    color: #666;
+    padding: 6px 0;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .step ul li .bullet {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #333;
+  }
+
+  .step:nth-child(1) ul li .bullet { background: rgba(59,130,246,0.4); }
+  .step:nth-child(2) ul li .bullet { background: rgba(139,92,246,0.4); } /* actually 3rd child due to arrows */
+  .step:nth-child(3) ul li .bullet { background: rgba(16,185,129,0.4); }
+
+  .arrow {
+    display: flex;
+    align-items: center;
+    padding-top: 50px;
+    color: #333;
+    font-size: 1.6rem;
+  }
+
+  /* accent colors per step */
+  .step:nth-child(1) .step-number { background: #3B82F6; color: #fff; }
+  .step:nth-child(1) { border-color: rgba(59,130,246,0.15); }
+
+  .step:nth-child(2) .step-number { background: #8B5CF6; color: #fff; }
+  .step:nth-child(2) { border-color: rgba(139,92,246,0.15); }
+
+  .step:nth-child(3) .step-number { background: #10B981; color: #fff; }
+  .step:nth-child(3) { border-color: rgba(16,185,129,0.15); }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>How the AI Sales Agent Works</h1>
+    <p class="subtitle">From stale lead to signed contract — automatically.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <span class="icon">📡</span>
+        <h2>Scan</h2>
+        <p>Syncs with the CRM every hour and flags what's falling through the cracks.</p>
+        <ul>
+          <li><span class="bullet"></span>Missed follow-ups</li>
+          <li><span class="bullet"></span>Stalled estimates</li>
+          <li><span class="bullet"></span>Cold leads worth reviving</li>
+        </ul>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <span class="icon">✍️</span>
+        <h2>Draft</h2>
+        <p>AI writes the right message based on where each lead sits in the pipeline.</p>
+        <ul>
+          <li><span class="bullet"></span>Trained on your sales playbook</li>
+          <li><span class="bullet"></span>Matches tone and timing</li>
+          <li><span class="bullet"></span>Context-aware, not generic</li>
+        </ul>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <span class="icon">🚀</span>
+        <h2>Send</h2>
+        <p>Rep reviews, approves with one tap, and the message goes out.</p>
+        <ul>
+          <li><span class="bullet"></span>SMS and email delivery</li>
+          <li><span class="bullet"></span>Human always in the loop</li>
+          <li><span class="bullet"></span>Full audit trail in CRM</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

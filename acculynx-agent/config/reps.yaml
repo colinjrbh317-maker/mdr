@@ -1,0 +1,28 @@
+# Rep mapping. MVP bootstrap: every lead routes to Colin via solo-sender mode.
+#
+# When solo_sender_mode=true (settings/.env), we use the rep with rep_id="*"
+# regardless of what AccuLynx's history says about lead ownership.
+#
+# Once Austin onboards real reps:
+#   1. Verify each rep's email as a SendGrid Single Sender (~5 min each)
+#   2. Replace the wildcard entry with one row per rep
+#   3. Match rep_id to the AccuLynx user.id from `/users` endpoint
+#      (Run: python scripts/inspect_rep_link.py to see all 16 users)
+#   4. Set SOLO_SENDER_MODE=false in .env
+#
+# AccuLynx user IDs already discovered (from /users):
+#   alexbohm@moderndayroof.com         → 0bb3a2a5-49fc-4f6d-8d89-a8c56855fc93 (CompanyAdmin)
+#   aliciaumberto@moderndayroof.com    → ecae74b2-a28d-4775-9c80-0851e6010ddb (LocationAdmin)
+#   aj@moderndayroof.com               → 4ea127be-7494-4b8c-a603-4b99b209ab24 (Sales)
+#   austin@moderndayroof.com (Austin Hungate) → 88887648-9d02-4ece-ab42-56c0d64d07bc
+
+default_rep_email: colin@socialtheorymedia.com
+
+reps:
+  - rep_id: "*"
+    name: Colin Ryan
+    first_name: Colin
+    email: colin@socialtheorymedia.com
+    title: Account Manager
+    signature_phone: "540-553-6007"
+    sendgrid_sender_email: colin@socialtheorymedia.com

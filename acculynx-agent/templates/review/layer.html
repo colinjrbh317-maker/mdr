@@ -1,0 +1,141 @@
+{% extends "review/base.html" %}
+{% block title %}{{ layer_name }} · {{ lead.contact_name }} · Cadence Review{% endblock %}
+{% block content %}
+<h1>{{ layer_name.replace('_', ' ') }}</h1>
+<div class="lead-meta" style="margin-bottom: 20px;">
+  <b>Lead:</b> <a href="/review/{{ lead.id }}">{{ lead.contact_name or "Homeowner" }}</a> ·
+  <b>Email:</b> {{ lead.contact_email }} ·
+  <b>Address:</b> {{ lead.address }}<br>
+  <b>Tone:</b> {{ layer.tone }}<br>
+  <b>Goal:</b> {{ layer.goal }}
+</div>
+
+{% for t in touches %}
+  <div class="card" data-touch="{{ t.index }}" data-channel="{{ t.channel }}">
+    <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px;">
+      <h3 style="margin: 0;">Touch {{ t.index + 1 }} of {{ touches|length }}</h3>
+      <span class="badge {{ t.channel }}">{{ t.channel }}</span>
+      <span class="lead-meta">Day {{ t.day_offset }}</span>
+      {% if t.autonomous_ok %}
+        <span class="badge auto">Autonomous</span>
+      {% else %}
+        <span class="badge gated">Needs rep approval</span>
+      {% endif %}
+      <span style="margin-left: auto; display: flex; gap: 6px;">
+        <button onclick="loadDraft('{{ lead.id }}', '{{ layer_name }}', {{ t.index }}, '{{ t.channel }}', true)">↻ Regenerate</button>
+        <button onclick="openEditor('{{ layer_name }}', {{ t.index }}, '{{ t.channel }}')">✎ Edit template</button>
+      </span>
+    </div>
+    <div class="lead-meta" style="margin-bottom: 8px;"><i>Content type: {{ t.content_type }}</i></div>
+    <div id="draft-{{ t.index }}-{{ t.channel }}" class="draft-body">
+      <div class="skeleton"></div>
+    </div>
+  </div>
+{% endfor %}
+
+<dialog id="editor-dialog" style="border: 1px solid var(--border); border-radius: 12px; padding: 20px; max-width: 720px; width: 90vw;">
+  <h3 style="margin-top: 0;">Edit template</h3>
+  <div class="lead-meta" id="editor-meta"></div>
+  <textarea id="editor-textarea" placeholder="Loading..."></textarea>
+  <div style="display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;">
+    <button onclick="document.getElementById('editor-dialog').close()">Cancel</button>
+    <button class="primary" onclick="saveTemplate()">Save & re-generate</button>
+  </div>
+</dialog>
+
+<script>
+const leadId = "{{ lead.id }}";
+const layerName = "{{ layer_name }}";
+
+async function loadDraft(leadId, layerName, touchIndex, channel, force=false) {
+  const target = document.getElementById(`draft-${touchIndex}-${channel}`);
+  target.innerHTML = '<div class="skeleton"></div>';
+  const url = force
+    ? `/review/regenerate/${leadId}/${layerName}/${touchIndex}/${channel}`
+    : `/review/draft/${leadId}/${layerName}/${touchIndex}/${channel}`;
+  const method = force ? 'POST' : 'GET';
+  try {
+    const res = await fetch(url, {method});
+    if (!res.ok) {
+      target.innerHTML = `<div class="err">Error: ${res.status} ${await res.text()}</div>`;
+      return;
+    }
+    const d = await res.json();
+    if (d.escalation) {
+      target.innerHTML = `<div class="err">⚠ ESCALATION: ${escapeHtml(d.escalation)}</div>`;
+      return;
+    }
+    let html = '';
+    if (d.subject) html += `<div class="subject">Subject: ${escapeHtml(d.subject)}</div>`;
+    html += `<div class="body-text">${escapeHtml(d.body || '(empty)')}</div>`;
+    html += `<div class="lead-meta" style="margin-top: 8px;">`;
+    html += `<span class="${d.postflight_ok ? 'ok' : 'err'}">●</span> `;
+    html += d.postflight_ok ? 'Postflight passed' : `Postflight failed: ${(d.postflight_reasons||[]).join(', ')}`;
+    if (d.regenerations > 0) html += ` · ${d.regenerations} regeneration(s)`;
+    html += ` · From: ${escapeHtml(d.rep_name)} &lt;${escapeHtml(d.rep_email)}&gt;`;
+    if (d.cached) html += ` · cached`;
+    html += '</div>';
+    target.innerHTML = html;
+  } catch (e) {
+    target.innerHTML = `<div class="err">Network error: ${escapeHtml(String(e))}</div>`;
+  }
+}
+
+async function openEditor(layerName, touchIndex, channel) {
+  const dialog = document.getElementById('editor-dialog');
+  document.getElementById('editor-meta').textContent = `${layerName} · Touch ${touchIndex + 1} · ${channel}`;
+  const ta = document.getElementById('editor-textarea');
+  ta.value = "Loading current template…";
+  dialog.dataset.layer = layerName;
+  dialog.dataset.touch = touchIndex;
+  dialog.dataset.channel = channel;
+  dialog.showModal();
+  try {
+    const res = await fetch(`/review/template-source/${layerName}/${touchIndex}/${channel}`);
+    ta.value = res.ok ? await res.text() : `(could not load: ${res.status})`;
+  } catch (e) {
+    ta.value = `(error: ${e})`;
+  }
+}
+
+async function saveTemplate() {
+  const dialog = document.getElementById('editor-dialog');
+  const layer = dialog.dataset.layer;
+  const touch = parseInt(dialog.dataset.touch, 10);
+  const channel = dialog.dataset.channel;
+  const template = document.getElementById('editor-textarea').value;
+  try {
+    const res = await fetch(`/review/templates/${layer}/${touch}/${channel}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({template}),
+    });
+    if (!res.ok) {
+      alert(`Save failed: ${res.status}`);
+      return;
+    }
+    dialog.close();
+    loadDraft(leadId, layer, touch, channel, true);
+  } catch (e) {
+    alert(`Network error: ${e}`);
+  }
+}
+
+function escapeHtml(str) {
+  return String(str || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+// Lazy load each draft on page ready
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-touch]').forEach(el => {
+    const touch = parseInt(el.dataset.touch, 10);
+    const channel = el.dataset.channel;
+    loadDraft(leadId, layerName, touch, channel);
+  });
+});
+</script>
+{% endblock %}

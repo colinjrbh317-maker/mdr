@@ -1,0 +1,40 @@
+{% extends "review/base.html" %}
+{% block title %}Cadence Review · Pick a lead{% endblock %}
+{% block content %}
+<h1>Pick a lead to walk through every touch</h1>
+<p class="subtitle">Real Claude drafts using real homeowner data. Edit any template inline, save the overlay, export <code>copy.yaml</code> when you're done.</p>
+
+<div class="card">
+  <h3>How to use this</h3>
+  <ol>
+    <li>Pick a lead from the table below. Real homeowners, real addresses, real milestones.</li>
+    <li>You'll see all 11 cadence layers in the sidebar. Click any layer to see every touch in it.</li>
+    <li>Each touch card shows the generated email or text. Click <b>Edit template</b> to tweak the underlying copy. Save writes to <code>config/copy.yaml</code>.</li>
+    <li>When you're happy, <a href="/review/export">Export copy.yaml</a> and ship it to me.</li>
+  </ol>
+</div>
+
+<h2>Active leads ({{ leads|length }})</h2>
+<table class="leads-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Address</th>
+      <th>Milestone</th>
+      <th>Layer</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for L in leads %}
+      <tr onclick="window.location='/review/{{ L.id }}'">
+        <td><b>{{ L.name }}</b></td>
+        <td>{{ L.email }}</td>
+        <td>{{ L.address }}</td>
+        <td><span class="pill-status">{{ L.milestone }}</span></td>
+        <td>{{ L.layer }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,36 @@
+# Live business facts injected into the drafter prompt. Edit when reality changes.
+# Anything in this file beats whatever's hardcoded in templates_final.md.
+#
+# WHY THIS FILE EXISTS:
+# templates_final.md had hardcoded "231 five-star Google reviews" and
+# "$250 referral" amounts. Those age. Pulling them out into yaml means
+# Austin can edit one place when the numbers change.
+
+google_reviews:
+  count: 231
+  rating: 5.0
+  url: "https://g.page/r/CTSIWlk2QyDZEAE/review"
+
+referral:
+  amount_dollars: 250
+  description: "for anyone you send our way who signs a contract"
+
+install:
+  arrival_window: "6 to 8 AM"
+  lead_time_weeks: "2 to 3"
+
+warranties:
+  manufacturer: "GAF Master Elite manufacturer warranty on qualifying systems"
+  workmanship: "Modern Day Roofing workmanship guarantee"
+
+company:
+  name: "Modern Day Roofing"
+  short_name: "MDR"
+  phone: "540-553-6007"
+  hq_city: "Christiansburg"
+  hq_state: "Virginia"
+  service_area: "New River Valley, Roanoke, and surrounding areas of Virginia"
+  certifications:
+    - "GAF Master Elite contractor"
+  email_general: "sales@moderndayroof.com"
+  website: "moderndayroof.com"
