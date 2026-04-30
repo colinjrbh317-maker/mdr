@@ -24,7 +24,7 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
   const [website, setWebsite] = useState(""); // honeypot
 
   async function submitLead() {
-    if (!name.trim() || !phone.trim() || !smsConsent) return;
+    if (!name.trim() || !phone.trim()) return;
 
     setState("submitting");
     setErrorMsg("");
@@ -42,6 +42,7 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
           message: message.trim(),
           website,
           source,
+          sms_consent: smsConsent,
           gclid: sessionStorage.getItem("gclid") || "",
           fclid: sessionStorage.getItem("fclid") || "",
           landing_page: sessionStorage.getItem("landing_page") || "",
@@ -108,7 +109,7 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
 
   function handleContinue(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!name.trim() || !phone.trim() || !smsConsent) return;
+    if (!name.trim() || !phone.trim()) return;
 
     (window as any).hj?.('event', 'form_step_1_completed');
     setStep(2);
@@ -195,13 +196,12 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
             type="checkbox"
             id={`sms-consent-${source}`}
             name="sms_consent"
-            required
             checked={smsConsent}
             onChange={(e) => setSmsConsent(e.target.checked)}
             className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-accent"
           />
           <span>
-            I agree to receive text messages from Modern Day Roofing at the phone number provided for appointment confirmations, scheduling, and service updates. Message frequency varies. Msg and data rates may apply. Reply STOP to opt out. Consent is not a condition of purchase. See{" "}
+            <strong>Optional:</strong> I agree to receive text messages from Modern Day Roofing at the phone number provided for appointment confirmations, scheduling, and service updates. Message frequency varies. Msg and data rates may apply. Reply STOP to opt out. Consent is not required to submit this form or receive a quote. See{" "}
             <a href="/privacy" className="underline hover:text-text-primary">Privacy Policy</a>
             {" and "}
             <a href="/terms" className="underline hover:text-text-primary">Terms</a>.
@@ -210,7 +210,6 @@ export default function LeadCaptureForm({ source, compact = false, channel = "di
 
         <button
           type="submit"
-          disabled={!smsConsent}
           className="w-full px-6 py-3.5 bg-accent hover:bg-accent-dark text-white font-bold text-sm uppercase tracking-wide rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           Continue →

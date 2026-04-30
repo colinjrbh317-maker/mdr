@@ -23,7 +23,7 @@ export default function ContactForm() {
     const message = data.get("message") as string;
     const website = data.get("website") as string; // honeypot
 
-    if (!firstName.trim() || !phone.trim() || !smsConsent) return;
+    if (!firstName.trim() || !phone.trim()) return;
 
     const fullAddress = [address, city, state_, zip].filter(Boolean).join(", ");
     const name = `${firstName.trim()} ${lastName.trim()}`.trim();
@@ -44,6 +44,7 @@ export default function ContactForm() {
           message: message?.trim() || "",
           website,
           source: "contact-page",
+          sms_consent: smsConsent,
           gclid: sessionStorage.getItem("gclid") || "",
           fclid: sessionStorage.getItem("fclid") || "",
           landing_page: sessionStorage.getItem("landing_page") || "",
@@ -159,19 +160,18 @@ export default function ContactForm() {
         <p className="text-accent-light text-sm">{errorMsg}</p>
       )}
 
-      {/* SMS Consent Checkbox */}
+      {/* SMS Consent Checkbox - OPTIONAL (TCR/A2P 10DLC compliant) */}
       <label htmlFor="contact-sms-consent" className="flex items-start gap-2 text-xs text-text-dim leading-relaxed cursor-pointer select-none">
         <input
           type="checkbox"
           id="contact-sms-consent"
           name="sms_consent"
-          required
           checked={smsConsent}
           onChange={(e) => setSmsConsent(e.target.checked)}
           className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-accent"
         />
         <span>
-          I agree to receive text messages from Modern Day Roofing at the phone number provided, including appointment confirmations, inspection scheduling, estimate follow-ups, and service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase. See{" "}
+          <strong>Optional:</strong> I agree to receive text messages from Modern Day Roofing at the phone number provided, including appointment confirmations, inspection scheduling, estimate follow-ups, and service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out or HELP for help. Consent is not required to submit this form or receive service. See{" "}
           <a href="/privacy" className="underline hover:text-text-muted">Privacy Policy</a>
           {" "}and{" "}
           <a href="/terms" className="underline hover:text-text-muted">Terms</a>.
@@ -181,7 +181,7 @@ export default function ContactForm() {
       {/* Submit */}
       <button
         type="submit"
-        disabled={state === "submitting" || !smsConsent}
+        disabled={state === "submitting"}
         className="w-full px-6 py-4 bg-accent hover:bg-accent-dark text-white font-bold text-base uppercase tracking-wide rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
       >
         {state === "submitting" ? "Submitting..." : "Request Your Free Estimate!"}

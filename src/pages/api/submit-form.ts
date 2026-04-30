@@ -104,12 +104,14 @@ export const POST: APIRoute = async ({ request }) => {
         acculynxContactId = result.contactId;
         acculynxStatus = "success";
 
-        // Send instant SMS confirmation via Twilio
-        if (result.jobId && phone) {
+        // Send instant SMS confirmation via Twilio — ONLY if user opted in.
+        // Required for A2P 10DLC / TCR compliance: SMS opt-in must be optional,
+        // never a condition of form submission. Consent state is also recorded
+        // in the AccuLynx job note below so Sierra can see it.
+        if (result.jobId && phone && sms_consent === true) {
           const smsResult = await sendLeadConfirmationSMS(phone.trim(), firstName);
           if (smsResult) {
-            // Log the text in AccuLynx job messages so Sierra sees it
-            await addJobMessage(result.jobId, `[Auto-SMS sent via Twilio] Hi ${firstName}! This is Modern Day Roofing. We received your inquiry and will be reaching out shortly. Need immediate help? Call us at (540) 553-6007`);
+            await addJobMessage(result.jobId, `[Auto-SMS sent via Twilio - user opted in] Hi ${firstName}! This is Modern Day Roofing. We received your inquiry and will be reaching out shortly. Need immediate help? Call us at (540) 553-6007`);
           }
         }
 
@@ -147,6 +149,10 @@ export const POST: APIRoute = async ({ request }) => {
             ? `⏰ SLA: Call back within 3 minutes per SOP.`
             : `🌙 AFTER HOURS — call back ${hours.callbackPhrase} (first thing when office opens).`;
 
+          const smsLine = sms_consent === true
+            ? `📱 SMS Consent: GRANTED (you may text this lead)`
+            : `📱 SMS Consent: NOT GIVEN (calls only — do not text)`;
+
           const noteLines = [
             `🔔 CALL BACK REQUESTED — ${sourceLabel}`,
             hours.isOpen ? null : `(${hours.crmLabel})`,
@@ -162,6 +168,7 @@ export const POST: APIRoute = async ({ request }) => {
             chat_context ? `\nWhat they said in chat:\n${chat_context}` : null,
             message?.trim() ? `\nMessage:\n${message.trim()}` : null,
             ``,
+            smsLine,
             urgencyLine,
             `Submitted: ${hours.currentET}`,
           ].filter(Boolean).join("\n");
@@ -194,6 +201,7 @@ export const POST: APIRoute = async ({ request }) => {
             service: service?.trim() || "",
             message: message?.trim() || "",
             source: source || "",
+            sms_consent: sms_consent === true ? "YES" : "NO",
             gclid: gclid || "",
             fclid: fclid || "",
             landing_page: landing_page || "",

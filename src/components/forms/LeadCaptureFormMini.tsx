@@ -21,7 +21,7 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
     const phone = data.get("phone") as string;
     const website = data.get("website") as string; // honeypot
 
-    if (!name.trim() || !phone.trim() || !smsConsent) return;
+    if (!name.trim() || !phone.trim()) return;
 
     setState("submitting");
 
@@ -35,6 +35,7 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
           email: "",
           website,
           source,
+          sms_consent: smsConsent,
           gclid: sessionStorage.getItem("gclid") || "",
           fclid: sessionStorage.getItem("fclid") || "",
           landing_page: sessionStorage.getItem("landing_page") || "",
@@ -120,13 +121,12 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
           type="checkbox"
           id={`mini-sms-consent-${source}`}
           name="sms_consent"
-          required
           checked={smsConsent}
           onChange={(e) => setSmsConsent(e.target.checked)}
           className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-accent"
         />
         <span>
-          I agree to receive text messages from Modern Day Roofing, including appointment confirmations, estimate follow-ups, and service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. See{" "}
+          <strong>Optional:</strong> I agree to receive text messages from Modern Day Roofing, including appointment confirmations, estimate follow-ups, and service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent is not required to submit this form. See{" "}
           <a href="/privacy" className="underline hover:text-text-muted transition-colors">Privacy Policy</a>
           {" "}and{" "}
           <a href="/terms" className="underline hover:text-text-muted transition-colors">Terms</a>.
@@ -135,7 +135,7 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
 
       <button
         type="submit"
-        disabled={state === "submitting" || !smsConsent}
+        disabled={state === "submitting"}
         className="w-full px-6 py-3.5 bg-accent hover:bg-accent-dark text-white font-bold text-sm uppercase tracking-wide rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {state === "submitting" ? (
