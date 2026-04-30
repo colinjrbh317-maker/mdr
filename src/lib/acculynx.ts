@@ -260,6 +260,8 @@ export interface JobData {
   formSource?: string;
   gclid?: string;
   fclid?: string;
+  /** "urgent" sets AccuLynx jobPriority = "Urgent" — used for /emergency form */
+  priority?: "urgent" | "normal";
 }
 
 export interface CreateJobResult {
@@ -317,6 +319,11 @@ export async function createJob(data: JobData): Promise<CreateJobResult | null> 
   const tradeTypeId = TRADE_TYPES[data.serviceType || ""];
   if (tradeTypeId) {
     body.tradeTypes = [{ id: tradeTypeId }];
+  }
+
+  // Job priority — emergency leads land as Urgent so Sierra's queue surfaces them
+  if (data.priority === "urgent") {
+    body.jobPriority = "Urgent";
   }
 
   const res = await post("/jobs", body);
@@ -467,6 +474,7 @@ export async function createLead(data: ContactData & {
   formSource?: string;
   gclid?: string;
   fclid?: string;
+  priority?: "urgent" | "normal";
 }): Promise<{ contactId: string; jobId: string | null } | null> {
   // Step 1: Create contact
   const contact = await createContact(data);
@@ -488,6 +496,7 @@ export async function createLead(data: ContactData & {
     formSource: data.formSource,
     gclid: data.gclid,
     fclid: data.fclid,
+    priority: data.priority,
   });
 
   // Step 3: Assign company representative (Sierra Duncan) so the lead isn't unassigned

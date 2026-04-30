@@ -9,9 +9,6 @@ const team = [
   { name: "Austin Hungate", title: "CEO & Founder", photo: "/assets/web/team-Austin-Hungate-CEO.jpg" },
   { name: "Alex Bohm", title: "COO", photo: "/assets/web/team-Alex-Bohm-COO.jpg" },
   { name: "Alicia Umberto", title: "Marketing & Outreach Director", photo: "/assets/web/team-Alicia-Umberto-Marketing-and-Outreach-Dirctor.jpg" },
-  { name: "AJ Jaklitsch", title: "Sales", photo: "/assets/web/team-AJ-Jaklitsch-sales.jpg" },
-  { name: "Chris Duncan", title: "Sales", photo: "/assets/web/team-Chris-Duncan-Sales.jpg" },
-  { name: "Cory Clement", title: "Sales", photo: "/assets/web/team-Cory-Clement-Sales.jpg" },
 ];
 ---
 
@@ -69,7 +66,7 @@ const team = [
       </p>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
       {team.map((member) => (
         <div class="text-center group">
           <div class="relative w-32 h-32 md:w-40 md:h-40 mx-auto mb-4 overflow-hidden rounded-full ring-4 ring-white shadow-lg">
@@ -84,6 +81,10 @@ const team = [
           <p class="text-sm text-text-muted">{member.title}</p>
         </div>
       ))}
+    </div>
+
+    <div class="text-center mt-10">
+      <Button href="/team" variant="outline" size="lg">Meet the Whole Team</Button>
     </div>
   </SectionContainer>
 

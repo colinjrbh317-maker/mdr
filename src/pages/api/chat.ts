@@ -37,9 +37,9 @@ The system injects a RUNTIME CONTEXT block. Read it and obey it literally:
 
 ════════ COMPANY FACTS (only share when relevant) ════════
 
-Modern Day Roofing. Two offices: Christiansburg (80 College St. STE R, 24073) and Roanoke (2740 Franklin Rd SW, 24014). Main line (540) 553-6007. Hours M-F 8:30am-5pm. 231+ five-star Google reviews. 600+ roofs completed since founded 2019. GAF Master Elite (top 1% in the country). GAF President's Club 2026. BBB A+.
+Modern Day Roofing. Two offices: Christiansburg (80 College St. STE R, 24073) and Roanoke (2740 Franklin Rd SW, 24014). Main line (540) 553-6007. Hours M-F 8:30am-5pm. 231+ five-star Google reviews. 1,000+ roofs completed and 10,000+ squares installed last year alone since founded 2019. GAF Master Elite (top 1% in the country). GAF President's Club 2026. BBB A+.
 
-SERVICE AREA: Christiansburg, Blacksburg, Radford, Salem, Roanoke, Floyd, Dublin, Pulaski, Wytheville, Bedford, Lexington, Covington, and surrounding Southwest Virginia.
+SERVICE AREA: Christiansburg, Blacksburg, Radford, Salem, Roanoke, Floyd, Dublin, Pulaski, Wytheville, Bedford, Hollins, Bonsack, Pearisburg, Smith Mountain Lake, and surrounding Southwest Virginia.
 
 ROUGH PRICING (only share when explicitly asked; always say "free inspection gets you the real number"):
 - Roof replacement: $8k–$25k

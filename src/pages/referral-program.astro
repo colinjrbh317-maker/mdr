@@ -71,10 +71,10 @@ const testimonials = [
           Referral Program
         </p>
         <h1 class="text-4xl md:text-5xl font-bold text-white">
-          Refer a Friend, Earn Rewards
+          Refer a Friend, Earn <span class="text-accent-light">$250</span>
         </h1>
         <p class="mt-4 text-lg text-white/85 max-w-2xl leading-relaxed">
-          Love your new roof? Share the experience. When you refer a friend and they complete a project with us, you get rewarded.
+          Love your new roof? Share the experience. When you refer a friend and they complete a project with us, you get a $250 cash reward — every time.
         </p>
         <div class="mt-8">
           <Button href="#referral-form" size="lg">Submit a Referral</Button>
@@ -83,6 +83,23 @@ const testimonials = [
     </div>
   </section>
 
+  {/* Referral Form (moved up — primary CTA) */}
+  <SectionContainer background="warm" padding="md" id="referral-form">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-text-primary">
+          Submit Your Referral Today
+        </h2>
+        <p class="mt-3 text-text-muted">
+          Tell us who to contact and we'll take it from there. You'll be notified when the project is complete and your $250 reward is ready.
+        </p>
+      </div>
+      <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8">
+        <ReferralForm client:load />
+      </div>
+    </div>
+  </SectionContainer>
+
   {/* How It Works */}
   <SectionContainer background="white" padding="lg">
     <div class="text-center mb-12">
@@ -90,7 +107,7 @@ const testimonials = [
         How It Works
       </h2>
       <p class="mt-3 text-text-muted max-w-xl mx-auto">
-        Three simple steps to earn your referral reward.
+        Three simple steps to earn your $250 referral reward.
       </p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
@@ -114,16 +131,15 @@ const testimonials = [
       </h2>
       <p class="text-text-body text-lg leading-relaxed mb-6">
         For every successful referral that leads to a completed roofing project, you'll receive a
-        <strong class="text-accent"> cash reward</strong>. The exact amount depends on the project scope — but
-        our past referrers have been very happy with the payout.
+        <strong class="text-accent">$250 cash reward</strong>. No cap on referrals — refer five friends, earn $1,250.
       </p>
       <div class="bg-bg-card border border-border rounded-xl p-8 inline-block">
         <p class="text-text-muted text-sm uppercase tracking-wider mb-2">Referral Reward</p>
-        <p class="text-4xl font-display font-bold text-accent">$$$</p>
+        <p class="text-5xl font-display font-bold text-accent">$250</p>
         <p class="text-text-muted text-sm mt-2">Per completed project</p>
       </div>
       <p class="text-sm text-text-muted mt-6">
-        Call <a href="tel:5405536007" class="text-accent font-semibold hover:underline">(540) 553-6007</a> to ask about current reward amounts.
+        Questions? Call <a href="tel:5405536007" class="text-accent font-semibold hover:underline">(540) 553-6007</a>.
       </p>
     </div>
   </SectionContainer>
@@ -155,20 +171,16 @@ const testimonials = [
     </div>
   </SectionContainer>
 
-  {/* Referral Form */}
-  <SectionContainer background="warm" padding="md" id="referral-form">
-    <div class="max-w-2xl mx-auto">
-      <div class="text-center mb-8">
-        <h2 class="text-2xl md:text-3xl font-bold text-text-primary">
-          Submit Your Referral Today
-        </h2>
-        <p class="mt-3 text-text-muted">
-          Tell us who to contact and we'll take it from there. You'll be notified when the project is complete and your reward is ready.
-        </p>
-      </div>
-      <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8">
-        <ReferralForm client:load />
-      </div>
+  {/* Final CTA — return to form */}
+  <SectionContainer background="accent" padding="md">
+    <div class="text-center max-w-2xl mx-auto">
+      <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">
+        Ready to Earn $250?
+      </h2>
+      <p class="text-white/90 mb-6">
+        Submit a referral now — it takes less than a minute.
+      </p>
+      <Button href="#referral-form" variant="secondary" size="lg">Submit a Referral</Button>
     </div>
   </SectionContainer>
 </Layout>

@@ -2,13 +2,15 @@ import { useState, useEffect, useCallback } from "react";
 
 const PROOF_ENTRIES = [
   { name: "Shannon P.", city: "Christiansburg", action: "booked a free inspection" },
-  { name: "Marcus T.", city: "Blacksburg", action: "scheduled a roof replacement" },
+  { name: "Marcus T.", city: "Smith Mountain Lake", action: "scheduled a roof replacement" },
   { name: "Jennifer L.", city: "Roanoke", action: "booked a free inspection" },
   { name: "David W.", city: "Salem", action: "requested a storm damage assessment" },
   { name: "Amanda R.", city: "Radford", action: "booked a free inspection" },
   { name: "Chris M.", city: "Christiansburg", action: "got a financing pre-approval" },
   { name: "Lisa K.", city: "Floyd", action: "booked a free inspection" },
-  { name: "Robert H.", city: "Blacksburg", action: "scheduled a free estimate" },
+  { name: "Robert H.", city: "Bedford", action: "scheduled a free estimate" },
+  { name: "Karen B.", city: "Blacksburg", action: "got a financing pre-approval" },
+  { name: "James W.", city: "Pulaski", action: "booked a free inspection" },
 ];
 
 function getTimeAgo(): string {

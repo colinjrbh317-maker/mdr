@@ -3,6 +3,7 @@ import { spamCheck, getClientIP } from "@/lib/spam-filter";
 import { createLead, addJobNote, addJobMessage, formatFinancingNote } from "@/lib/acculynx";
 import { sendLeadConfirmationSMS } from "@/lib/twilio";
 import { getBusinessHoursInfo } from "@/lib/business-hours";
+import { sendLeadConfirmationEmail } from "@/lib/lead-confirmation-email";
 
 export const prerender = false;
 
@@ -17,7 +18,7 @@ function fakeSuccess() {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, phone, email, address, service, message, website, source, gclid, fclid, landing_page, financing_data, sms_consent, chat_context } = body;
+    const { name, phone, email, address, service, message, website, source, gclid, fclid, landing_page, financing_data, sms_consent, chat_context, priority } = body;
 
     // --- Layer 1: Honeypot check ---
     if (website) {
@@ -86,6 +87,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 1. Create lead in AccuLynx CRM
     try {
+      const isUrgentLead = priority === "urgent" || source === "emergency";
       const result = await createLead({
         firstName,
         lastName,
@@ -96,6 +98,7 @@ export const POST: APIRoute = async ({ request }) => {
         formSource: source || "",
         gclid: gclid || "",
         fclid: fclid || "",
+        priority: isUrgentLead ? "urgent" : "normal",
       });
 
       if (result) {
@@ -113,6 +116,18 @@ export const POST: APIRoute = async ({ request }) => {
           if (smsResult) {
             await addJobMessage(result.jobId, `[Auto-SMS sent via Twilio - user opted in] Hi ${firstName}! This is Modern Day Roofing. We received your inquiry and will be reaching out shortly. Need immediate help? Call us at (540) 553-6007`);
           }
+        }
+
+        // Send thank-you confirmation email to the lead (if they provided one).
+        // Only fires for FORM submissions — phone calls and manual CRM entries
+        // don't hit this endpoint, so no double-tap with Sierra's appointment confirmation.
+        // Business-hours aware (off-hours says "Monday morning" instead of "this hour").
+        if (email?.trim()) {
+          sendLeadConfirmationEmail({
+            to: email.trim(),
+            firstName: firstName || name.trim().split(/\s+/)[0] || "there",
+            isUrgent: isUrgentLead,
+          }).catch((err) => console.error("[LeadEmail] async error:", err));
         }
 
         // For financing leads: add a detailed note to the job so reps see everything
@@ -139,15 +154,31 @@ export const POST: APIRoute = async ({ request }) => {
           // concise "Call Back Requested" note so Sierra's queue surfaces it.
           // Note: business-hours aware — no "3-min SLA" pressure on a Sunday 11pm lead.
           const hours = getBusinessHoursInfo();
-          const sourceLabel = source === "ai-chatbot"
-            ? "AI CHATBOT LEAD"
-            : source === "contact-form" ? "CONTACT FORM LEAD"
-            : source ? `${source.toUpperCase()} LEAD`
-            : "WEB LEAD";
+          const SOURCE_LABELS: Record<string, string> = {
+            "ai-chatbot": "AI CHATBOT LEAD",
+            "contact-form": "CONTACT FORM LEAD",
+            "contact-page": "CONTACT PAGE LEAD",
+            "referral-outbound": "REFERRAL — REFERRER",
+            "referral-inbound": "REFERRAL — REFERRED",
+            "financing-funnel": "FINANCING QUIZ LEAD",
+            "lp-hero": "LP HERO FORM",
+            "lp-final-cta": "LP FINAL CTA FORM",
+            "lp-mini": "LP MINI FORM",
+            "emergency": "🚨 EMERGENCY LEAD",
+            "exit-intent": "EXIT-INTENT POPUP LEAD",
+            "phone-rescue": "PHONE-CLICK RESCUE LEAD",
+            "mobile-retention": "MOBILE RETENTION LEAD",
+            "roof-quiz": "ROOF QUIZ LEAD",
+          };
+          const sourceLabel = SOURCE_LABELS[source as string]
+            ?? (source ? `${String(source).toUpperCase()} LEAD` : "WEB LEAD");
 
-          const urgencyLine = hours.isOpen
-            ? `⏰ SLA: Call back within 3 minutes per SOP.`
-            : `🌙 AFTER HOURS — call back ${hours.callbackPhrase} (first thing when office opens).`;
+          const isUrgent = priority === "urgent" || source === "emergency";
+          const urgencyLine = isUrgent
+            ? `🚨 URGENT — call back IMMEDIATELY (emergency request).`
+            : hours.isOpen
+              ? `⏰ SLA: Call back within 3 minutes per SOP.`
+              : `🌙 AFTER HOURS — call back ${hours.callbackPhrase} (first thing when office opens).`;
 
           const smsLine = sms_consent === true
             ? `📱 SMS Consent: GRANTED (you may text this lead)`

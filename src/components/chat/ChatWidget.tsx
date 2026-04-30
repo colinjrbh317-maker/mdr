@@ -140,7 +140,11 @@ export default function ChatWidget() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: newMessages.filter((m) => m.role !== "assistant" || m.content !== WELCOME_MESSAGE.content),
+          // Strip welcome msg AND any empty/partial assistant turns to avoid the bot
+          // re-summarizing its own prior incomplete reply (the "self-repeat" bug).
+          messages: newMessages.filter(
+            (m) => m.role !== "assistant" || (m.content && m.content.trim() !== "" && m.content !== WELCOME_MESSAGE.content),
+          ),
           page: window.location.pathname,
           user_turn_count: userTurnCount,
           lead_form_visible: userTurnCount >= 2 && !leadSubmitted,
@@ -202,10 +206,15 @@ export default function ChatWidget() {
         }
       }
 
-      // Sync ref with final state so next sendMessage reads the complete conversation
+      // Strip any trailing empty assistant placeholder if the stream produced nothing
+      // (network blip, server hang) — prevents next turn from sending an empty reply
+      // back into the conversation.
       setMessages((prev) => {
-        messagesRef.current = prev;
-        return prev;
+        const cleaned = prev[prev.length - 1]?.role === "assistant" && !prev[prev.length - 1]?.content?.trim()
+          ? prev.slice(0, -1)
+          : prev;
+        messagesRef.current = cleaned;
+        return cleaned;
       });
 
       // Track chat interaction

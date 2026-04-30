@@ -158,6 +158,11 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     {/* Hotjar — analytics, session recording, heatmaps */}
     {!isStudio && <Hotjar />}
     {!isStudio && <IntentTracker />}
+
+    {/* CallRail Dynamic Number Insertion — swaps tel: links to tracking numbers */}
+    {!isStudio && import.meta.env.PUBLIC_CALLRAIL_ID && (
+      <script is:inline async src={`https://cdn.callrail.com/companies/${import.meta.env.PUBLIC_CALLRAIL_ID}/swap.js`}></script>
+    )}
   </head>
   <body class="min-h-screen flex flex-col">
     <a href="#main-content" class="skip-link">Skip to main content</a>

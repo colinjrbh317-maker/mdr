@@ -57,6 +57,7 @@
     { "source": "/troutville-roofing-company/", "destination": "/areas/troutville", "permanent": true },
     { "source": "/smith-mountain-lake-roofing-company/", "destination": "/areas/smith-mountain-lake", "permanent": true },
     { "source": "/privacy-policy/", "destination": "/privacy", "permanent": true },
+    { "source": "/terms-and-conditions/", "destination": "/terms", "permanent": true },
     { "source": "/sitemap/", "destination": "/sitemap-index.xml", "permanent": true },
     { "source": "/referral-program/", "destination": "/referral-program", "permanent": true },
     { "source": "/test-home/financing/", "destination": "/financing", "permanent": true },
