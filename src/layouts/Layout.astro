@@ -120,6 +120,11 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
     <link rel="apple-touch-icon" sizes="150x150" href="/favicon-150x150.png" />
 
+    <!-- Preload hero poster on homepage for LCP -->
+    {Astro.url.pathname === '/' && (
+      <link rel="preload" as="image" href="/assets/hero/hero-main.webp" fetchpriority="high" />
+    )}
+
     <!-- Preconnect -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600&display=swap" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />

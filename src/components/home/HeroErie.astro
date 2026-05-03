@@ -11,6 +11,16 @@ const heroPosterUrl = "/assets/hero/hero-main.webp";
 
   {/* Background Image/Video — full bleed on desktop, taller on mobile to fit CTAs */}
   <div class="relative w-full h-[65vh] md:absolute md:inset-0 md:h-full z-0 overflow-hidden">
+    {/* Static poster — server-rendered so browser discovers LCP image immediately, before React hydrates */}
+    <img
+      src={heroPosterUrl}
+      alt=""
+      aria-hidden="true"
+      fetchpriority="high"
+      loading="eager"
+      decoding="async"
+      class="absolute inset-0 w-full h-full object-cover"
+    />
     <HeroBackground client:load videoUrl={heroVideoUrl} posterUrl={heroPosterUrl} />
   </div>
 

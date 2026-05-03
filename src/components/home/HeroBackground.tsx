@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 interface HeroBackgroundProps {
   videoUrl?: string;
@@ -10,12 +9,7 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-bg-darker">
       {/* Video Background */}
-      <motion.div
-        initial={{ scale: 1.05 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 2.0, ease: "easeOut" }}
-        className="relative w-full h-full"
-      >
+      <div className="relative w-full h-full animate-hero-zoom">
         {videoUrl ? (
           <video
             className="absolute inset-0 w-full h-full object-cover"
@@ -54,7 +48,7 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ videoUrl, posterUrl }) 
 
         {/* Bottom gradient for depth — heavier on mobile to anchor CTAs over imagery */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 md:from-bg-darker via-black/20 md:via-transparent to-transparent opacity-90 md:opacity-70" />
-      </motion.div>
+      </div>
     </div>
   );
 };

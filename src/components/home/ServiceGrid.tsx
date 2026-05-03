@@ -12,7 +12,7 @@ const services: Service[] = [
     {
         title: "Roof Replacement",
         description: "Complete tear-off and replacement with premium GAF roofing systems. Lifetime warranty available from a GAF Master Elite contractor.",
-        image: "/assets/drive/mdr-after-heritage.jpg",
+        image: "/assets/drive/mdr-after-heritage.webp",
         href: "/services/roof-replacement",
     },
     {
@@ -24,13 +24,13 @@ const services: Service[] = [
     {
         title: "Shingle Roofing",
         description: "GAF Timberline HDZ and designer shingle options with the industry's strongest warranty coverage.",
-        image: "/assets/drive/mdr-after-4plex.jpg",
+        image: "/assets/drive/mdr-after-4plex.webp",
         href: "/services/shingle-roofing",
     },
     {
         title: "Roof Repair",
         description: "Fast emergency repairs and leak fixes. Same-day assessments available for urgent situations.",
-        image: "/assets/drive/mdr-repair-12.jpg",
+        image: "/assets/drive/mdr-repair-12.webp",
         href: "/services/roof-repair",
     },
     {
