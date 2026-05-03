@@ -8,12 +8,43 @@ const API_KEY = import.meta.env.ACCULYNX_API_KEY || "";
 
 // --- AccuLynx ID mappings (from GET /company-settings/* endpoints) ---
 
-/** Lead source IDs — must match names configured in AccuLynx */
+/**
+ * Lead source IDs — must match GUIDs from AccuLynx settings (Lead Sources).
+ * The "Form Submission Website" parent has 5 children (sub-sources) Alicia
+ * configured so reports can break web leads down by where they came from.
+ * GUIDs pulled from GET /company-settings/leads/lead-sources/{id}.
+ */
 const LEAD_SOURCES: Record<string, string> = {
-  "website":          "0d0f692b-f016-4328-acc0-6080e0a46817", // "Form Submission Website"
-  "facebook":         "388292df-ee5b-4a5a-9caf-a2fba4d1e947", // "Form Facebook Submission"
-  "google-ads":       "a4d84415-9551-4811-9378-5be20fa20238", // "Google Ads"
-  "referral":         "b9e4f996-1b60-4bf5-8cc7-df5e0fcbffb3", // "Referral"
+  // Top-level
+  "website":            "0d0f692b-f016-4328-acc0-6080e0a46817", // Form Submission Website (parent — fallback)
+  "facebook":           "388292df-ee5b-4a5a-9caf-a2fba4d1e947", // Form Facebook Submission
+  "google-ads":         "a4d84415-9551-4811-9378-5be20fa20238", // Google Ads
+  "referral":           "b9e4f996-1b60-4bf5-8cc7-df5e0fcbffb3", // Referral (parent)
+  // Children of "Form Submission Website"
+  "contact-form":       "95937140-1a8e-4c6f-add0-85029f0c91ce", // /Contact
+  "chat-bot":           "1df55dce-5d72-4b1b-8086-d24875e22b19", // Chat Bot
+  "emergency-form":     "3e6d411b-b905-4fb7-93da-2596a61bd69e", // Emergency Roof Repair
+  "financing-form":     "fd6586e5-a2a2-4ae3-92f8-b90009629a81", // Financing Form
+  "mobile-sticky":      "6b44f3d9-07e3-479f-a847-0418290523cb", // Mobile sticky
+  // Children of "Referral"
+  "referral-page-form": "01644a31-4a6f-4804-8381-21dc124ec33e", // Referral Page Form
+};
+
+/**
+ * Map a form's `source` literal (sent from the frontend) to a LEAD_SOURCES key.
+ * Order matters: granular sources resolve first, then PPC overrides (gclid/fclid)
+ * fire on top in createJob() if present.
+ */
+const FORM_SOURCE_TO_LEAD_SOURCE: Record<string, string> = {
+  "contact-page":           "contact-form",
+  "ai-chatbot":             "chat-bot",
+  "emergency":              "emergency-form",
+  "financing-funnel":       "financing-form",
+  "mobile-sticky-cta":      "mobile-sticky",
+  "referral-outbound":      "referral-page-form",
+  "referral-inbound":       "referral-page-form",
+  // Sources without a dedicated AccuLynx child fall through to "website" (Form Submission Website parent).
+  // If Alicia adds children for these later (e.g. "Roof Quiz", "Exit Intent", "Phone Rescue", "Mobile Retention", "LP Hero"), add the mapping here.
 };
 
 /** Work type IDs — numeric IDs from AccuLynx */
@@ -151,6 +182,9 @@ export function parseAddress(combined: string): {
 function resolveLeadSourceId(source?: string): string {
   if (!source) return LEAD_SOURCES["website"];
 
+  const exactKey = FORM_SOURCE_TO_LEAD_SOURCE[source];
+  if (exactKey) return LEAD_SOURCES[exactKey];
+
   const s = source.toLowerCase();
   if (s.includes("facebook") || s.includes("meta") || s.includes("fclid")) {
     return LEAD_SOURCES["facebook"];
@@ -159,7 +193,7 @@ function resolveLeadSourceId(source?: string): string {
     return LEAD_SOURCES["google-ads"];
   }
   if (s.includes("referral")) {
-    return LEAD_SOURCES["referral"];
+    return LEAD_SOURCES["referral-page-form"];
   }
   return LEAD_SOURCES["website"];
 }
@@ -321,9 +355,11 @@ export async function createJob(data: JobData): Promise<CreateJobResult | null> 
     body.tradeTypes = [{ id: tradeTypeId }];
   }
 
-  // Job priority — emergency leads land as Urgent so Sierra's queue surfaces them
+  // Job priority — emergency leads land as Urgent so Sierra's queue surfaces them.
+  // AccuLynx's API field is `priority` (not `jobPriority` — the GET response uses
+  // `jobPriority` but POST takes `priority`). Verified by round-trip on 2026-05-03.
   if (data.priority === "urgent") {
-    body.jobPriority = "Urgent";
+    body.priority = "Urgent";
   }
 
   const res = await post("/jobs", body);
