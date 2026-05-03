@@ -8,6 +8,7 @@ import Breadcrumb from "@/components/common/Breadcrumb.astro";
 const team = [
   { name: "Austin Hungate", title: "CEO & Founder", photo: "/assets/web/team-Austin-Hungate-CEO.jpg" },
   { name: "Alex Bohm", title: "COO", photo: "/assets/web/team-Alex-Bohm-COO.jpg" },
+  { name: "Sierra Duncan", title: "Director of First Impressions", photo: "/assets/team/optimized/Sierra-DuncanDirector-of-First-Impressions.webp" },
   { name: "Alicia Umberto", title: "Marketing & Outreach Director", photo: "/assets/web/team-Alicia-Umberto-Marketing-and-Outreach-Dirctor.jpg" },
 ];
 ---
@@ -66,7 +67,7 @@ const team = [
       </p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
       {team.map((member) => (
         <div class="text-center group">
           <div class="relative w-32 h-32 md:w-40 md:h-40 mx-auto mb-4 overflow-hidden rounded-full ring-4 ring-white shadow-lg">

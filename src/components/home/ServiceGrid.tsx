@@ -42,7 +42,7 @@ const services: Service[] = [
     {
         title: "Gutters & Guards",
         description: "Seamless aluminum gutter installation with leaf protection options to keep your system flowing.",
-        image: "/assets/drive/mdr-gutters-1.jpg",
+        image: "/assets/drive/mdr-system-drip-edge-detail.jpg",
         href: "/services/gutters",
     }
 ];
