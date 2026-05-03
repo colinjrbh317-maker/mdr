@@ -16,22 +16,22 @@ const givingAreas = [
   {
     icon: "shield",
     title: "Veterans & First Responders",
-    description: "We honor those who serve. Active military, veterans, police, firefighters, and EMTs receive discounted roofing services. It's a small way to say thank you for protecting our community.",
+    description: "Active military, veterans, police, firefighters, and EMTs receive discounted roofing services. It's a small way to say thank you.",
   },
   {
     icon: "storm",
     title: "Storm Relief",
-    description: "When severe weather hits the New River Valley or Roanoke area, we mobilize fast. Free emergency tarping, priority scheduling for storm-damaged homes, and help navigating insurance claims when families need it most.",
+    description: "Free emergency tarping, priority scheduling for storm-damaged homes, and help navigating insurance claims when families need it most.",
   },
   {
     icon: "trophy",
     title: "Local Sponsorships",
-    description: "From youth sports leagues to community festivals, we invest in the events and organizations that make southwest Virginia a great place to live. You'll see the MDR name on jerseys, banners, and event programs across the region.",
+    description: "Youth sports, community festivals, school events — you'll see the MDR name on jerseys and banners across southwest Virginia.",
   },
   {
     icon: "heart",
     title: "Volunteer Build Days",
-    description: "Our crew donates time and skills to help families in need. Whether it's a Habitat for Humanity build or emergency roof repairs for elderly homeowners, we believe in showing up for our neighbors.",
+    description: "Our crew donates time and skills to families in need — Habitat builds, emergency repairs for elderly homeowners, and more.",
   },
 ];
 ---
@@ -41,7 +41,7 @@ const givingAreas = [
   description="Modern Day Roofing gives back to the Roanoke and New River Valley communities. See how we support local families, veterans, and first responders."
 >
   {/* Hero */}
-  <section class="relative min-h-[40vh] flex items-center dark-section" data-transparent-header>
+  <section class="relative min-h-[45vh] flex items-center dark-section" data-transparent-header>
     <div class="absolute inset-0 z-0">
       <img
         src="/assets/projects/Football-banner.jpeg"
@@ -61,7 +61,7 @@ const givingAreas = [
           Giving Back to Our Community
         </h1>
         <p class="mt-4 text-lg text-white/85 max-w-2xl leading-relaxed">
-          Modern Day Roofing is more than a business. We're neighbors, volunteers, and supporters of the people and places that make southwest Virginia home.
+          We live here. Our crew serves the same neighborhoods we roof — and we show up for them on and off the job site.
         </p>
         <div class="mt-8 flex flex-col sm:flex-row gap-4">
           <Button href="/contact" size="lg">Request Community Support</Button>
@@ -73,20 +73,19 @@ const givingAreas = [
     </div>
   </section>
 
-  {/* Intro */}
-  <SectionContainer background="white" padding="lg">
-    <div class="max-w-3xl mx-auto text-center">
-      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
-        Our Commitment to the Valley
-      </h2>
-      <p class="mt-4 text-text-body leading-relaxed">
-        We've completed over 1,000 roofs across the Roanoke and New River Valley region. But the number we're most proud of can't be counted — it's the relationships we've built with the families, organizations, and first responders who make this community strong. When you hire MDR, you're supporting a company that reinvests in the people around you.
-      </p>
-    </div>
-  </SectionContainer>
+  {/* Full-width photo — 5986 */}
+  <div class="w-full overflow-hidden" style="max-height: 520px;">
+    <img
+      src="/assets/projects/mdr-roof-dormers-5986.jpg"
+      alt="Modern Day Roofing community — serving southwest Virginia"
+      class="w-full h-full object-cover object-top"
+      loading="lazy"
+      style="max-height: 520px;"
+    />
+  </div>
 
   {/* How We Give Back */}
-  <SectionContainer background="light" padding="lg">
+  <SectionContainer background="white" padding="lg">
     <div class="text-center mb-12">
       <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
         How We Give Back
@@ -122,7 +121,7 @@ const givingAreas = [
               )}
             </div>
             <div>
-              <h3 class="text-lg font-display font-bold text-text-primary mb-2">{area.title}</h3>
+              <h3 class="text-lg font-display font-bold text-text-primary mb-1.5">{area.title}</h3>
               <p class="text-sm text-text-body leading-relaxed">{area.description}</p>
             </div>
           </div>
@@ -131,20 +130,16 @@ const givingAreas = [
     </div>
   </SectionContainer>
 
-  {/* Our Neighbors */}
-  <SectionContainer background="warm" padding="md">
-    <div class="max-w-3xl mx-auto text-center">
-      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
-        Our Neighbors, Our Customers
-      </h2>
-      <p class="mt-4 text-text-body leading-relaxed">
-        Modern Day Roofing is locally owned and operated with offices in Christiansburg and Roanoke. We don't fly in from out of state after a storm and disappear when the work dries up. We live here. Our kids go to the same schools. We shop at the same stores. When we put a roof on your home, we're protecting a neighbor — not a number.
-      </p>
-      <p class="mt-4 text-text-body leading-relaxed">
-        That's why we stand behind every roof with GAF Master Elite warranties and personal accountability. If something isn't right, you know where to find us.
-      </p>
-    </div>
-  </SectionContainer>
+  {/* Community photo — 0146 */}
+  <div class="w-full overflow-hidden" style="max-height: 560px;">
+    <img
+      src="/assets/projects/mdr-community-0146.jpg"
+      alt="Modern Day Roofing — community involvement"
+      class="w-full h-full object-cover object-top"
+      loading="lazy"
+      style="max-height: 560px;"
+    />
+  </div>
 
   {/* CTA + Form */}
   <SectionContainer background="white" padding="md">
@@ -154,7 +149,7 @@ const givingAreas = [
           Partner With Us
         </h2>
         <p class="mt-3 text-text-muted">
-          Have a community initiative or know a family that needs help? Reach out — we'd love to hear from you.
+          Have a community initiative or know a family that needs help? Reach out.
         </p>
       </div>
       <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8">

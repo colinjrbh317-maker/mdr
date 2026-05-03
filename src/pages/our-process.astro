@@ -16,57 +16,38 @@ const steps = [
   {
     number: "01",
     title: "Free Inspection",
-    description: "We assess your roof's condition top to bottom — shingles, flashing, ventilation, gutters, and decking. You get a detailed report with photos, even if the answer is 'you're fine for now.'",
-    detail: "30-45 minutes on-site",
+    description: "We assess shingles, flashing, ventilation, gutters, and decking. You get a detailed report with photos — even if the answer is 'you're fine for now.'",
+    detail: "30–45 min on-site",
   },
   {
     number: "02",
     title: "Detailed Proposal",
-    description: "You receive a clear, itemized proposal with no hidden costs. We walk you through every line item so you know exactly what you're paying for and why.",
+    description: "A clear, itemized proposal with no hidden costs. We walk through every line so you know exactly what you're paying for and why.",
     detail: "Transparent pricing",
   },
   {
     number: "03",
     title: "Material Selection",
-    description: "Choose your shingles, color, and style from GAF's full product line. We'll show you samples, explain the differences, and help you pick what looks best on your home.",
+    description: "Choose from GAF's full shingle line. We'll show samples, explain the differences, and help you pick what looks best on your home.",
     detail: "GAF Timberline HDZ & more",
   },
   {
     number: "04",
     title: "Scheduling",
-    description: "We work around your schedule and weather. You'll know the exact start date, and we'll keep you updated if anything changes. No surprises.",
-    detail: "Typically 1-2 weeks out",
+    description: "We work around your schedule. You'll know the exact start date and get updates if anything changes. No surprises.",
+    detail: "Typically 1–2 weeks out",
   },
   {
     number: "05",
     title: "Installation",
-    description: "Our professional crew arrives on time, protects your landscaping, installs to GAF specifications, and cleans up thoroughly. Most residential roofs are completed in 1-2 days.",
-    detail: "1-2 day completion",
+    description: "Our crew arrives on time, protects your landscaping, installs to GAF specs, and cleans up completely. Most homes are done in 1–2 days.",
+    detail: "1–2 day completion",
   },
   {
     number: "06",
     title: "Final Walkthrough",
-    description: "We inspect the finished roof together. You approve the work before we consider the job complete. Then we register your GAF warranty and you're protected for decades.",
+    description: "We inspect the finished roof together. You approve before we consider the job complete. Then we register your GAF warranty — you're covered for decades.",
     detail: "Your sign-off required",
-  },
-];
-
-const differentiators = [
-  {
-    title: "GAF Master Elite Certified",
-    description: "Top 3% of roofers nationwide. This certification means better warranties, better materials, and better installation quality.",
-  },
-  {
-    title: "Local Family Business",
-    description: "Two offices in Christiansburg and Roanoke. We live in the community we serve. When a storm hits, we're already here.",
-  },
-  {
-    title: "1,000+ Roofs Completed",
-    description: "Experience matters. We've seen every roof type, every problem, and every situation in southwest Virginia's climate.",
-  },
-  {
-    title: "No Subcontractors",
-    description: "Our crews are our own. Every installer is trained, insured, and accountable to our quality standards.",
   },
 ];
 ---
@@ -76,15 +57,15 @@ const differentiators = [
   description="See exactly how Modern Day Roofing handles your project from free inspection to final walkthrough. Six clear steps, no surprises, no hidden costs."
 >
   {/* Hero */}
-  <section class="relative min-h-[40vh] flex items-center dark-section" data-transparent-header>
+  <section class="relative min-h-[45vh] flex items-center dark-section" data-transparent-header>
     <div class="absolute inset-0 z-0">
       <img
-        src="/assets/team/ASP_6381-2.jpg"
-        alt="Austin leading the Modern Day Roofing team"
-        class="w-full h-full object-cover"
+        src="/assets/projects/mdr-roofs-for-troops-5907.jpg"
+        alt="Modern Day Roofing team — Roofs for Troops"
+        class="w-full h-full object-cover object-top"
         loading="eager"
       />
-      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/85 to-bg-darker/50"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-bg-darker/95 via-bg-darker/80 to-bg-darker/40"></div>
     </div>
     <div class="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 py-16 md:py-24 w-full">
       <Breadcrumb items={breadcrumbItems} />
@@ -96,7 +77,7 @@ const differentiators = [
           Our Roofing Process
         </h1>
         <p class="mt-4 text-lg text-white/85 max-w-2xl leading-relaxed">
-          Six clear steps from inspection to completion. No surprises, no hidden costs, no pressure. Here's exactly what to expect.
+          Six clear steps from inspection to completion. No surprises, no hidden costs, no pressure.
         </p>
         <div class="mt-8 flex flex-col sm:flex-row gap-4">
           <Button href="/contact" size="lg">Start Your Project</Button>
@@ -108,25 +89,39 @@ const differentiators = [
     </div>
   </section>
 
+  {/* Video — First Thing */}
+  <section class="bg-bg-darker">
+    <video
+      autoplay
+      muted
+      loop
+      playsinline
+      class="w-full max-h-[75vh] object-cover block"
+      aria-label="Modern Day Roofing — project showcase"
+    >
+      <source src="/assets/video/mdr-final-edit.mp4" type="video/mp4" />
+    </video>
+  </section>
+
   {/* Process Steps */}
   <SectionContainer background="white" padding="lg">
-    <div class="text-center mb-16">
+    <div class="text-center mb-14">
       <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
-        Your Roofing Project in 6 Steps
+        Your Project in 6 Steps
       </h2>
       <p class="mt-3 text-text-muted max-w-xl mx-auto">
         Every project follows the same proven process. No shortcuts, no guesswork.
       </p>
     </div>
-    <div class="max-w-4xl mx-auto space-y-8">
+    <div class="max-w-4xl mx-auto space-y-6">
       {steps.map((step, i) => (
-        <div class={`flex flex-col md:flex-row gap-6 items-start ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
-          <div class="flex-shrink-0 w-20 h-20 rounded-2xl bg-accent text-white flex items-center justify-center">
-            <span class="text-2xl font-display font-bold">{step.number}</span>
+        <div class={`flex flex-col md:flex-row gap-5 items-start ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-accent text-white flex items-center justify-center">
+            <span class="text-xl font-display font-bold">{step.number}</span>
           </div>
-          <div class="flex-1 bg-bg-card border border-border rounded-xl p-6">
-            <div class="flex items-center justify-between mb-2">
-              <h3 class="text-xl font-display font-bold text-text-primary">{step.title}</h3>
+          <div class="flex-1 bg-bg-card border border-border rounded-xl p-5">
+            <div class="flex items-center justify-between mb-1.5">
+              <h3 class="text-lg font-display font-bold text-text-primary">{step.title}</h3>
               <span class="text-xs text-accent font-semibold bg-accent/10 px-3 py-1 rounded-full hidden sm:block">
                 {step.detail}
               </span>
@@ -138,41 +133,15 @@ const differentiators = [
     </div>
   </SectionContainer>
 
-  {/* What Makes MDR Different */}
-  <SectionContainer background="light" padding="md">
-    <div class="text-center mb-12">
-      <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary">
-        What Makes Us Different
-      </h2>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-      {differentiators.map((item) => (
-        <div class="bg-bg-card border border-border rounded-xl p-6">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-bold text-text-primary mb-1">{item.title}</h3>
-              <p class="text-sm text-text-muted">{item.description}</p>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </SectionContainer>
-
   {/* CTA + Form */}
-  <SectionContainer background="white" padding="md">
+  <SectionContainer background="light" padding="md">
     <div class="max-w-2xl mx-auto">
       <div class="text-center mb-8">
         <h2 class="text-2xl md:text-3xl font-bold text-text-primary">
-          Start Your Project — Free Estimate
+          Ready? Step One Is Free.
         </h2>
         <p class="mt-3 text-text-muted">
-          Step one is a free, no-obligation inspection. Fill out the form and we'll be in touch within 24 hours.
+          A free, no-obligation inspection. Fill out the form and we'll be in touch within 24 hours.
         </p>
       </div>
       <div class="bg-bg-card border border-border rounded-xl p-6 md:p-8">
