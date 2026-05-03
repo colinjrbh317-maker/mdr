@@ -31,4 +31,5 @@ token.json
 test-results/
 *.png
 !public/assets/**/*.png
+!public/favicon-*.png
 .vercel

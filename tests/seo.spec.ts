@@ -77,6 +77,36 @@ test.describe("SEO essentials", () => {
   });
 });
 
+test.describe("Favicon", () => {
+  test("Homepage has favicon link tags with correct sizes", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const icon48 = page.locator('link[rel="icon"][sizes="48x48"]');
+    await expect(icon48).toHaveCount(1);
+    const href48 = await icon48.getAttribute("href");
+    expect(href48).toBe("/favicon-48x48.png");
+
+    const icon90 = page.locator('link[rel="icon"][sizes="90x90"]');
+    await expect(icon90).toHaveCount(1);
+
+    const appleIcon = page.locator('link[rel="apple-touch-icon"]');
+    await expect(appleIcon).toHaveCount(1);
+    const appleHref = await appleIcon.getAttribute("href");
+    expect(appleHref).toBe("/favicon-150x150.png");
+  });
+
+  test("Favicon PNG files return HTTP 200", async ({ request }) => {
+    const r48 = await request.get("/favicon-48x48.png");
+    expect(r48.status()).toBe(200);
+
+    const r90 = await request.get("/favicon-90x90.png");
+    expect(r90.status()).toBe(200);
+
+    const r150 = await request.get("/favicon-150x150.png");
+    expect(r150.status()).toBe(200);
+  });
+});
+
 test.describe("Sitemap & robots.txt", () => {
   test("robots.txt is accessible and references sitemap", async ({ page }) => {
     const response = await page.goto("/robots.txt");
