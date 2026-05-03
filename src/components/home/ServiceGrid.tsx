@@ -12,7 +12,7 @@ const services: Service[] = [
     {
         title: "Roof Replacement",
         description: "Complete tear-off and replacement with premium GAF roofing systems. Lifetime warranty available from a GAF Master Elite contractor.",
-        image: "/assets/web/Untitled-1800-x-1440-px.webp",
+        image: "/assets/drive/mdr-after-heritage.jpg",
         href: "/services/roof-replacement",
     },
     {
@@ -24,25 +24,25 @@ const services: Service[] = [
     {
         title: "Shingle Roofing",
         description: "GAF Timberline HDZ and designer shingle options with the industry's strongest warranty coverage.",
-        image: "/assets/web/dji_fly_20251105_160154_425_1762438973026_photo.webp",
+        image: "/assets/drive/mdr-after-4plex.jpg",
         href: "/services/shingle-roofing",
     },
     {
         title: "Roof Repair",
         description: "Fast emergency repairs and leak fixes. Same-day assessments available for urgent situations.",
-        image: "/assets/web/Untitled-1800-x-1440-px-2.webp",
+        image: "/assets/drive/mdr-repair-12.jpg",
         href: "/services/roof-repair",
     },
     {
         title: "Storm Damage",
         description: "Insurance claim assistance and emergency tarping. We work directly with your insurer from start to finish.",
-        image: "/assets/web/Untitled-1800-x-1440-px-3.webp",
+        image: "/assets/drive/mdr-storm-damage-1.jpg",
         href: "/services/storm-damage",
     },
     {
         title: "Gutters & Guards",
         description: "Seamless aluminum gutter installation with leaf protection options to keep your system flowing.",
-        image: "/assets/web/dji_fly_20250630_140410_766_1751306661861_photo.webp",
+        image: "/assets/drive/mdr-gutters-1.jpg",
         href: "/services/gutters",
     }
 ];

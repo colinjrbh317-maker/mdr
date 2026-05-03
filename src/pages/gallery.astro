@@ -23,43 +23,69 @@ const categories = [
   { label: "Gutters", value: "gutters" },
 ];
 
-// Static gallery projects with categories and before/after data
+// Static gallery projects with categories. Real photos from Alicia's Drive (mdr-*) +
+// drone aerials. Each item is unique to its category — click any photo to enlarge.
 const galleryProjects = [
-  { src: "/assets/web/Untitled-1800-x-1440-px.webp", title: "Premium Shingle Roof — Stone Estate", location: "New River Valley, VA", category: "shingle" },
-  { src: "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.webp", title: "Standing Seam Metal Roof", location: "Christiansburg, VA", category: "metal" },
+  // Shingle replacements (Alicia's labeled before/afters as headline finished shots)
+  { src: "/assets/drive/mdr-after-heritage.jpg", title: "GAF Heritage Replacement — Complete", location: "Christiansburg, VA", category: "shingle" },
+  { src: "/assets/drive/mdr-after-4plex.jpg", title: "Multi-Unit Roof Replacement", location: "New River Valley, VA", category: "shingle" },
+  { src: "/assets/drive/mdr-after-terracotta.png", title: "Terracotta Tile Restoration", location: "Roanoke Area, VA", category: "shingle" },
   { src: "/assets/web/gallery-dji_fly_20251105_160154_425_1762438973026_photo.jpg", title: "Architectural Shingle Replacement", location: "Roanoke, VA", category: "shingle" },
-  { src: "/assets/web/Untitled-1800-x-1440-px-1.webp", title: "Full Roof Replacement — Aerial View", location: "Blacksburg, VA", category: "shingle" },
-  { src: "/assets/web/gallery-dji_fly_20250630_135332_722_1751306023542_photo.jpg", title: "New Roof — Residential Home", location: "Salem, VA", category: "shingle" },
-  { src: "/assets/web/Untitled-1800-x-1440-px-2.webp", title: "GAF Timberline HDZ Installation", location: "Christiansburg, VA", category: "shingle" },
-  { src: "/assets/web/gallery-dji_fly_20250721_123356_135_1753115663863_photo.jpg", title: "Complete Roof System — Drone View", location: "Radford, VA", category: "shingle" },
-  { src: "/assets/web/Untitled-1800-x-1440-px-3.webp", title: "Premium Roof Replacement", location: "Roanoke, VA", category: "shingle" },
-  { src: "/assets/web/gallery-dji_fly_20250711_160918_986_1752264568015_photo.jpg", title: "Metal Roofing — Farmhouse Style", location: "Floyd, VA", category: "metal" },
-  { src: "/assets/web/gallery-img_5561-1.jpg", title: "Ridge Cap Detail", location: "Christiansburg, VA", category: "repair" },
-  { src: "/assets/web/gallery-dji_fly_20251105_160244_430_1762438961614_photo.jpg", title: "Completed Shingle Roof — Aerial", location: "Blacksburg, VA", category: "shingle" },
-  { src: "/assets/web/gallery-img_5558-1.jpg", title: "Installation In Progress", location: "New River Valley, VA", category: "repair" },
-  { src: "/assets/web/gallery-dji_fly_20250630_140228_761_1751306561592_photo.jpg", title: "Flat Roof System", location: "Christiansburg, VA", category: "repair" },
-  { src: "/assets/web/gallery-dji_fly_20250711_170804_84_1752268097606_photo.jpg", title: "Standing Seam Metal — After", location: "Roanoke, VA", category: "metal" },
-  { src: "/assets/web/gallery-img_5557-1.jpg", title: "Gutter Guard Installation", location: "Blacksburg, VA", category: "gutters" },
-  { src: "/assets/web/gallery-dji_fly_20251105_160302_432_1762438957426_photo.jpg", title: "Storm Damage Repair — Completed", location: "Salem, VA", category: "storm-damage" },
+  { src: "/assets/web/gallery-dji_fly_20250630_135332_722_1751306023542_photo.jpg", title: "New Roof — Residential", location: "Salem, VA", category: "shingle" },
+  { src: "/assets/web/gallery-dji_fly_20250721_123356_135_1753115663863_photo.jpg", title: "Complete Roof System — Aerial", location: "Radford, VA", category: "shingle" },
+  { src: "/assets/web/gallery-dji_fly_20251105_160244_430_1762438961614_photo.jpg", title: "Completed Roof — Aerial View", location: "Blacksburg, VA", category: "shingle" },
   { src: "/assets/web/gallery-img_6325.jpg", title: "Residential Roof — Street View", location: "Christiansburg, VA", category: "shingle" },
-  { src: "/assets/web/gallery-img_6324.jpg", title: "Roof Replacement — Complete", location: "Radford, VA", category: "shingle" },
+  { src: "/assets/web/gallery-img_6324.jpg", title: "Replacement — Complete", location: "Radford, VA", category: "shingle" },
+  // Metal
+  { src: "/assets/web/dji_fly_20250630_135406_726_1751306060507_photo.webp", title: "Standing Seam Metal Roof", location: "Christiansburg, VA", category: "metal" },
+  { src: "/assets/web/gallery-dji_fly_20250711_160918_986_1752264568015_photo.jpg", title: "Metal Roofing — Farmhouse", location: "Floyd, VA", category: "metal" },
+  { src: "/assets/web/gallery-dji_fly_20250711_170804_84_1752268097606_photo.jpg", title: "Standing Seam — Finished", location: "Roanoke, VA", category: "metal" },
+  // Repair (Alicia's labeled repair photos)
+  { src: "/assets/drive/mdr-repair-12.jpg", title: "Active Leak Repair", location: "Blacksburg, VA", category: "repair" },
+  { src: "/assets/drive/mdr-repair-11.jpg", title: "Shingle Repair Detail", location: "Christiansburg, VA", category: "repair" },
+  { src: "/assets/drive/mdr-repair-3tab.jpg", title: "3-Tab Repair", location: "Salem, VA", category: "repair" },
+  { src: "/assets/drive/mdr-repair-13.jpg", title: "Valley Repair", location: "Radford, VA", category: "repair" },
+  { src: "/assets/drive/mdr-repair-7.jpg", title: "Flashing Repair", location: "Roanoke, VA", category: "repair" },
+  { src: "/assets/drive/mdr-repair-after.jpg", title: "Repair — Completed", location: "Smith Mountain Lake, VA", category: "repair" },
+  // Storm damage
+  { src: "/assets/drive/mdr-storm-damage-1.jpg", title: "Storm Damage Assessment", location: "New River Valley, VA", category: "storm-damage" },
+  { src: "/assets/drive/mdr-storm-damage-2.jpg", title: "Wind Damage Repair", location: "Roanoke, VA", category: "storm-damage" },
+  { src: "/assets/drive/mdr-storm-damage-tree.jpg", title: "Tree Impact — Emergency", location: "Christiansburg, VA", category: "storm-damage" },
+  // Gutters (Alicia's labeled gutter photos)
+  { src: "/assets/drive/mdr-gutters-1.jpg", title: "Seamless Gutter Install", location: "Christiansburg, VA", category: "gutters" },
+  { src: "/assets/drive/mdr-gutters-2.jpg", title: "Gutter System — Complete", location: "Blacksburg, VA", category: "gutters" },
+  { src: "/assets/drive/mdr-gutters-3.jpg", title: "Gutter Guard Installation", location: "Radford, VA", category: "gutters" },
 ];
 
-// Before/after project pairs
+// Before/after project pairs — real Alicia pairs
 const beforeAfterProjects = [
   {
-    title: "Full Roof Replacement — Before & After",
+    title: "GAF Heritage Replacement — Before & After",
     location: "Christiansburg, VA",
     category: "shingle",
-    before: "/assets/web/IMG_8457-2.webp",
-    after: "/assets/web/IMG_8458-2.webp",
+    before: "/assets/drive/mdr-before-heritage.jpg",
+    after: "/assets/drive/mdr-after-heritage.jpg",
   },
   {
-    title: "Shingle Replacement — Before & After",
+    title: "Multi-Unit Replacement — Before & After",
     location: "New River Valley, VA",
     category: "shingle",
-    before: "/assets/web/IMG_1661-1.webp",
-    after: "/assets/web/IMG_1662-1.webp",
+    before: "/assets/drive/mdr-before-4plex.jpg",
+    after: "/assets/drive/mdr-after-4plex.jpg",
+  },
+  {
+    title: "Terracotta Tile Restoration — Before & After",
+    location: "Roanoke Area, VA",
+    category: "shingle",
+    before: "/assets/drive/mdr-before-terracotta.png",
+    after: "/assets/drive/mdr-after-terracotta.png",
+  },
+  {
+    title: "Roof Repair — Before & After",
+    location: "Southwest Virginia",
+    category: "repair",
+    before: "/assets/drive/mdr-repair-before.jpg",
+    after: "/assets/drive/mdr-repair-after.jpg",
   },
 ];
 ---
@@ -112,20 +138,32 @@ const beforeAfterProjects = [
   <SectionContainer background="white" padding="md">
     <div class="text-center mb-10">
       <h2 class="text-2xl md:text-3xl font-bold text-text-primary">Before & After</h2>
-      <p class="mt-2 text-text-muted">See the difference quality roofing makes</p>
+      <p class="mt-2 text-text-muted">Real projects. Real transformations.</p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
       {beforeAfterProjects.map((project) => (
         <div class="bg-bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
           <div class="grid grid-cols-2 gap-0">
-            <div class="relative">
-              <span class="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold uppercase px-2 py-1 rounded">Before</span>
-              <img src={project.before} alt={`Before — ${project.title}`} class="w-full aspect-square object-cover" loading="lazy" />
-            </div>
-            <div class="relative">
-              <span class="absolute top-2 left-2 bg-accent text-white text-[10px] font-bold uppercase px-2 py-1 rounded">After</span>
-              <img src={project.after} alt={`After — ${project.title}`} class="w-full aspect-square object-cover" loading="lazy" />
-            </div>
+            <button
+              type="button"
+              class="gallery-zoom relative block w-full text-left focus-visible:outline-2 focus-visible:outline-accent"
+              data-src={project.before}
+              data-title={`Before — ${project.title}`}
+              aria-label={`Open larger view: Before — ${project.title}`}
+            >
+              <span class="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold uppercase px-2 py-1 rounded z-10">Before</span>
+              <img src={project.before} alt={`Before — ${project.title}`} class="w-full aspect-square object-cover hover:opacity-90 transition-opacity" loading="lazy" />
+            </button>
+            <button
+              type="button"
+              class="gallery-zoom relative block w-full text-left focus-visible:outline-2 focus-visible:outline-accent"
+              data-src={project.after}
+              data-title={`After — ${project.title}`}
+              aria-label={`Open larger view: After — ${project.title}`}
+            >
+              <span class="absolute top-2 left-2 bg-accent text-white text-[10px] font-bold uppercase px-2 py-1 rounded z-10">After</span>
+              <img src={project.after} alt={`After — ${project.title}`} class="w-full aspect-square object-cover hover:opacity-90 transition-opacity" loading="lazy" />
+            </button>
           </div>
           <div class="p-4">
             <h3 class="font-semibold text-text-primary text-sm">{project.title}</h3>
@@ -163,7 +201,14 @@ const beforeAfterProjects = [
     {/* Card Grid */}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="gallery-grid">
       {galleryProjects.map((project) => (
-        <div class="gallery-item group" data-category={project.category}>
+        <button
+          type="button"
+          class="gallery-item gallery-zoom group text-left focus-visible:outline-2 focus-visible:outline-accent"
+          data-category={project.category}
+          data-src={project.src}
+          data-title={project.title}
+          aria-label={`Open larger view: ${project.title}`}
+        >
           <div class="bg-white border border-border rounded-xl overflow-hidden transition-all hover:border-accent/40 hover:shadow-lg">
             <div class="relative aspect-[4/3] overflow-hidden">
               <img
@@ -175,6 +220,11 @@ const beforeAfterProjects = [
               <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-text-primary text-[11px] font-semibold uppercase tracking-wide px-3 py-1 rounded-full">
                 {project.category === "storm-damage" ? "Storm Damage" : project.category.charAt(0).toUpperCase() + project.category.slice(1)}
               </span>
+              <span class="absolute bottom-3 right-3 bg-black/60 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zm-7-3v6m-3-3h6"/>
+                </svg>
+              </span>
             </div>
             <div class="p-4">
               <h3 class="font-semibold text-text-primary text-sm group-hover:text-accent transition-colors">{project.title}</h3>
@@ -184,10 +234,32 @@ const beforeAfterProjects = [
               </p>
             </div>
           </div>
-        </div>
+        </button>
       ))}
     </div>
   </SectionContainer>
+
+  {/* Lightbox modal — shows enlarged image when any photo card is clicked */}
+  <div
+    id="gallery-lightbox"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="lightbox-title"
+  >
+    <button
+      type="button"
+      id="lightbox-close"
+      class="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-full transition-colors"
+      aria-label="Close (Esc)"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <figure class="max-w-[95vw] max-h-[90vh] flex flex-col items-center gap-3">
+      <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+      <figcaption id="lightbox-title" class="text-white text-sm md:text-base font-medium text-center"></figcaption>
+    </figure>
+  </div>
 
   {/* CTA */}
   <SectionContainer background="accent" padding="md">
@@ -196,7 +268,7 @@ const beforeAfterProjects = [
         Your Home Could Be Next.
       </h2>
       <p class="mt-4 text-white/90 max-w-2xl mx-auto text-lg">
-        Join 600+ Virginia homeowners who chose MDR. Get a free inspection and see what's possible.
+        Join 1,000+ Virginia homeowners who chose MDR. Get a free inspection and see what's possible.
       </p>
       <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
         <a href="/contact" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-lg bg-white text-accent hover:bg-gray-100 shadow-lg transition-all min-h-[52px]">
@@ -242,6 +314,46 @@ const beforeAfterProjects = [
           }
         });
       });
+    });
+
+    // --- Lightbox: click any .gallery-zoom (cards + before/after pairs) to enlarge ---
+    const lightbox = document.getElementById("gallery-lightbox");
+    const lightboxImg = document.getElementById("lightbox-image") as HTMLImageElement | null;
+    const lightboxTitle = document.getElementById("lightbox-title");
+    const closeBtn = document.getElementById("lightbox-close");
+
+    function openLightbox(src: string, title: string) {
+      if (!lightbox || !lightboxImg || !lightboxTitle) return;
+      lightboxImg.src = src;
+      lightboxImg.alt = title;
+      lightboxTitle.textContent = title;
+      lightbox.classList.remove("hidden");
+      lightbox.classList.add("flex");
+      document.body.style.overflow = "hidden";
+    }
+    function closeLightbox() {
+      if (!lightbox || !lightboxImg) return;
+      lightbox.classList.add("hidden");
+      lightbox.classList.remove("flex");
+      lightboxImg.src = "";
+      document.body.style.overflow = "";
+    }
+
+    document.querySelectorAll<HTMLButtonElement>(".gallery-zoom").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const src = btn.dataset.src;
+        const title = btn.dataset.title || "";
+        if (src) openLightbox(src, title);
+      });
+    });
+
+    closeBtn?.addEventListener("click", closeLightbox);
+    lightbox?.addEventListener("click", (e) => {
+      // Click on backdrop (outside the figure) closes
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && lightbox && !lightbox.classList.contains("hidden")) closeLightbox();
     });
   }
 

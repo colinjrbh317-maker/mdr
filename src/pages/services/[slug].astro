@@ -33,41 +33,50 @@ if (!service) {
   return Astro.redirect("/404");
 }
 
-// Fallback images for services without CMS photos — each service gets a unique image
+// Fallback images for services without CMS photos — each service gets a unique image.
+// Prefer real photos from Alicia's labeled Drive folders (mdr-* under /assets/drive/).
 const fallbackImages: Record<string, string> = {
-  "roof-replacement": "/assets/projects/Untitled-1800-x-1440-px.jpg",
-  "shingle-roofing": "/assets/projects/Untitled-1800-x-1440-px-1.jpg",
+  // Replacement / shingle / metal — real finished installs
+  "roof-replacement": "/assets/drive/mdr-after-heritage.jpg",
+  "shingle-roofing": "/assets/drive/mdr-after-4plex.jpg",
   "metal-roofing": "/assets/projects/dji_fly_20250630_135406_726_1751306060507_photo.JPG",
-  "timber-seal": "/assets/projects/Untitled-1800-x-1440-px-4.jpg",
-  "roof-repair": "/assets/projects/Untitled-1800-x-1440-px-2.jpg",
-  "roof-maintenance": "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG",
-  "gutters": "/assets/projects/dji_fly_20251105_160008_416_1762439005458_photo.JPG",
-  "storm-damage": "/assets/projects/Untitled-1800-x-1440-px-3.jpg",
+  "timber-seal": "/assets/drive/mdr-system-strike-zone-shingles.png",
+  // Repair family — Alicia's repair-* photos
+  "roof-repair": "/assets/drive/mdr-repair-12.jpg",
+  "roof-maintenance": "/assets/drive/mdr-repair-11.jpg",
+  "wind-damage-repair": "/assets/drive/mdr-storm-damage-tree.jpg",
+  "hail-damage-repair": "/assets/drive/mdr-storm-damage-1.jpg",
+  "emergency-roof-repair": "/assets/drive/mdr-storm-damage-2.jpg",
+  "skylight-repair": "/assets/drive/mdr-repair-3tab.jpg",
+  // Storm + insurance
+  "storm-damage": "/assets/drive/mdr-storm-damage-1.jpg",
+  "insurance-claims-help": "/assets/drive/mdr-storm-damage-2.jpg",
+  // Gutter family — Alicia's labeled gutter photos
+  "gutters": "/assets/drive/mdr-gutters-1.jpg",
+  "seamless-gutters": "/assets/drive/mdr-gutters-2.jpg",
+  "gutter-guards": "/assets/drive/mdr-gutters-3.jpg",
+  "gutter-repair": "/assets/drive/mdr-gutters-1.jpg",
+  // Inspection
+  "roof-inspection": "/assets/drive/mdr-repair-11.jpg",
+  // Roofing system component-anchored
+  "skylights": "/assets/drive/mdr-system-clean-decking.jpg",
+  "roof-coatings": "/assets/drive/mdr-system-feature-overview.png",
+  "silicone-roof-coating": "/assets/drive/mdr-system-catch-all.jpg",
+  // Commercial / flat — keep DJI aerials (no specific Alicia shots)
   "commercial-roofing": "/assets/projects/dji_fly_20251105_155920_411_1762439016516_photo.JPG",
-  "flat-roofing": "/assets/projects/dji_fly_20250630_140410_766_1751306661861_photo.JPG",
-  "siding": "/assets/projects/dji_fly_20251105_160046_419_1762438984409_photo-1.JPG",
-  "skylights": "/assets/projects/IMG_5558-1.jpg",
-  "roof-coatings": "/assets/projects/dji_fly_20250630_135844_746_1751306349301_photo.JPG",
-  "roof-inspection": "/assets/projects/dji_fly_20251105_160216_427_1762438968829_photo.JPG",
-  "wind-damage-repair": "/assets/projects/Catch-all-bburg.jpg",
-  "hail-damage-repair": "/assets/projects/dji_fly_20251105_160302_432_1762438957426_photo.JPG",
-  "emergency-roof-repair": "/assets/projects/Landscaping-nets.jpg",
-  "insurance-claims-help": "/assets/projects/dji_fly_20251105_160058_421_1762438980497_photo.JPG",
-  "seamless-gutters": "/assets/projects/dji_fly_20250630_140030_755_1751306447124_photo.JPG",
-  "gutter-guards": "/assets/projects/IMG_5557-1.jpg",
-  "gutter-repair": "/assets/projects/dji_fly_20241025_170718_583_1729890501648_photo-1.jpg",
   "commercial-roof-repair": "/assets/projects/HVAC-protection.jpg",
   "commercial-roof-replacement": "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG",
   "commercial-roof-coatings": "/assets/projects/dji_fly_20251105_160244_430_1762438961614_photo.JPG",
-  "hoa-roofing": "/assets/projects/dji_fly_20251105_160414_436_1762438949252_photo.JPG",
+  "flat-roofing": "/assets/projects/dji_fly_20250630_140410_766_1751306661861_photo.JPG",
   "tpo-roofing": "/assets/projects/dji_fly_20250630_140110_757_1751306482991_photo.JPG",
   "epdm-roofing": "/assets/projects/dji_fly_20250630_140228_761_1751306561592_photo.JPG",
   "modified-bitumen": "/assets/projects/dji_fly_20250630_135346_724_1751306044686_photo.JPG",
+  "hoa-roofing": "/assets/projects/dji_fly_20251105_160414_436_1762438949252_photo.JPG",
+  // Siding — keep aerials
+  "siding": "/assets/projects/dji_fly_20251105_160046_419_1762438984409_photo-1.JPG",
   "vinyl-siding": "/assets/projects/dji_fly_20250630_135332_722_1751306023542_photo.JPG",
   "fiber-cement-siding": "/assets/projects/dji_fly_20251105_160308_433_1762438955249_photo.JPG",
   "siding-repair": "/assets/projects/dji_fly_20251105_160146_424_1762438974992_photo.JPG",
-  "skylight-repair": "/assets/projects/IMG_5560-1.jpg",
-  "silicone-roof-coating": "/assets/projects/IMG_5561-2.jpg",
 };
 
 const heroImage = service.featuredImage
