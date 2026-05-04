@@ -400,7 +400,7 @@ export async function addJobNote(jobId: string, text: string): Promise<boolean> 
     return false;
   }
 
-  const res = await post(`/jobs/${jobId}/notes`, { text });
+  const res = await post(`/jobs/${jobId}/messages`, { message: text });
   if (!res) return false;
 
   console.log(`[AccuLynx] Note added to job ${jobId}`);
