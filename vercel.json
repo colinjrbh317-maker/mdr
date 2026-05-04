@@ -1,27 +1,7 @@
 {
   "rewrites": [
     { "source": "/ingest/static/:path*", "destination": "https://us-assets.i.posthog.com/static/:path*" },
-    { "source": "/ingest/:path*", "destination": "https://us.i.posthog.com/:path*" },
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "go.moderndayroof.com" }],
-      "destination": "/lp/branded?channel=meta"
-    },
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "lp.moderndayroof.com" }],
-      "destination": "/lp/branded?channel=google"
-    },
-    {
-      "source": "/:campaign",
-      "has": [{ "type": "host", "value": "go.moderndayroof.com" }],
-      "destination": "/lp/:campaign?channel=meta"
-    },
-    {
-      "source": "/:campaign",
-      "has": [{ "type": "host", "value": "lp.moderndayroof.com" }],
-      "destination": "/lp/:campaign?channel=google"
-    }
+    { "source": "/ingest/:path*", "destination": "https://us.i.posthog.com/:path*" }
   ],
   "headers": [
     {
@@ -37,6 +17,8 @@
     }
   ],
   "redirects": [
+    { "source": "/lp", "destination": "https://lp.moderndayroof.com/branded", "permanent": true },
+    { "source": "/lp/:campaign", "destination": "https://lp.moderndayroof.com/:campaign", "permanent": true },
     { "source": "/home/", "destination": "/", "permanent": true },
     { "source": "/contact-us/", "destination": "/contact", "permanent": true },
     { "source": "/services/", "destination": "/services", "permanent": true },
