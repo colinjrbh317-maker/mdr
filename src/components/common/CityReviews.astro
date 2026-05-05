@@ -21,7 +21,36 @@ const { city, count = 6, heading } = Astro.props;
 const cityReviews = reviewsForCityWithFallback(city, count, 3);
 const exactCount = cityReviews.filter((r) => r.city.toLowerCase() === city.toLowerCase()).length;
 const hasNearby = cityReviews.length > exactCount;
+
+// JSON-LD Review schema for the top 3 cards. Adding individual Review
+// nodes (not just AggregateRating) is what triggers the star-rating
+// rich snippet under city-page results in Google SERPs. Significant
+// CTR lift when it lands.
+const topReviewsSchema = cityReviews.slice(0, 3).map((r) => ({
+  "@type": "Review",
+  reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
+  author: { "@type": "Person", name: r.name },
+  reviewBody: r.quote,
+  itemReviewed: { "@type": "RoofingContractor", name: `Modern Day Roofing - ${city}` },
+}));
+
+const reviewsBlockSchema = {
+  "@context": "https://schema.org",
+  "@type": "RoofingContractor",
+  name: `Modern Day Roofing - ${city}`,
+  url: `https://moderndayroof.com/areas/${city.toLowerCase().replace(/ /g, "-")}`,
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "5.0",
+    reviewCount: 240,
+    bestRating: 5,
+    worstRating: 1,
+  },
+  review: topReviewsSchema,
+};
 ---
+
+<script type="application/ld+json" set:html={JSON.stringify(reviewsBlockSchema)} />
 
 <section class="py-14 md:py-20 bg-bg-light">
   <div class="mx-auto max-w-[1200px] px-4 md:px-6">
@@ -47,7 +76,7 @@ const hasNearby = cityReviews.length > exactCount;
             </svg>
           ))}
         </div>
-        <span class="text-text-muted text-sm">231+ reviews on Google</span>
+        <span class="text-text-muted text-sm">240+ reviews on Google</span>
       </div>
 
       {hasNearby && (
@@ -105,7 +134,7 @@ const hasNearby = cityReviews.length > exactCount;
         rel="noopener noreferrer"
         class="inline-flex items-center gap-2 text-accent font-semibold text-sm hover:underline transition-colors"
       >
-        Read All 231+ Reviews on Google
+        Read All 240+ Reviews on Google
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
         </svg>
