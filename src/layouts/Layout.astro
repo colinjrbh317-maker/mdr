@@ -132,6 +132,16 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 
+    {/* Google Tag Manager — must fire as high in <head> as possible.
+       Brian/Alicia's container handles GA4 + Google Ads conversion tags + Conversion Linker. */}
+    {!isStudio && import.meta.env.PUBLIC_GTM_ID && (
+      <script is:inline define:vars={{ id: import.meta.env.PUBLIC_GTM_ID }}>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',id);
+      </script>
+    )}
+
     {/* GA4 */}
     {!isStudio && import.meta.env.PUBLIC_GA4_ID && (
       <>
@@ -171,6 +181,19 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     )}
   </head>
   <body class="min-h-screen flex flex-col">
+    {/* Google Tag Manager (noscript) — must be first child of <body>. */}
+    {!isStudio && import.meta.env.PUBLIC_GTM_ID && (
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${import.meta.env.PUBLIC_GTM_ID}`}
+          height="0"
+          width="0"
+          style="display:none;visibility:hidden"
+          title="gtm-noscript"
+        ></iframe>
+      </noscript>
+    )}
+
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <Header navigation={navigation} siteSettings={siteSettings} />
