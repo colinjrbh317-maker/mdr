@@ -13,6 +13,7 @@ import {
 } from "@/sanity/lib/queries";
 import { urlForImage } from "@/sanity/lib/url-for-image";
 import { areaFacts, formatZipList, formatNeighborhoodList } from "@/data/area-content";
+import CityReviews from "@/components/common/CityReviews.astro";
 
 export const prerender = true;
 
@@ -474,6 +475,9 @@ const content = serviceContent[serviceSlug as string] || {
       </aside>
     </div>
   </SectionContainer>
+
+  {/* City-specific Google Reviews (Tier 1 cities only) */}
+  {localFacts && <CityReviews city={area.name} />}
 
   {/* FAQs */}
   <SectionContainer background="light" padding="md">
