@@ -19,7 +19,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const APIFY_FILE = "/Users/colinryan/Downloads/Google Reviews Scraper May 5 2026.json";
+// Two scrapes: the original ("dated") had review_id + reviewed_at_date
+// but Apify redacted reviewer_name; the second ("named") includes the
+// reviewer's name but lacks date. We merge them by matching review
+// text so each output row has both name AND a date.
+const APIFY_DATED = "/Users/colinryan/Downloads/Google Reviews Scraper May 5 2026.json";
+const APIFY_NAMED = "/Users/colinryan/Downloads/Google Maps Reviews Scraper May 5 2026.json";
 const OUT = path.join(import.meta.dirname, "..", "src", "data", "reviews.ts");
 
 // Existing 18 curated reviews with names + cities. We will keep ONLY
@@ -99,36 +104,96 @@ function findCityInContent(text) {
   return null;
 }
 
-const raw = JSON.parse(fs.readFileSync(APIFY_FILE, "utf8"));
-console.log(`Loaded ${raw.length} raw rows from Apify`);
+const datedRaw = JSON.parse(fs.readFileSync(APIFY_DATED, "utf8"));
+const namedRaw = JSON.parse(fs.readFileSync(APIFY_NAMED, "utf8"));
+console.log(`Loaded ${datedRaw.length} dated rows + ${namedRaw.length} named rows from Apify`);
 
-// Dedupe by review_id
-const seen = new Set();
-const dedup = raw.filter((r) => {
-  const id = r.review_id;
-  if (!id || seen.has(id)) return false;
-  seen.add(id);
+// Build a map of dated reviews keyed by first 60 chars of normalized content
+function normKey(s) {
+  return (s || "").replace(/\s+/g, " ").trim().slice(0, 60).toLowerCase();
+}
+const dateByText = new Map();
+for (const r of datedRaw) {
+  const key = normKey(r.content);
+  if (key && !dateByText.has(key)) {
+    dateByText.set(key, { reviewedAt: r.reviewed_at_date, ownerResponse: r.owner_response || "" });
+  }
+}
+console.log(`Date map built: ${dateByText.size} unique text-keyed rows`);
+
+// Dedupe named reviews by text key
+const seenNamed = new Set();
+const namedDedup = namedRaw.filter((r) => {
+  const k = normKey(r.text);
+  if (!k || seenNamed.has(k)) return false;
+  seenNamed.add(k);
   return true;
 });
-console.log(`After dedup: ${dedup.length}`);
+console.log(`Named dedup: ${namedDedup.length}`);
 
-// Filter to 5-star with content
-const five = dedup.filter((r) => r.rating === 5 && (r.content || "").trim().length > 30);
+// Filter to 5-star with substantive text. Merge in dates.
+const five = namedDedup
+  .filter((r) => r.stars === 5 && (r.text || "").trim().length > 30)
+  .map((r) => {
+    const meta = dateByText.get(normKey(r.text));
+    return {
+      content: r.text,
+      rating: r.stars,
+      reviewer_name: r.name || "",
+      reviewed_at_date: meta?.reviewedAt || null,
+      owner_response: meta?.ownerResponse || "",
+    };
+  });
 console.log(`5-star with substantive content: ${five.length}`);
 
-// Sort newest-first so featured reviews are recent
-five.sort((a, b) => new Date(b.reviewed_at_date) - new Date(a.reviewed_at_date));
+// Sort newest-first; rows without a matched date go last
+five.sort((a, b) => {
+  if (!a.reviewed_at_date && !b.reviewed_at_date) return 0;
+  if (!a.reviewed_at_date) return 1;
+  if (!b.reviewed_at_date) return -1;
+  return new Date(b.reviewed_at_date) - new Date(a.reviewed_at_date);
+});
 
 // Build output reviews
 const output = [];
 const usedCurated = new Set();
+
+function toDisplayName(rawName) {
+  // Apify "named" scrape returns names like "donna hurd" or
+  // "Sheila Songster (CHRIS)". Strip any parenthetical alias, then
+  // convert to "Donna H." style. Casing is normalized (Google reviewers
+  // sometimes type their name in all-lowercase or all-caps).
+  let s = (rawName || "").replace(/\s*\([^)]*\)\s*/g, " ").trim();
+  const parts = s.split(/\s+/).filter((p) => /[A-Za-z]/.test(p));
+  if (parts.length === 0) return "";
+  const cap = (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+  const first = cap(parts[0]);
+  if (parts.length === 1) return first;
+  // Find the last alphabetic part (already filtered above)
+  const last = parts[parts.length - 1];
+  const lastInitial = last.charAt(0).toUpperCase();
+  return `${first} ${lastInitial}.`;
+}
+
+function initialsFromName(displayName) {
+  const parts = displayName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "G";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+}
+
+function hashColor(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
 
 for (const r of five) {
   const content = r.content;
   const ownerResp = r.owner_response || "";
   const haystack = content + " " + ownerResp;
 
-  // Try to match a curated entry by quoteHint
+  // Try to match a curated entry by quoteHint to inherit its city tag
   let curated = null;
   for (let i = 0; i < CURATED.length; i++) {
     if (usedCurated.has(i)) continue;
@@ -139,42 +204,31 @@ for (const r of five) {
     }
   }
 
-  // Try to find a city in the review or owner response
+  // City: prefer explicit content mention, then curated tag, else Service Area
   const city = findCityInContent(haystack) || (curated && curated.city) || "Service Area";
 
   const date = relativeDate(r.reviewed_at_date);
-  const colorIdx = output.length % AVATAR_COLORS.length;
+  const parsedName = toDisplayName(r.reviewer_name);
+  const displayName = (parsedName && parsedName.length >= 2) ? parsedName : "Verified Google Review";
+  const initials = displayName === "Verified Google Review" ? "G" : initialsFromName(displayName);
+  const color = hashColor(displayName + content.slice(0, 20));
 
-  if (curated) {
-    output.push({
-      name: curated.name,
-      initials: curated.initials,
-      color: curated.color,
-      city: curated.city,
-      rating: 5,
-      quote: content,
-      date,
-      verified: true,
-      reviewedAt: r.reviewed_at_date,
-    });
-  } else {
-    output.push({
-      name: "Verified Google Review",
-      initials: "G",
-      color: AVATAR_COLORS[colorIdx],
-      city,
-      rating: 5,
-      quote: content,
-      date,
-      verified: true,
-      reviewedAt: r.reviewed_at_date,
-    });
-  }
+  output.push({
+    name: displayName,
+    initials,
+    color,
+    city,
+    rating: 5,
+    quote: content,
+    date,
+    verified: true,
+    reviewedAt: r.reviewed_at_date,
+  });
 }
 
 console.log(`Output reviews: ${output.length} (curated matches: ${usedCurated.size})`);
 
-// Sort: named curated first within each city, then anonymous, then by reviewedAt newest-first
+// Sort: named first, then by reviewedAt newest-first
 output.sort((a, b) => {
   const aNamed = a.name !== "Verified Google Review" ? 0 : 1;
   const bNamed = b.name !== "Verified Google Review" ? 0 : 1;
