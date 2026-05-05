@@ -175,7 +175,12 @@ const cities = ["All", ...reviewCities];
           el.style.display = 'none';
         }
       } else {
-        if (el.dataset.reviewCity === city) {
+        // City filter: show exact-city matches plus general "Service Area"
+        // anonymous reviews (Apify-redacted reviewers whose review text
+        // didn't mention a specific city). Reviews tagged for OTHER
+        // cities are hidden.
+        const cardCity = el.dataset.reviewCity;
+        if (cardCity === city || cardCity === 'Service Area') {
           el.style.display = '';
           el.classList.remove('hidden');
         } else {
