@@ -33,15 +33,15 @@ if (!service) {
   return Astro.redirect("/404");
 }
 
-// Fallback images for services without CMS photos — each service gets a unique image.
+// Fallback images for services without CMS photos, each service gets a unique image.
 // Prefer real photos from Alicia's labeled Drive folders (mdr-* under /assets/drive/).
 const fallbackImages: Record<string, string> = {
-  // Replacement / shingle / metal — real finished installs
+  // Replacement / shingle / metal, real finished installs
   "roof-replacement": "/assets/drive/mdr-after-heritage.jpg",
   "shingle-roofing": "/assets/drive/mdr-after-4plex.jpg",
   "metal-roofing": "/assets/projects/dji_fly_20250630_135406_726_1751306060507_photo.JPG",
   "timber-seal": "/assets/drive/mdr-system-strike-zone-shingles.png",
-  // Repair family — Alicia's repair-* photos
+  // Repair family, Alicia's repair-* photos
   "roof-repair": "/assets/drive/mdr-repair-12.jpg",
   "roof-maintenance": "/assets/drive/mdr-repair-11.jpg",
   "wind-damage-repair": "/assets/drive/mdr-storm-damage-tree.jpg",
@@ -51,7 +51,7 @@ const fallbackImages: Record<string, string> = {
   // Storm + insurance
   "storm-damage": "/assets/drive/mdr-storm-damage-1.jpg",
   "insurance-claims-help": "/assets/drive/mdr-storm-damage-2.jpg",
-  // Gutter family — Alicia's labeled gutter photos
+  // Gutter family, Alicia's labeled gutter photos
   "gutters": "/assets/drive/mdr-gutters-1.jpg",
   "seamless-gutters": "/assets/drive/mdr-gutters-2.jpg",
   "gutter-guards": "/assets/drive/mdr-gutters-3.jpg",
@@ -62,7 +62,7 @@ const fallbackImages: Record<string, string> = {
   "skylights": "/assets/drive/mdr-system-clean-decking.jpg",
   "roof-coatings": "/assets/drive/mdr-system-feature-overview.png",
   "silicone-roof-coating": "/assets/drive/mdr-system-catch-all.jpg",
-  // Commercial / flat — keep DJI aerials (no specific Alicia shots)
+  // Commercial / flat, keep DJI aerials (no specific Alicia shots)
   "commercial-roofing": "/assets/projects/dji_fly_20251105_155920_411_1762439016516_photo.JPG",
   "commercial-roof-repair": "/assets/projects/HVAC-protection.jpg",
   "commercial-roof-replacement": "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG",
@@ -72,7 +72,7 @@ const fallbackImages: Record<string, string> = {
   "epdm-roofing": "/assets/projects/dji_fly_20250630_140228_761_1751306561592_photo.JPG",
   "modified-bitumen": "/assets/projects/dji_fly_20250630_135346_724_1751306044686_photo.JPG",
   "hoa-roofing": "/assets/projects/dji_fly_20251105_160414_436_1762438949252_photo.JPG",
-  // Siding — keep aerials
+  // Siding, keep aerials
   "siding": "/assets/projects/dji_fly_20251105_160046_419_1762438984409_photo-1.JPG",
   "vinyl-siding": "/assets/projects/dji_fly_20250630_135332_722_1751306023542_photo.JPG",
   "fiber-cement-siding": "/assets/projects/dji_fly_20251105_160308_433_1762438955249_photo.JPG",
@@ -85,7 +85,7 @@ const heroImage = service.featuredImage
 
 const seoTitle = service.seo?.metaTitle || `${service.name} Christiansburg, Roanoke & Blacksburg VA | 5★ 231 Reviews`;
 const seoDescription =
-  service.seo?.metaDescription || service.description || `Professional ${service.name.toLowerCase()} in Christiansburg, Roanoke & Blacksburg VA. GAF Master Elite, 5★ rated by 231 homeowners. Free estimates — call (540) 553-6007.`;
+  service.seo?.metaDescription || service.description || `Professional ${service.name.toLowerCase()} in Christiansburg, Roanoke & Blacksburg VA. GAF Master Elite, 5★ rated by 231 homeowners. Free estimates, call (540) 553-6007.`;
 
 // Breadcrumb items
 const breadcrumbItems = [
@@ -117,68 +117,68 @@ for (const s of [...manualRelated, ...childServices]) {
 // Service-specific FAQ data (hardcoded until CMS write access available)
 const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
   "roof-replacement": [
-    {q: "How do I know if I need a full roof replacement?", a: "If your roof is 20+ years old, has widespread shingle damage (curling, cracking, missing granules), or you're seeing multiple leaks, it's likely time. We offer free inspections and will give you an honest assessment — if repairs can extend your roof's life, we'll tell you."},
-    {q: "What does the replacement process look like?", a: "We tear off the old roof down to the decking, inspect and repair any wood damage, then install the full GAF roofing system — ice and water shield, underlayment, starter strips, shingles, ridge caps, and ventilation. Most residential roofs are completed in 1-2 days."},
-    {q: "What warranty do I get with a new roof?", a: "As a GAF Master Elite contractor, we offer the Golden Pledge warranty — 50-year material coverage and 25-year workmanship coverage, backed by GAF, not just our company. It's one of the strongest warranties in the industry."},
+    {q: "How do I know if I need a full roof replacement?", a: "If your roof is 20+ years old, has widespread shingle damage (curling, cracking, missing granules), or you're seeing multiple leaks, it's likely time. We offer free inspections and will give you an honest assessment, if repairs can extend your roof's life, we'll tell you."},
+    {q: "What does the replacement process look like?", a: "We tear off the old roof down to the decking, inspect and repair any wood damage, then install the full GAF roofing system, ice and water shield, underlayment, starter strips, shingles, ridge caps, and ventilation. Most residential roofs are completed in 1-2 days."},
+    {q: "What warranty do I get with a new roof?", a: "As a GAF Master Elite contractor, we offer the Golden Pledge warranty, 50-year material coverage and 25-year workmanship coverage, backed by GAF, not just our company. It's one of the strongest warranties in the industry."},
     {q: "Will my insurance cover a roof replacement?", a: "If your roof was damaged by a covered event like hail or wind, insurance typically covers replacement minus your deductible. We work with insurance companies regularly and can guide you through the claims process."},
-    {q: "How long does a new roof last?", a: "GAF Timberline HDZ shingles last 25-30 years. Metal roofs can last 50+ years. The key is proper installation of the complete roofing system — not just shingles, but underlayment, ventilation, and flashing."},
+    {q: "How long does a new roof last?", a: "GAF Timberline HDZ shingles last 25-30 years. Metal roofs can last 50+ years. The key is proper installation of the complete roofing system, not just shingles, but underlayment, ventilation, and flashing."},
   ],
   "roof-repair": [
-    {q: "How do I know if I need repair vs. replacement?", a: "If the damage is isolated — a few missing shingles, a small leak, damaged flashing around a chimney — repair is usually the right call. If you're seeing widespread issues or the roof is over 20 years old, replacement may be more cost-effective."},
+    {q: "How do I know if I need repair vs. replacement?", a: "If the damage is isolated, a few missing shingles, a small leak, damaged flashing around a chimney, repair is usually the right call. If you're seeing widespread issues or the roof is over 20 years old, replacement may be more cost-effective."},
     {q: "Can you fix a leak without replacing the whole roof?", a: "In most cases, yes. Leaks are often caused by damaged flashing, cracked pipe boots, nail pops, or a few missing shingles. We locate the source, fix it, and test to confirm the repair holds."},
     {q: "How quickly can you respond to an emergency?", a: "We offer 24/7 emergency service for storm damage and active leaks. We prioritize getting a tarp or temporary repair in place to stop water intrusion, then schedule the full repair when conditions allow."},
-    {q: "How much does a typical repair cost?", a: "Minor repairs like replacing a few shingles or sealing a small leak typically range from $400-$1,000. More involved repairs vary by scope. We provide a detailed, itemized quote after inspection — no surprises."},
+    {q: "How much does a typical repair cost?", a: "Minor repairs like replacing a few shingles or sealing a small leak typically range from $400-$1,000. More involved repairs vary by scope. We provide a detailed, itemized quote after inspection, no surprises."},
   ],
   "shingle-roofing": [
-    {q: "What type of shingles do you install?", a: "We install GAF Timberline HDZ — the number one selling shingle in North America. They offer wind resistance up to 130 mph, algae resistance, and enhanced curb appeal. We also offer GAF's premium designer lines."},
-    {q: "How long do asphalt shingles last in Virginia?", a: "Quality architectural shingles last 25-30 years in Virginia's climate. Our region's heat, humidity, and freeze-thaw cycles are tough on roofs — which is why proper installation of the full system matters as much as the shingle itself."},
-    {q: "What's the difference between 3-tab and architectural shingles?", a: "3-tab shingles are flat, thinner, and less wind-resistant — we don't recommend them. Architectural shingles are thicker, more durable, better wind-rated, and give your roof a richer appearance. The price difference is modest for a much better product."},
+    {q: "What type of shingles do you install?", a: "We install GAF Timberline HDZ, the number one selling shingle in North America. They offer wind resistance up to 130 mph, algae resistance, and enhanced curb appeal. We also offer GAF's premium designer lines."},
+    {q: "How long do asphalt shingles last in Virginia?", a: "Quality architectural shingles last 25-30 years in Virginia's climate. Our region's heat, humidity, and freeze-thaw cycles are tough on roofs, which is why proper installation of the full system matters as much as the shingle itself."},
+    {q: "What's the difference between 3-tab and architectural shingles?", a: "3-tab shingles are flat, thinner, and less wind-resistant, we don't recommend them. Architectural shingles are thicker, more durable, better wind-rated, and give your roof a richer appearance. The price difference is modest for a much better product."},
     {q: "How do I know if my shingles need replacing?", a: "Look for curling or buckling, dark streaks (algae), excessive granules in your gutters, or visible bald spots. If your roof is 20+ years old and showing these signs, it's time for a professional inspection."},
   ],
   "metal-roofing": [
-    {q: "Is metal roofing worth the higher upfront cost?", a: "For many homeowners, yes. Metal roofs last 50+ years — roughly double the lifespan of shingles. They're more energy-efficient, reflect heat, and require less maintenance. The cost per year is often lower than shingles when you factor in longevity."},
-    {q: "Are metal roofs noisy when it rains?", a: "Not with modern installation. Metal roofing installed over solid decking with underlayment is no louder than shingles during rain. The old 'tin barn' reputation comes from metal installed directly over open rafters — not how residential metal roofs are done."},
-    {q: "Can you install metal over my existing shingles?", a: "In some cases — but we generally recommend a full tear-off. Installing over old shingles can trap moisture, hide decking damage, and void certain warranties. We inspect and advise on the best approach for your home."},
-    {q: "What styles of metal roofing do you offer?", a: "We install standing seam metal — the gold standard for residential applications. Clean lines, excellent weather resistance, and a modern look that works with everything from farmhouses to contemporary homes. Multiple colors available."},
+    {q: "Is metal roofing worth the higher upfront cost?", a: "For many homeowners, yes. Metal roofs last 50+ years, roughly double the lifespan of shingles. They're more energy-efficient, reflect heat, and require less maintenance. The cost per year is often lower than shingles when you factor in longevity."},
+    {q: "Are metal roofs noisy when it rains?", a: "Not with modern installation. Metal roofing installed over solid decking with underlayment is no louder than shingles during rain. The old 'tin barn' reputation comes from metal installed directly over open rafters, not how residential metal roofs are done."},
+    {q: "Can you install metal over my existing shingles?", a: "In some cases, but we generally recommend a full tear-off. Installing over old shingles can trap moisture, hide decking damage, and void certain warranties. We inspect and advise on the best approach for your home."},
+    {q: "What styles of metal roofing do you offer?", a: "We install standing seam metal, the gold standard for residential applications. Clean lines, excellent weather resistance, and a modern look that works with everything from farmhouses to contemporary homes. Multiple colors available."},
   ],
   "gutters": [
-    {q: "How often should gutters be cleaned?", a: "At minimum twice a year — spring and fall. If you have overhanging trees, quarterly cleaning prevents clogs that cause water to back up under your roof edge, leading to fascia rot and foundation damage."},
+    {q: "How often should gutters be cleaned?", a: "At minimum twice a year, spring and fall. If you have overhanging trees, quarterly cleaning prevents clogs that cause water to back up under your roof edge, leading to fascia rot and foundation damage."},
     {q: "How do I know if my gutters need replacing?", a: "Look for visible sagging, rust, separation at seams, water pooling near your foundation, or paint peeling on fascia boards. If your gutters are pulling away from the house or you see standing water inside them, it's time."},
-    {q: "What type of gutters do you install?", a: "We install seamless aluminum gutters — custom-formed on-site to fit your home precisely. Seamless means fewer joints, fewer leak points, and a cleaner look. We also install gutter guards to reduce maintenance."},
+    {q: "What type of gutters do you install?", a: "We install seamless aluminum gutters, custom-formed on-site to fit your home precisely. Seamless means fewer joints, fewer leak points, and a cleaner look. We also install gutter guards to reduce maintenance."},
     {q: "Do gutters really affect my roof?", a: "Absolutely. Clogged or damaged gutters cause water to back up under your roof edge, damaging fascia, soffit, and eventually the roof decking itself. Proper gutter function is part of the complete roofing system."},
   ],
   "storm-damage": [
     {q: "What should I do right after storm damage?", a: "Document the damage with photos, contact your insurance company to file a claim, and call us. We offer 24/7 emergency response to tarp damaged areas and prevent further water intrusion while we plan the full repair."},
     {q: "Will my insurance cover storm damage repairs?", a: "Most homeowner's policies cover storm damage from wind, hail, and fallen debris. We work with insurance adjusters regularly and can help document damage to support your claim. You're typically responsible only for your deductible."},
-    {q: "How can I tell if my roof has storm damage?", a: "After a storm, look for missing or lifted shingles, dented gutters, granules washed into downspouts, or dents in metal flashing. Some damage isn't visible from the ground — that's why we offer free post-storm inspections."},
+    {q: "How can I tell if my roof has storm damage?", a: "After a storm, look for missing or lifted shingles, dented gutters, granules washed into downspouts, or dents in metal flashing. Some damage isn't visible from the ground, that's why we offer free post-storm inspections."},
     {q: "Do I need to replace the whole roof after a storm?", a: "Not always. If damage is limited to one section, targeted repair may be sufficient. But if a significant portion is compromised, full replacement ensures consistent protection and may be covered by insurance."},
   ],
   "roof-maintenance": [
-    {q: "How often should my roof be inspected?", a: "At least once a year, and after any major storm. Regular inspections catch small issues — a lifted shingle, a cracked pipe boot — before they become expensive repairs. We offer annual maintenance plans."},
+    {q: "How often should my roof be inspected?", a: "At least once a year, and after any major storm. Regular inspections catch small issues, a lifted shingle, a cracked pipe boot, before they become expensive repairs. We offer annual maintenance plans."},
     {q: "What does a roof maintenance visit include?", a: "We inspect shingles, flashing, ridge caps, valleys, pipe boots, ventilation, gutters, and attic ventilation. We check for moss or algae growth, clear debris, and provide a detailed report with photos of any concerns."},
     {q: "Can regular maintenance extend my roof's life?", a: "Significantly. A well-maintained roof can last 5-10 years longer than a neglected one. Catching a $200 flashing repair early prevents a $5,000 water damage problem later."},
     {q: "Do you offer maintenance plans?", a: "Yes. Our annual maintenance plans include a thorough inspection, minor repairs, gutter cleaning, and a written report. It's the easiest way to protect your investment and catch issues early."},
   ],
   "timber-seal": [
-    {q: "What is Timber Seal?", a: "Timber Seal is GAF's premium wood-look roofing option — it gives you the aesthetic of natural wood shakes with the durability and fire resistance of modern roofing materials. Beautiful appearance with none of the maintenance headaches."},
-    {q: "How does Timber Seal compare to real wood shakes?", a: "Timber Seal looks like wood but lasts longer, resists fire, won't rot or split, and requires far less maintenance. Real wood shakes need regular treatment and can be a fire hazard — Timber Seal eliminates those concerns."},
+    {q: "What is Timber Seal?", a: "Timber Seal is GAF's premium wood-look roofing option, it gives you the aesthetic of natural wood shakes with the durability and fire resistance of modern roofing materials. Beautiful appearance with none of the maintenance headaches."},
+    {q: "How does Timber Seal compare to real wood shakes?", a: "Timber Seal looks like wood but lasts longer, resists fire, won't rot or split, and requires far less maintenance. Real wood shakes need regular treatment and can be a fire hazard, Timber Seal eliminates those concerns."},
     {q: "Is Timber Seal more expensive than standard shingles?", a: "Yes, it's a premium product. But for homeowners who want the wood-shake look, it's significantly less expensive and more durable than real wood. We can walk you through the cost comparison during your free estimate."},
   ],
   "commercial-roofing": [
     {q: "What types of commercial roofing does MDR install?", a: "We install TPO, EPDM, modified bitumen, commercial metal, and roof coating systems. We handle everything from small retail buildings to large commercial properties and HOA communities across the Roanoke and New River Valley areas."},
-    {q: "How long does a commercial roof last?", a: "TPO and EPDM systems typically last 20-30 years with proper maintenance. Commercial metal roofs can last 40-60 years. Regular inspections and maintenance programs extend life significantly — we offer annual commercial maintenance plans."},
+    {q: "How long does a commercial roof last?", a: "TPO and EPDM systems typically last 20-30 years with proper maintenance. Commercial metal roofs can last 40-60 years. Regular inspections and maintenance programs extend life significantly, we offer annual commercial maintenance plans."},
     {q: "Do you work with property managers and HOAs?", a: "Yes, we work extensively with property managers, HOAs, and multi-family property owners. We handle everything from individual unit repairs to full community re-roofing projects, including coordination with board approvals and insurance."},
     {q: "Is MDR licensed for commercial roofing in Virginia?", a: "Yes. We're fully licensed, bonded, and insured for both residential and commercial roofing in Virginia. As a GAF Master Elite contractor, we can offer enhanced commercial warranty coverage."},
   ],
   "commercial-roof-repair": [
     {q: "How quickly can you respond to a commercial roof leak?", a: "We offer same-day emergency response for active commercial leaks. We'll tarp or temporarily seal the area to stop water intrusion, then schedule a permanent repair at a time that minimizes disruption to your business."},
-    {q: "Can you repair my commercial roof without replacing it?", a: "In many cases, yes. If damage is localized — a puncture, failed seam, or flashing issue — targeted repair is often the most cost-effective solution. We'll inspect and give you an honest recommendation."},
+    {q: "Can you repair my commercial roof without replacing it?", a: "In many cases, yes. If damage is localized, a puncture, failed seam, or flashing issue, targeted repair is often the most cost-effective solution. We'll inspect and give you an honest recommendation."},
     {q: "Do you offer commercial roof maintenance programs?", a: "Yes. Our annual maintenance plans include biannual inspections, minor repairs, drain clearing, and detailed condition reports. Preventive maintenance can extend your roof's life by 5-10 years and prevent costly emergency repairs."},
     {q: "Will my business need to close during repairs?", a: "Rarely. Most commercial repairs are completed from the roof with minimal disruption below. For larger projects, we schedule work during off-hours when possible and always coordinate with you to minimize business impact."},
   ],
   "commercial-roof-replacement": [
     {q: "How long does a commercial roof replacement take?", a: "Depending on building size and system type, commercial replacements take 1-3 weeks. We phase work to minimize disruption and can schedule around your business hours when needed."},
-    {q: "What commercial roofing systems do you install?", a: "We install TPO, EPDM, modified bitumen, and commercial metal systems. Each has different strengths — we recommend the best fit based on your building type, budget, and long-term goals."},
+    {q: "What commercial roofing systems do you install?", a: "We install TPO, EPDM, modified bitumen, and commercial metal systems. Each has different strengths, we recommend the best fit based on your building type, budget, and long-term goals."},
     {q: "Can you replace a commercial roof in sections?", a: "Yes. For large buildings or tight budgets, phased replacement lets you spread the cost over time while addressing the most critical sections first. We create a prioritized replacement plan based on condition."},
   ],
   "commercial-roof-coatings": [
@@ -193,19 +193,19 @@ const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
   ],
   "flat-roofing": [
     {q: "What's the best flat roofing material for Virginia?", a: "TPO is the most popular choice for its balance of cost, durability, and energy efficiency. EPDM is excellent for budget-conscious projects. Modified bitumen works well for complex roof shapes. We'll recommend the best option based on your building and budget."},
-    {q: "How long do flat roofs last?", a: "TPO systems last 20-30 years, EPDM 25-30 years, and modified bitumen 15-20 years with proper installation and maintenance. The key is proper drainage — standing water is the #1 enemy of flat roofs."},
+    {q: "How long do flat roofs last?", a: "TPO systems last 20-30 years, EPDM 25-30 years, and modified bitumen 15-20 years with proper installation and maintenance. The key is proper drainage, standing water is the #1 enemy of flat roofs."},
     {q: "Why do flat roofs leak more than pitched roofs?", a: "Flat roofs don't actually leak more when properly installed. The issue is usually poor drainage, failed seams, or punctures from foot traffic or debris. Regular maintenance and proper slope design prevent most flat roof problems."},
     {q: "Can you install a flat roof on a residential home?", a: "Yes. Flat or low-slope sections are common on modern homes, additions, and covered porches. We use the same commercial-grade materials to ensure your residential flat roof performs just as well."},
   ],
   "tpo-roofing": [
-    {q: "What makes TPO a good choice for flat roofs?", a: "TPO is heat-welded at the seams, creating a watertight bond stronger than the membrane itself. It reflects UV radiation, reducing cooling costs, and resists punctures, chemicals, and mold growth — ideal for Virginia's climate."},
-    {q: "How long does a TPO roof last?", a: "A properly installed TPO system lasts 20-30 years. The heat-welded seams are the most durable part — unlike glued or taped seams, they won't separate over time. Regular maintenance extends life further."},
-    {q: "Is TPO roofing energy efficient?", a: "Yes — TPO's white reflective surface can reduce cooling costs by 10-30% compared to dark roofing materials. It meets ENERGY STAR requirements and is a popular choice for energy-conscious building owners in the Roanoke area."},
+    {q: "What makes TPO a good choice for flat roofs?", a: "TPO is heat-welded at the seams, creating a watertight bond stronger than the membrane itself. It reflects UV radiation, reducing cooling costs, and resists punctures, chemicals, and mold growth, ideal for Virginia's climate."},
+    {q: "How long does a TPO roof last?", a: "A properly installed TPO system lasts 20-30 years. The heat-welded seams are the most durable part, unlike glued or taped seams, they won't separate over time. Regular maintenance extends life further."},
+    {q: "Is TPO roofing energy efficient?", a: "Yes, TPO's white reflective surface can reduce cooling costs by 10-30% compared to dark roofing materials. It meets ENERGY STAR requirements and is a popular choice for energy-conscious building owners in the Roanoke area."},
   ],
   "epdm-roofing": [
     {q: "What is EPDM roofing?", a: "EPDM is a synthetic rubber membrane used on flat and low-slope roofs. It's one of the most time-tested flat roofing materials, known for durability, flexibility, and resistance to UV radiation and temperature extremes."},
-    {q: "How does EPDM compare to TPO?", a: "EPDM is typically more affordable upfront and has a longer track record. TPO offers better energy efficiency with its reflective surface. Both last 20-30 years — the best choice depends on your building's needs and budget."},
-    {q: "Can EPDM be repaired easily?", a: "Yes — EPDM is one of the easiest flat roof systems to repair. Patches bond well to the existing membrane, and seam repairs are straightforward. This repairability is one of EPDM's biggest advantages for long-term cost savings."},
+    {q: "How does EPDM compare to TPO?", a: "EPDM is typically more affordable upfront and has a longer track record. TPO offers better energy efficiency with its reflective surface. Both last 20-30 years, the best choice depends on your building's needs and budget."},
+    {q: "Can EPDM be repaired easily?", a: "Yes, EPDM is one of the easiest flat roof systems to repair. Patches bond well to the existing membrane, and seam repairs are straightforward. This repairability is one of EPDM's biggest advantages for long-term cost savings."},
   ],
   "modified-bitumen": [
     {q: "What is modified bitumen roofing?", a: "Modified bitumen is a multi-layer asphalt roofing system designed for flat and low-slope roofs. It combines the proven reliability of built-up roofing with modern polymer modifiers for improved flexibility and durability."},
@@ -213,56 +213,56 @@ const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
     {q: "How long does modified bitumen last?", a: "Modified bitumen systems typically last 15-20 years with proper maintenance. They're more affordable than TPO or EPDM upfront and perform well in applications where other single-ply membranes may be harder to install."},
   ],
   "siding": [
-    {q: "What type of siding do you recommend for Virginia homes?", a: "James Hardie fiber cement siding is our top recommendation for Virginia — it handles our humidity, temperature swings, and occasional severe weather better than any other option. Vinyl siding is a solid budget-friendly alternative with good durability."},
+    {q: "What type of siding do you recommend for Virginia homes?", a: "James Hardie fiber cement siding is our top recommendation for Virginia, it handles our humidity, temperature swings, and occasional severe weather better than any other option. Vinyl siding is a solid budget-friendly alternative with good durability."},
     {q: "How long does new siding last?", a: "Fiber cement siding lasts 30-50 years with minimal maintenance. Vinyl siding lasts 20-40 years. Both are significant upgrades from wood siding, which requires constant maintenance in Virginia's climate."},
     {q: "Will new siding improve my home's energy efficiency?", a: "Yes, significantly. Modern siding with proper insulation can reduce heating and cooling costs by 10-20%. We install insulated backing behind all siding to maximize energy performance."},
-    {q: "Can you replace siding on just one side of my house?", a: "Yes. If damage is limited to one wall — from a tree, storm, or sun exposure — we can replace that section and match it to your existing siding. For homes with widespread issues, full replacement is usually more cost-effective."},
+    {q: "Can you replace siding on just one side of my house?", a: "Yes. If damage is limited to one wall, from a tree, storm, or sun exposure, we can replace that section and match it to your existing siding. For homes with widespread issues, full replacement is usually more cost-effective."},
   ],
   "vinyl-siding": [
-    {q: "Is vinyl siding a good choice for Virginia?", a: "Yes. Modern vinyl siding is durable, low-maintenance, and handles Virginia's humidity and temperature swings well. It won't rot, peel, or need painting — just an occasional wash to keep it looking fresh."},
+    {q: "Is vinyl siding a good choice for Virginia?", a: "Yes. Modern vinyl siding is durable, low-maintenance, and handles Virginia's humidity and temperature swings well. It won't rot, peel, or need painting, just an occasional wash to keep it looking fresh."},
     {q: "How long does vinyl siding last?", a: "Quality vinyl siding lasts 20-40 years with virtually no maintenance. It won't rot, warp, or attract insects like wood. Color-through manufacturing means scratches don't show bare material underneath."},
-    {q: "Can vinyl siding be installed over existing siding?", a: "In some cases, yes — but we generally recommend removing old siding first. This lets us inspect and repair sheathing, install proper moisture barriers, and ensure a flat surface for the best long-term results."},
+    {q: "Can vinyl siding be installed over existing siding?", a: "In some cases, yes, but we generally recommend removing old siding first. This lets us inspect and repair sheathing, install proper moisture barriers, and ensure a flat surface for the best long-term results."},
   ],
   "fiber-cement-siding": [
-    {q: "Why is James Hardie fiber cement siding so popular?", a: "James Hardie is engineered specifically for climate zones — our Virginia-rated product handles humidity, freeze-thaw cycles, and UV exposure better than any competitor. It won't rot, warp, crack, or attract termites."},
-    {q: "Does fiber cement siding need to be painted?", a: "James Hardie's ColorPlus Technology comes factory-finished with a baked-on color that resists fading for 15+ years. When it eventually needs refreshing, it takes paint beautifully — unlike vinyl which can't be painted darker."},
+    {q: "Why is James Hardie fiber cement siding so popular?", a: "James Hardie is engineered specifically for climate zones, our Virginia-rated product handles humidity, freeze-thaw cycles, and UV exposure better than any competitor. It won't rot, warp, crack, or attract termites."},
+    {q: "Does fiber cement siding need to be painted?", a: "James Hardie's ColorPlus Technology comes factory-finished with a baked-on color that resists fading for 15+ years. When it eventually needs refreshing, it takes paint beautifully, unlike vinyl which can't be painted darker."},
     {q: "How does fiber cement compare to vinyl siding?", a: "Fiber cement is thicker, more impact-resistant, and has a richer wood-like appearance. It lasts 30-50 years vs. 20-40 for vinyl. The upfront cost is higher, but the longevity and curb appeal make it a strong investment."},
   ],
   "siding-repair": [
-    {q: "Can you repair just a few damaged siding panels?", a: "Yes. If damage is limited to a small area — from impact, storm, or moisture — we can replace individual panels or sections. We match your existing siding's style, color, and profile for a seamless repair."},
+    {q: "Can you repair just a few damaged siding panels?", a: "Yes. If damage is limited to a small area, from impact, storm, or moisture, we can replace individual panels or sections. We match your existing siding's style, color, and profile for a seamless repair."},
     {q: "How do I know if my siding needs repair or replacement?", a: "Localized damage like a cracked panel, loose section, or small area of moisture damage usually calls for repair. If you're seeing widespread warping, rot, fading, or multiple problem areas, full replacement is more cost-effective."},
-    {q: "Can damaged siding cause other problems?", a: "Yes — damaged siding allows moisture behind your walls, leading to mold, rot, and structural damage. Even small gaps or cracks should be addressed promptly to prevent expensive hidden damage to your home's structure."},
+    {q: "Can damaged siding cause other problems?", a: "Yes, damaged siding allows moisture behind your walls, leading to mold, rot, and structural damage. Even small gaps or cracks should be addressed promptly to prevent expensive hidden damage to your home's structure."},
   ],
   "skylights": [
-    {q: "Will a skylight make my roof leak?", a: "Not when properly installed. Skylight leaks almost always result from improper flashing or installation — not the skylight itself. As a GAF Master Elite contractor, our installation methods are warrantied and proven leak-free."},
+    {q: "Will a skylight make my roof leak?", a: "Not when properly installed. Skylight leaks almost always result from improper flashing or installation, not the skylight itself. As a GAF Master Elite contractor, our installation methods are warrantied and proven leak-free."},
     {q: "How much does skylight installation cost?", a: "A standard fixed skylight installation typically runs $1,500-$3,000 including the unit and labor. Venting skylights cost $2,000-$4,000. Price varies by size, type, and roof complexity. We provide detailed quotes after a free inspection."},
-    {q: "Can you add a skylight to an existing roof?", a: "Yes. We can install skylights on most existing roofs — the main requirements are adequate attic space and a roof section without obstructions (plumbing vents, structural beams). We'll assess feasibility during your free consultation."},
+    {q: "Can you add a skylight to an existing roof?", a: "Yes. We can install skylights on most existing roofs, the main requirements are adequate attic space and a roof section without obstructions (plumbing vents, structural beams). We'll assess feasibility during your free consultation."},
     {q: "What type of skylight is best?", a: "For most homes, we recommend VELUX fixed or venting skylights with low-E glass. Fixed skylights are more affordable; venting models add ventilation. Solar-powered venting skylights qualify for federal tax credits."},
   ],
   "skylight-repair": [
-    {q: "Why is my skylight leaking?", a: "Most skylight leaks are caused by deteriorated flashing, cracked seals, or improper original installation — not the skylight unit itself. We inspect the full assembly to identify the exact source and provide a targeted repair."},
-    {q: "Can you repair my skylight or does it need replacement?", a: "Many skylight issues — condensation, minor leaks, cracked seals — can be repaired without full replacement. If the unit itself is cracked, heavily fogged, or over 20 years old, replacement is usually the better investment."},
+    {q: "Why is my skylight leaking?", a: "Most skylight leaks are caused by deteriorated flashing, cracked seals, or improper original installation, not the skylight unit itself. We inspect the full assembly to identify the exact source and provide a targeted repair."},
+    {q: "Can you repair my skylight or does it need replacement?", a: "Many skylight issues, condensation, minor leaks, cracked seals, can be repaired without full replacement. If the unit itself is cracked, heavily fogged, or over 20 years old, replacement is usually the better investment."},
     {q: "How much does skylight repair cost?", a: "Skylight repairs typically range from $300-$800 depending on the issue. Re-flashing is the most common repair and prevents future leaks. We provide a clear quote after inspecting your skylight."},
   ],
   "roof-coatings": [
-    {q: "Can a roof coating really extend my roof's life?", a: "Yes — a properly applied silicone or elastomeric coating can add 10-15 years to an existing roof. It seals small cracks, reflects UV radiation, and creates a waterproof membrane over your existing roof surface."},
+    {q: "Can a roof coating really extend my roof's life?", a: "Yes, a properly applied silicone or elastomeric coating can add 10-15 years to an existing roof. It seals small cracks, reflects UV radiation, and creates a waterproof membrane over your existing roof surface."},
     {q: "Is a roof coating cheaper than replacement?", a: "Significantly. Roof coatings typically cost 50-70% less than full replacement. For a roof that's aging but structurally sound, coating is often the smartest investment."},
-    {q: "What types of roofs can be coated?", a: "Coatings work best on flat and low-slope roofs — TPO, EPDM, modified bitumen, metal, and built-up roofing. They're not typically used on residential shingle roofs. We'll inspect your roof to determine if coating is the right solution."},
+    {q: "What types of roofs can be coated?", a: "Coatings work best on flat and low-slope roofs, TPO, EPDM, modified bitumen, metal, and built-up roofing. They're not typically used on residential shingle roofs. We'll inspect your roof to determine if coating is the right solution."},
     {q: "How long does a roof coating last?", a: "Quality silicone coatings last 10-15 years. They can be recoated when they wear, extending your roof's life indefinitely without ever doing a full tear-off. This makes them an excellent long-term investment for commercial buildings."},
   ],
   "silicone-roof-coating": [
-    {q: "Why choose silicone over other roof coatings?", a: "Silicone is the gold standard for flat roof coatings because it handles ponding water without degrading — a critical advantage since standing water is common on flat roofs. It also offers excellent UV resistance and stays flexible in Virginia's temperature swings."},
-    {q: "Can silicone coating be applied over an existing coating?", a: "Yes — silicone can be recoated over itself when it wears, extending your roof's protection indefinitely without a tear-off. This makes it one of the most cost-effective long-term solutions for commercial flat roofs."},
-    {q: "How is silicone roof coating applied?", a: "We clean and prep the existing roof surface, repair any damage, then spray or roll the silicone coating in multiple passes to achieve the specified thickness. The process is fast — most commercial roofs are completed in 1-3 days."},
+    {q: "Why choose silicone over other roof coatings?", a: "Silicone is the gold standard for flat roof coatings because it handles ponding water without degrading, a critical advantage since standing water is common on flat roofs. It also offers excellent UV resistance and stays flexible in Virginia's temperature swings."},
+    {q: "Can silicone coating be applied over an existing coating?", a: "Yes, silicone can be recoated over itself when it wears, extending your roof's protection indefinitely without a tear-off. This makes it one of the most cost-effective long-term solutions for commercial flat roofs."},
+    {q: "How is silicone roof coating applied?", a: "We clean and prep the existing roof surface, repair any damage, then spray or roll the silicone coating in multiple passes to achieve the specified thickness. The process is fast, most commercial roofs are completed in 1-3 days."},
   ],
   "roof-inspection": [
-    {q: "How much does a roof inspection cost?", a: "Our standard roof inspections are free — no obligation, no pressure. We'll climb up, inspect every component, take photos, and give you an honest written assessment. We only charge for formal real estate inspection reports."},
+    {q: "How much does a roof inspection cost?", a: "Our standard roof inspections are free, no obligation, no pressure. We'll climb up, inspect every component, take photos, and give you an honest written assessment. We only charge for formal real estate inspection reports."},
     {q: "What do you check during an inspection?", a: "We inspect 15+ points: shingles (cracking, curling, missing), flashing (chimney, vents, valleys), pipe boots, ridge caps, gutters, soffit vents, ridge vents, and attic ventilation. We also check for signs of water damage, algae, and structural issues."},
-    {q: "How often should I have my roof inspected?", a: "At minimum once a year, plus after any major storm. Annual inspections catch small problems — a $200 flashing fix today prevents a $5,000 leak repair next year. We recommend spring or fall inspections."},
+    {q: "How often should I have my roof inspected?", a: "At minimum once a year, plus after any major storm. Annual inspections catch small problems, a $200 flashing fix today prevents a $5,000 leak repair next year. We recommend spring or fall inspections."},
     {q: "Do you provide inspection reports for home buyers?", a: "Yes. We offer detailed roof condition reports for home buyers that include photos, estimated remaining life, and any issues found. This is valuable for purchase negotiations and budgeting future maintenance."},
   ],
   "wind-damage-repair": [
-    {q: "How do I know if my roof has wind damage?", a: "Look for missing or lifted shingles, exposed nail heads, creased shingles, and damaged ridge caps. Wind damage often affects edges and ridges first. Some damage isn't visible from the ground — that's why we offer free post-storm inspections."},
+    {q: "How do I know if my roof has wind damage?", a: "Look for missing or lifted shingles, exposed nail heads, creased shingles, and damaged ridge caps. Wind damage often affects edges and ridges first. Some damage isn't visible from the ground, that's why we offer free post-storm inspections."},
     {q: "Will insurance cover wind damage?", a: "Most homeowner's policies cover wind damage. We work directly with insurance adjusters and can help document damage with photos and detailed reports to support your claim. You typically only pay your deductible."},
     {q: "How quickly can you repair wind damage?", a: "For emergency situations with active leaks, we respond same-day with tarping. Full repairs are typically scheduled within 1-2 weeks, depending on the extent of damage and material availability."},
     {q: "Can you repair just the damaged section?", a: "Yes, if wind damage is limited to one area. We match your existing shingle color and style for a seamless repair. If damage is widespread (30%+ of the roof), full replacement may be more cost-effective and is often covered by insurance."},
@@ -275,14 +275,14 @@ const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
   ],
   "emergency-roof-repair": [
     {q: "What counts as a roofing emergency?", a: "Active water leaking into your home, a tree or large branch on your roof, structural sagging, or large sections of missing roofing material after a storm. If water is actively entering your home, call us immediately at (540) 553-6007."},
-    {q: "Do you charge for emergency calls?", a: "We don't charge a separate emergency call fee. You pay for the work performed — tarping, temporary repair, or permanent fix. We provide a clear estimate before starting any work beyond emergency tarping."},
-    {q: "How fast can you get to my home?", a: "For active emergencies, we aim for same-day response. During major storm events, we triage by severity — active leaks and structural damage get priority. We serve all of Roanoke, Christiansburg, and the surrounding areas."},
+    {q: "Do you charge for emergency calls?", a: "We don't charge a separate emergency call fee. You pay for the work performed, tarping, temporary repair, or permanent fix. We provide a clear estimate before starting any work beyond emergency tarping."},
+    {q: "How fast can you get to my home?", a: "For active emergencies, we aim for same-day response. During major storm events, we triage by severity, active leaks and structural damage get priority. We serve all of Roanoke, Christiansburg, and the surrounding areas."},
     {q: "What should I do while waiting for the repair crew?", a: "Place buckets under active leaks, move valuables away from water, take photos for insurance documentation, and avoid going on the roof yourself. If you see structural sagging, evacuate that area of the home immediately."},
   ],
   "insurance-claims-help": [
     {q: "How does MDR help with insurance claims?", a: "We handle the entire process: free damage inspection, detailed photo documentation, meeting with your adjuster on-site, providing repair estimates in insurance-friendly format, and performing the approved work. We make the process as painless as possible."},
-    {q: "Will you meet with my insurance adjuster?", a: "Yes — this is one of the most valuable things we do. Having a roofing professional present during the adjuster's inspection ensures all damage is properly documented. Adjusters sometimes miss damage that's not visible from the ground."},
-    {q: "Do I have to pay anything out of pocket?", a: "You're responsible for your deductible — that's between you and your insurance company. The rest is covered by your claim. We never ask for payment beyond what your insurance approves, and we never inflate claims."},
+    {q: "Will you meet with my insurance adjuster?", a: "Yes, this is one of the most valuable things we do. Having a roofing professional present during the adjuster's inspection ensures all damage is properly documented. Adjusters sometimes miss damage that's not visible from the ground."},
+    {q: "Do I have to pay anything out of pocket?", a: "You're responsible for your deductible, that's between you and your insurance company. The rest is covered by your claim. We never ask for payment beyond what your insurance approves, and we never inflate claims."},
     {q: "What if my insurance denies the claim?", a: "We can help you appeal. We'll provide additional documentation, photos, and professional assessments to support your case. If the denial is legitimate and the damage doesn't meet your policy thresholds, we'll explain your options honestly."},
   ],
   "seamless-gutters": [
@@ -292,7 +292,7 @@ const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
     {q: "Can you match my gutter color to my home?", a: "Yes. Seamless gutters come in 20+ colors to match your trim, fascia, or siding. We can also paint gutters to achieve a custom color match."},
   ],
   "gutter-guards": [
-    {q: "Do gutter guards really work?", a: "Quality gutter guards dramatically reduce debris buildup — you'll go from cleaning gutters 2-4 times per year to maybe once every 2-3 years. They're not 100% maintenance-free, but they're the closest thing to it."},
+    {q: "Do gutter guards really work?", a: "Quality gutter guards dramatically reduce debris buildup, you'll go from cleaning gutters 2-4 times per year to maybe once every 2-3 years. They're not 100% maintenance-free, but they're the closest thing to it."},
     {q: "What type of gutter guards do you recommend?", a: "We recommend micro-mesh gutter guards for Virginia homes. They block even small debris like pine needles and shingle granules while allowing water to flow freely. They handle heavy rain better than screen or foam alternatives."},
     {q: "Can gutter guards be added to existing gutters?", a: "Yes. We install gutter guards on both new and existing gutter systems. We'll clean and inspect your current gutters first, make any necessary repairs, then install the guards for a complete protection system."},
     {q: "How much do gutter guards cost?", a: "Gutter guard installation typically costs $7-15 per linear foot, depending on the type and your home's configuration. For a typical home, that's $1,500-$3,500. The investment pays for itself in reduced cleaning costs and prevented water damage."},
@@ -300,8 +300,8 @@ const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
   "gutter-repair": [
     {q: "How do I know if my gutters need repair?", a: "Look for visible sagging, water overflowing during rain, puddles near your foundation, rust spots, separated seams, or paint peeling on your fascia boards. Any of these indicate gutter problems that should be addressed promptly."},
     {q: "Can damaged gutters affect my roof?", a: "Absolutely. Clogged or damaged gutters cause water to back up under your roof edge, damaging fascia boards, soffit, and eventually the roof decking. Ice dams in winter are also caused by gutter problems. Healthy gutters are part of a healthy roof system."},
-    {q: "Is it better to repair or replace gutters?", a: "If damage is localized — one sagging section, a leaky seam, a loose downspout — repair is usually sufficient and costs $200-$500. If gutters are 15+ years old with widespread issues, replacement with seamless gutters is more cost-effective long-term."},
-    {q: "How often should gutters be cleaned?", a: "At minimum twice a year — spring and fall. Homes with overhanging trees should clean quarterly. Regular cleaning prevents clogs that cause water backup, which damages your roof edge, fascia, and foundation."},
+    {q: "Is it better to repair or replace gutters?", a: "If damage is localized, one sagging section, a leaky seam, a loose downspout, repair is usually sufficient and costs $200-$500. If gutters are 15+ years old with widespread issues, replacement with seamless gutters is more cost-effective long-term."},
+    {q: "How often should gutters be cleaned?", a: "At minimum twice a year, spring and fall. Homes with overhanging trees should clean quarterly. Regular cleaning prevents clogs that cause water backup, which damages your roof edge, fascia, and foundation."},
   ],
 };
 

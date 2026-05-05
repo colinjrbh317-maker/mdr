@@ -6,7 +6,7 @@ import { loadQuery } from "@/sanity/lib/load-query";
 import { SITE_SETTINGS_QUERY, NAVIGATION_QUERY } from "@/sanity/lib/queries";
 import GclidCapture from "@/components/common/GclidCapture.astro";
 import ExitIntentPopup from "@/components/cro/ExitIntentPopup";
-// ScrollPopup removed — less intrusive CRO approach preferred
+// ScrollPopup removed, less intrusive CRO approach preferred
 import MobileRetentionPopup from "@/components/cro/MobileRetentionPopup";
 import EngagementPopup from "@/components/cro/EngagementPopup";
 import PhoneClickRescuePopup from "@/components/cro/PhoneClickRescuePopup";
@@ -15,7 +15,7 @@ import SocialProofToast from "@/components/cro/SocialProofToast";
 import ChatWidget from "@/components/chat/ChatWidget";
 import Hotjar from "@/components/analytics/Hotjar.astro";
 import IntentTracker from "@/components/analytics/IntentTracker.astro";
-// StickyMobileCTA removed — phone icon in header is sufficient
+// StickyMobileCTA removed, phone icon in header is sufficient
 import "@/styles/global.css";
 
 const isStudio = Astro.url.pathname.startsWith("/studio");
@@ -28,7 +28,7 @@ interface Props {
 
 const {
   title,
-  description = "Modern Day Roofing — Christiansburg, Roanoke & Blacksburg's top-rated roofing contractor. Roof replacement, repair & storm damage restoration. GAF Master Elite. 5★ 231 reviews. Free estimates.",
+  description = "Modern Day Roofing, Christiansburg, Roanoke & Blacksburg's top-rated roofing contractor. Roof replacement, repair & storm damage restoration. GAF Master Elite. 5★ 231 reviews. Free estimates.",
   ogImage,
 } = Astro.props;
 
@@ -161,11 +161,11 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
       </script>
     )}
 
-    {/* Hotjar — analytics, session recording, heatmaps */}
+    {/* Hotjar, analytics, session recording, heatmaps */}
     {!isStudio && <Hotjar />}
     {!isStudio && <IntentTracker />}
 
-    {/* CallRail Dynamic Number Insertion — swaps tel: links to tracking numbers */}
+    {/* CallRail Dynamic Number Insertion, swaps tel: links to tracking numbers */}
     {!isStudio && import.meta.env.PUBLIC_CALLRAIL_ID && (
       <script is:inline async src={`https://cdn.callrail.com/companies/${import.meta.env.PUBLIC_CALLRAIL_ID}/swap.js`}></script>
     )}
@@ -189,17 +189,17 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     <VisualEditing enabled={import.meta.env.DEV} />
 
     <ExitIntentPopup client:idle currentPage={Astro.url.pathname} />
-    {/* ScrollPopup removed — less intrusive CRO approach preferred */}
+    {/* ScrollPopup removed, less intrusive CRO approach preferred */}
     <MobileRetentionPopup client:idle />
     <EngagementPopup client:idle />
     <PhoneClickRescuePopup client:idle />
     <SocialProofToast client:idle />
     <ChatWidget client:idle />
-    {/* StickyMobileCTA removed — phone icon in header is sufficient */}
+    {/* StickyMobileCTA removed, phone icon in header is sufficient */}
 
     <GclidCapture />
 
-    {/* Global quote_cta_click tracker — phone_click is handled by IntentTracker (intent-tier.ts) */}
+    {/* Global quote_cta_click tracker, phone_click is handled by IntentTracker (intent-tier.ts) */}
     {!isStudio && (
       <script is:inline>
         document.addEventListener('click', function(e) {

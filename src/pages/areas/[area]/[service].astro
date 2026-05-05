@@ -12,6 +12,7 @@ import {
   ALL_AREA_SERVICE_COMBOS_QUERY,
 } from "@/sanity/lib/queries";
 import { urlForImage } from "@/sanity/lib/url-for-image";
+import { areaFacts, formatZipList, formatNeighborhoodList } from "@/data/area-content";
 
 export const prerender = true;
 
@@ -49,7 +50,7 @@ if (!area || !service) {
 
 // --- SEO ---
 const seoTitle = `${service.name} ${area.name} VA | 5★ 231 Reviews | Modern Day Roofing`;
-const seoDescription = `${service.name} in ${area.name}, VA — licensed, insured, GAF Master Elite. 5★ rated by 231 homeowners. Free estimates. Call (540) 553-6007.`;
+const seoDescription = `${service.name} in ${area.name}, VA, licensed, insured, GAF Master Elite. 5★ rated by 231 homeowners. Free estimates. Call (540) 553-6007.`;
 
 // --- Breadcrumbs ---
 const breadcrumbItems = [
@@ -124,18 +125,18 @@ const comboFaqs: Record<string, Array<{ q: string; a: string }>> = {
   ],
   "shingle-roofing": [
     { q: `What type of shingles work best in ${area.name}'s climate?`, a: `GAF Timberline HDZ architectural shingles are ideal for ${area.name}. They handle Virginia's temperature swings, resist winds up to 130 mph, and include algae resistance for the humidity. As a GAF Master Elite contractor, we back them with the industry's strongest warranty.` },
-    { q: `How long do shingle roofs last in ${area.name}?`, a: `Quality architectural shingles last 25-30 years in ${area.name}'s climate. Proper installation of the full roofing system — underlayment, ventilation, flashing, and shingles — is what makes the difference between a 20-year and 30-year roof.` },
-    { q: `What warranty comes with shingle roofing in ${area.name}?`, a: `As a GAF Master Elite contractor, we offer the Golden Pledge warranty — 50-year material coverage and 25-year workmanship coverage, backed by GAF. Only 3% of roofers nationwide qualify for this certification.` },
+    { q: `How long do shingle roofs last in ${area.name}?`, a: `Quality architectural shingles last 25-30 years in ${area.name}'s climate. Proper installation of the full roofing system, underlayment, ventilation, flashing, and shingles, is what makes the difference between a 20-year and 30-year roof.` },
+    { q: `What warranty comes with shingle roofing in ${area.name}?`, a: `As a GAF Master Elite contractor, we offer the Golden Pledge warranty, 50-year material coverage and 25-year workmanship coverage, backed by GAF. Only 3% of roofers nationwide qualify for this certification.` },
   ],
   "metal-roofing": [
     { q: `Is metal roofing a good choice for ${area.name} homes?`, a: `Metal roofing is excellent for ${area.name}. It handles Virginia's severe weather, reflects heat in summer to reduce cooling costs, and lasts 50+ years with minimal maintenance. Standing seam metal roofs also increase home value.` },
     { q: `How much does metal roofing cost in ${area.name}?`, a: `Standing seam metal roofing in ${area.name} typically costs more upfront than shingles, but the 50+ year lifespan and lower maintenance costs make it competitive on a per-year basis. We provide detailed quotes so you can compare the long-term value.` },
-    { q: `Do metal roofs work well in Virginia weather?`, a: `Absolutely. Metal roofs excel in Virginia's climate — they shed snow, resist high winds (up to 140+ mph for standing seam), and handle the freeze-thaw cycles better than most materials. They also stay cooler in our hot summers.` },
+    { q: `Do metal roofs work well in Virginia weather?`, a: `Absolutely. Metal roofs excel in Virginia's climate, they shed snow, resist high winds (up to 140+ mph for standing seam), and handle the freeze-thaw cycles better than most materials. They also stay cooler in our hot summers.` },
   ],
   "gutters": [
     { q: `Why are gutters important for ${area.name} homes?`, a: `${area.name} receives significant rainfall throughout the year. Without properly functioning gutters, water pools around your foundation, causing erosion, basement flooding, and structural damage. Gutters protect your home's foundation, siding, and landscaping.` },
     { q: `What type of gutters do you install in ${area.name}?`, a: `We install seamless aluminum gutters custom-formed on-site to fit your ${area.name} home precisely. Seamless means fewer joints, fewer leak points, and a cleaner appearance. We also offer gutter guard installation to reduce maintenance.` },
-    { q: `How often should gutters be cleaned in ${area.name}?`, a: `At minimum twice a year — spring and fall. With the trees common in ${area.name}, quarterly cleaning is even better. Clogged gutters cause water to back up under your roof edge, damaging fascia and potentially your roof decking.` },
+    { q: `How often should gutters be cleaned in ${area.name}?`, a: `At minimum twice a year, spring and fall. With the trees common in ${area.name}, quarterly cleaning is even better. Clogged gutters cause water to back up under your roof edge, damaging fascia and potentially your roof decking.` },
   ],
   "storm-damage": [
     { q: `What should I do after storm damage to my ${area.name} home?`, a: `Document the damage with photos, contact your insurance company, then call us at (540) 553-6007. We offer 24/7 emergency response in ${area.name} to tarp damaged areas and prevent further water intrusion while we plan the full repair.` },
@@ -143,7 +144,7 @@ const comboFaqs: Record<string, Array<{ q: string; a: string }>> = {
     { q: `How quickly can you respond to storm damage in ${area.name}?`, a: `We prioritize ${area.name} emergency calls and typically respond within hours for active leaks and exposed areas. Our goal is to get a tarp or temporary repair in place the same day to protect your home from further damage.` },
   ],
   "roof-maintenance": [
-    { q: `How often should my ${area.name} roof be inspected?`, a: `At least once a year, and after any major storm. ${area.name}'s climate — with hot summers, cold winters, and severe storms — puts extra stress on your roof. Regular inspections catch small issues before they become expensive repairs.` },
+    { q: `How often should my ${area.name} roof be inspected?`, a: `At least once a year, and after any major storm. ${area.name}'s climate, with hot summers, cold winters, and severe storms, puts extra stress on your roof. Regular inspections catch small issues before they become expensive repairs.` },
     { q: `What does a roof maintenance visit include in ${area.name}?`, a: `We inspect shingles, flashing, ridge caps, valleys, pipe boots, ventilation, gutters, and attic ventilation. We check for moss or algae growth, clear debris, and provide a detailed report with photos. Minor repairs are handled on the spot.` },
     { q: `Can maintenance extend my roof's lifespan in ${area.name}?`, a: `Significantly. A well-maintained roof in ${area.name} can last 5-10 years longer than a neglected one. Catching a $200 flashing repair early prevents a $5,000 water damage problem later. Our annual plans make it effortless.` },
   ],
@@ -157,7 +158,7 @@ const comboFaqs: Record<string, Array<{ q: string; a: string }>> = {
 const currentFaqs = comboFaqs[serviceSlug as string] || [
   { q: `Do you offer ${service.name.toLowerCase()} in ${area.name}?`, a: `Yes. Modern Day Roofing provides professional ${service.name.toLowerCase()} services throughout ${area.name} and the surrounding Virginia communities. Contact us at (540) 553-6007 for a free estimate.` },
   { q: `How do I get started with ${service.name.toLowerCase()} in ${area.name}?`, a: `Call us at (540) 553-6007 or fill out our contact form for a free, no-obligation estimate. We'll schedule a convenient time to inspect your property and provide a detailed quote.` },
-  { q: `Why choose Modern Day Roofing for ${service.name.toLowerCase()} in ${area.name}?`, a: `We're a GAF Master Elite certified contractor — a distinction held by only 3% of roofers nationwide. We offer the industry's strongest warranties, transparent pricing, and a commitment to quality that ${area.name} homeowners trust.` },
+  { q: `Why choose Modern Day Roofing for ${service.name.toLowerCase()} in ${area.name}?`, a: `We're a GAF Master Elite certified contractor, a distinction held by only 3% of roofers nationwide. We offer the industry's strongest warranties, transparent pricing, and a commitment to quality that ${area.name} homeowners trust.` },
 ];
 
 // --- JSON-LD ---
@@ -306,6 +307,9 @@ const serviceContent: Record<string, { intro: string; includes: string[] }> = {
   },
 };
 
+// --- Verified local facts (Tier 1 cities only; falls back gracefully) ---
+const localFacts = areaFacts[areaSlug as string];
+
 const content = serviceContent[serviceSlug as string] || {
   intro: `Modern Day Roofing provides professional ${service.name.toLowerCase()} services throughout ${area.name}, Virginia. Our experienced team delivers quality workmanship backed by industry-leading warranties and a commitment to customer satisfaction.`,
   includes: [
@@ -382,11 +386,50 @@ const content = serviceContent[serviceSlug as string] || {
 
             <h3>Why {area.name} Homeowners Choose Modern Day Roofing</h3>
             <p>
-              As a <strong>GAF Master Elite certified contractor</strong> — a distinction held by only 3% of roofers nationwide — we deliver the industry's highest standards right here in {area.name}. Every project comes with transparent pricing, respectful worksite management, and the strongest warranties available.
+              As a <strong>GAF Master Elite certified contractor</strong>, a distinction held by only 3% of roofers nationwide, we deliver the industry's highest standards right here in {area.name}. Every project comes with transparent pricing, respectful worksite management, and the strongest warranties available.
             </p>
             <p>
               We've served the {area.parentHub ? area.parentHub.name : area.name} community for years, building a reputation on honest assessments and quality workmanship. When we say we'll take care of your home, we mean it.
             </p>
+
+            {localFacts && (
+              <>
+                <h3>Local Roofing Context for {area.name}</h3>
+                <p>{localFacts.localRoofingContext}</p>
+
+                <div class="not-prose my-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div class="bg-bg-light border border-border rounded-lg p-4">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-text-muted">Elevation</div>
+                    <div class="mt-1 text-xl font-bold text-text-primary">{localFacts.elevationFt.toLocaleString()} ft</div>
+                  </div>
+                  <div class="bg-bg-light border border-border rounded-lg p-4">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-text-muted">Avg. Snow</div>
+                    <div class="mt-1 text-xl font-bold text-text-primary">{localFacts.annualSnowfallIn}"<span class="text-sm font-normal text-text-muted">/yr</span></div>
+                  </div>
+                  <div class="bg-bg-light border border-border rounded-lg p-4">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-text-muted">Avg. Rain</div>
+                    <div class="mt-1 text-xl font-bold text-text-primary">{localFacts.annualRainfallIn}"<span class="text-sm font-normal text-text-muted">/yr</span></div>
+                  </div>
+                  <div class="bg-bg-light border border-border rounded-lg p-4">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-text-muted">Population</div>
+                    <div class="mt-1 text-xl font-bold text-text-primary">{localFacts.population.split(' ')[0]}</div>
+                  </div>
+                </div>
+
+                <h4>{area.name} Neighborhoods We Serve</h4>
+                <p>
+                  We work on roofs throughout {area.name}, including {formatNeighborhoodList(localFacts.neighborhoods)}.
+                  Our service area for {area.name} covers ZIP codes {formatZipList(localFacts.zipCodes)}.
+                  {localFacts.fromHQ && ` ${localFacts.fromHQ}`}
+                </p>
+
+                {localFacts.recentSevereWeather && (
+                  <p class="text-sm text-text-muted italic">
+                    <strong>Recent severe weather:</strong> {localFacts.recentSevereWeather}
+                  </p>
+                )}
+              </>
+            )}
           </div>
         </ScrollReveal>
       </div>
@@ -436,7 +479,7 @@ const content = serviceContent[serviceSlug as string] || {
   <SectionContainer background="light" padding="md">
     <div class="max-w-3xl mx-auto">
       <h2 class="text-2xl md:text-3xl font-display font-bold text-text-primary text-center mb-8">
-        {service.name} in {area.name} — FAQs
+        {service.name} in {area.name}, FAQs
       </h2>
       <div class="space-y-4">
         {currentFaqs.map((faq) => (
