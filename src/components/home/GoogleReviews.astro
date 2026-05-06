@@ -14,12 +14,15 @@ const totalReviewCount = reviews.length;
 // JSON-LD Review schema for top 3 reviews so SERPs can display
 // individual star ratings under the result. This is one of the
 // strongest signals for SERP click-through-rate.
+// Note: no `itemReviewed` here — these Review objects are nested inside the
+// parent RoofingContractor's `review[]` array, so the subject is implicit.
+// Including itemReviewed creates a directional conflict per Google's
+// structured-data validator.
 const topReviewsSchema = reviews.slice(0, 3).map((r) => ({
   "@type": "Review",
   reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
   author: { "@type": "Person", name: r.name },
   reviewBody: r.quote,
-  itemReviewed: { "@type": "RoofingContractor", name: "Modern Day Roofing" },
 }));
 
 const reviewsAggregateSchema = {
