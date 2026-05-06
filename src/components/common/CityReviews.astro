@@ -42,6 +42,18 @@ const reviewsBlockSchema = {
   "@type": "RoofingContractor",
   name: `Modern Day Roofing - ${city}`,
   url: `https://moderndayroof.com/areas/${city.toLowerCase().replace(/ /g, "-")}`,
+  telephone: "(540) 553-6007",
+  priceRange: "$$",
+  image: "https://moderndayroof.com/og-default.png",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "80 College St. STE R",
+    addressLocality: "Christiansburg",
+    addressRegion: "VA",
+    postalCode: "24073",
+    addressCountry: "US",
+  },
+  areaServed: { "@type": "City", name: `${city}, VA` },
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: "5.0",
