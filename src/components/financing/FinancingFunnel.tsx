@@ -897,7 +897,7 @@ export default function FinancingFunnel() {
                     </svg>
                   ))}
                 </div>
-                <p className="text-xs text-text-dim">Trusted by 231+ homeowners</p>
+                <p className="text-xs text-text-dim">Trusted by 270+ homeowners</p>
               </div>
               <button onClick={resetFunnel} className="text-xs text-text-dim hover:text-accent transition-colors underline">
                 Start Over

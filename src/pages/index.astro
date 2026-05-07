@@ -11,6 +11,7 @@ import ServicesAndGallery from "@/components/home/ServicesAndGallery.astro";
 import HeroErie from "@/components/home/HeroErie.astro";
 import GoogleReviews from "@/components/home/GoogleReviews.astro";
 import WhyMDR from "@/components/home/WhyMDR.astro";
+import FacebookFeed from "@/components/home/FacebookFeed.astro";
 
 const homepageFaqs = [
   {
@@ -19,7 +20,7 @@ const homepageFaqs = [
   },
   {
     question: "What is a GAF Master Elite contractor?",
-    answer: "Only the top 1% of roofing contractors in the country earn GAF Master Elite certification. It means we've met rigorous standards for training, insurance, and customer satisfaction, and it qualifies us to offer GAF's strongest warranty, the Golden Pledge.",
+    answer: "GAF Master Elite is a certification earned by only the top 2% of roofing contractors in the country. It means we've met rigorous standards for training, insurance, and customer satisfaction, and it qualifies us to offer GAF's strongest warranty, the Golden Pledge. On top of that, we were ranked among just 127 contractors to earn 3-Star President's Club status with GAF in 2026.",
   },
   {
     question: "Do you offer financing for roof replacement?",
@@ -37,8 +38,8 @@ const homepageFaqs = [
 ---
 
 <Layout
-  title="Roofing Contractor Christiansburg, Roanoke & Blacksburg VA | 5★ 231 Reviews"
-  description="Modern Day Roofing, Christiansburg, Roanoke & Blacksburg's top-rated roofing contractor. Roof replacement, repair & storm damage. GAF Master Elite. 5★ 231 reviews. Free estimates. (540) 553-6007."
+  title="Roofing Contractor Christiansburg, Roanoke & Blacksburg VA | 5★ 270 Reviews"
+  description="Modern Day Roofing, Christiansburg, Roanoke & Blacksburg's top-rated roofing contractor. Roof replacement, repair & storm damage. GAF Master Elite. 5★ 270 reviews. Free estimates. (540) 553-6007."
 >
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -189,6 +190,9 @@ const homepageFaqs = [
 
   {/* 6. GOOGLE REVIEWS */}
   <GoogleReviews />
+
+  {/* 6.5 LIVE FACEBOOK FEED */}
+  <FacebookFeed />
 
   {/* 6. STATS COUNTER */}
   <StatsCounter />

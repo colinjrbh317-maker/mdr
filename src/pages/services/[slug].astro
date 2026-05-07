@@ -44,18 +44,18 @@ const fallbackImages: Record<string, string> = {
   // Repair family, Alicia's repair-* photos
   "roof-repair": "/assets/drive/mdr-repair-12.jpg",
   "roof-maintenance": "/assets/drive/mdr-repair-11.jpg",
-  "wind-damage-repair": "/assets/drive/mdr-storm-damage-tree.jpg",
-  "hail-damage-repair": "/assets/drive/mdr-storm-damage-1.jpg",
-  "emergency-roof-repair": "/assets/drive/mdr-storm-damage-2.jpg",
+  "wind-damage-repair": "/assets/storm-damage/wind-damage.webp",
+  "hail-damage-repair": "/assets/storm-damage/hail-damage.webp",
+  "emergency-roof-repair": "/assets/storm-damage/hail-storm-damage.webp",
   "skylight-repair": "/assets/drive/mdr-repair-3tab.jpg",
   // Storm + insurance
-  "storm-damage": "/assets/drive/mdr-storm-damage-1.jpg",
-  "insurance-claims-help": "/assets/drive/mdr-storm-damage-2.jpg",
-  // Gutter family, Alicia's labeled gutter photos
-  "gutters": "/assets/drive/mdr-gutters-1.jpg",
-  "seamless-gutters": "/assets/drive/mdr-gutters-2.jpg",
-  "gutter-guards": "/assets/drive/mdr-gutters-3.jpg",
-  "gutter-repair": "/assets/drive/mdr-gutters-1.jpg",
+  "storm-damage": "/assets/storm-damage/hail-storm-damage.webp",
+  "insurance-claims-help": "/assets/storm-damage/insurance-claim-help.webp",
+  // Gutter family, Alicia's new labeled gutter photos
+  "gutters": "/assets/gutters/gutters-1.webp",
+  "seamless-gutters": "/assets/gutters/gutters-2.webp",
+  "gutter-guards": "/assets/gutters/gutters-3.webp",
+  "gutter-repair": "/assets/gutters/gutters-1.webp",
   // Inspection
   "roof-inspection": "/assets/drive/mdr-repair-11.jpg",
   // Roofing system component-anchored
@@ -83,9 +83,9 @@ const heroImage = service.featuredImage
   ? urlForImage(service.featuredImage).width(1600).height(800).url()
   : fallbackImages[slug as string] || "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG";
 
-const seoTitle = service.seo?.metaTitle || `${service.name} Christiansburg, Roanoke & Blacksburg VA | 5★ 231 Reviews`;
+const seoTitle = service.seo?.metaTitle || `${service.name} Christiansburg, Roanoke & Blacksburg VA | 5★ 270 Reviews`;
 const seoDescription =
-  service.seo?.metaDescription || service.description || `Professional ${service.name.toLowerCase()} in Christiansburg, Roanoke & Blacksburg VA. GAF Master Elite, 5★ rated by 231 homeowners. Free estimates, call (540) 553-6007.`;
+  service.seo?.metaDescription || service.description || `Professional ${service.name.toLowerCase()} in Christiansburg, Roanoke & Blacksburg VA. GAF Master Elite, 5★ rated by 270 homeowners. Free estimates, call (540) 553-6007.`;
 
 // Breadcrumb items
 const breadcrumbItems = [
@@ -160,9 +160,9 @@ const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
     {q: "Do you offer maintenance plans?", a: "Yes. Our annual maintenance plans include a thorough inspection, minor repairs, gutter cleaning, and a written report. It's the easiest way to protect your investment and catch issues early."},
   ],
   "timber-seal": [
-    {q: "What is Timber Seal?", a: "Timber Seal is GAF's premium wood-look roofing option, it gives you the aesthetic of natural wood shakes with the durability and fire resistance of modern roofing materials. Beautiful appearance with none of the maintenance headaches."},
-    {q: "How does Timber Seal compare to real wood shakes?", a: "Timber Seal looks like wood but lasts longer, resists fire, won't rot or split, and requires far less maintenance. Real wood shakes need regular treatment and can be a fire hazard, Timber Seal eliminates those concerns."},
-    {q: "Is Timber Seal more expensive than standard shingles?", a: "Yes, it's a premium product. But for homeowners who want the wood-shake look, it's significantly less expensive and more durable than real wood. We can walk you through the cost comparison during your free estimate."},
+    {q: "What is GAF TimberSteel?", a: "GAF TimberSteel is a metal shingle system that gives you the look of premium architectural shingles with the durability of stone-coated steel. It pairs the curb appeal homeowners want with a 50-year service life, Class A fire resistance, and Class 4 impact protection."},
+    {q: "How does TimberSteel compare to standard asphalt shingles?", a: "TimberSteel lasts roughly twice as long as a standard asphalt shingle, handles hail and wind far better, and won't lose granules over time. It also reflects more solar heat, which can lower cooling costs in the summer."},
+    {q: "Is TimberSteel a good choice for Virginia weather?", a: "Yes. TimberSteel is built for climates with snow, hail, and freeze-thaw cycles. The interlocking steel panels resist uplift in heavy wind and shed snow more efficiently than dimensional shingles, which is especially helpful at Christiansburg and Blacksburg elevations."},
   ],
   "commercial-roofing": [
     {q: "What types of commercial roofing does MDR install?", a: "We install TPO, EPDM, modified bitumen, commercial metal, and roof coating systems. We handle everything from small retail buildings to large commercial properties and HOA communities across the Roanoke and New River Valley areas."},
@@ -325,7 +325,7 @@ const serviceJsonLd = {
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "5.0",
-      reviewCount: "231",
+      reviewCount: "270",
       bestRating: "5",
       worstRating: "1",
     },

@@ -73,7 +73,7 @@ export default function ScrollPopup() {
               <span key={i} className="text-amber-400 text-sm">★</span>
             ))}
           </div>
-          <span className="text-xs font-semibold text-text-muted">231 Reviews</span>
+          <span className="text-xs font-semibold text-text-muted">270 Reviews</span>
         </div>
 
         <h3 className="text-lg font-bold text-text-primary leading-tight mb-1">
