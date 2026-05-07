@@ -18,14 +18,14 @@ const { cityName } = Astro.props;
         Live geo-tagged jobs from the Modern Day Roofing crew. Tap a pin to see the work we've done in your neighborhood.
       </p>
     </div>
-    <div class="rounded-2xl overflow-hidden border border-border bg-bg-light shadow-sm" style="min-height: 480px;">
-      <div id="gb-widget-mount" class="w-full"></div>
+    {/* Pinparrot widget self-renders adjacent to its script tag. The script must keep id="gb_widget_script". */}
+    <div class="rounded-2xl overflow-hidden border border-border bg-bg-light shadow-sm">
+      <script
+        is:inline
+        id="gb_widget_script"
+        type="module"
+        src="https://team.pinparrot.com/gb-widget.js"
+        data-widget-id="o5emvwlw"></script>
     </div>
   </div>
-  <script
-    is:inline
-    id="gb_widget_script"
-    type="module"
-    src="https://team.pinparrot.com/gb-widget.js"
-    data-widget-id="o5emvwlw"></script>
 </SectionContainer>
