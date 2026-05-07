@@ -16,6 +16,7 @@ import {
 import { urlForImage } from "@/sanity/lib/url-for-image";
 import ScrollReveal from "@/components/common/ScrollReveal.astro";
 import CityReviews from "@/components/common/CityReviews.astro";
+import LocalMapWidget from "@/components/blocks/LocalMapWidget.astro";
 import { areaFacts as tier1AreaFacts } from "@/data/area-content";
 
 export const prerender = true;
@@ -51,11 +52,12 @@ const areaHeroImages: Record<string, string> = {
   "wytheville": "/assets/areas/wytheville-hero.webp",
   "vinton": "/assets/areas/vinton-hero.webp",
   "troutville": "/assets/areas/troutville-hero.webp",
-  "lexington": "/assets/areas/lexington-hero.webp",
-  "covington": "/assets/areas/covington-hero.webp",
   "smith-mountain-lake": "/assets/areas/smith-mountain-lake-hero.webp",
   "new-river-valley": "/assets/areas/new-river-valley-hero.webp",
   "roanoke-area": "/assets/areas/roanoke-area-hero.webp",
+  "hollins": "/assets/areas/hollins-hero.webp",
+  "cave-spring": "/assets/areas/cave-spring-hero.webp",
+  "pearisburg": "/assets/areas/pearisburg-hero.webp",
 };
 const areaHeroImage = area.featuredImage
   ? urlForImage(area.featuredImage).width(1600).height(800).url()
@@ -63,9 +65,9 @@ const areaHeroImage = area.featuredImage
 const siblingAreas = area.siblingAreas || [];
 const servicesOffered = area.servicesOffered || [];
 
-const seoTitle = area.seo?.metaTitle || `${area.name} Roofing Contractor | 5★ 231 Reviews | Free Estimates`;
+const seoTitle = area.seo?.metaTitle || `${area.name} Roofing Contractor | 5★ 270 Reviews | Free Estimates`;
 const seoDescription =
-  area.seo?.metaDescription || area.description || `${area.name}'s top-rated roofing contractor. Roof replacement, roof repair & storm damage restoration. GAF Master Elite, 5★ rated by 231 homeowners. Free estimates, call (540) 553-6007.`;
+  area.seo?.metaDescription || area.description || `${area.name}'s top-rated roofing contractor. Roof replacement, roof repair & storm damage restoration. GAF Master Elite, 5★ rated by 270 homeowners. Free estimates, call (540) 553-6007.`;
 
 // Breadcrumb items
 const breadcrumbItems = [
@@ -98,8 +100,8 @@ const serviceFallbackImages: Record<string, string> = {
   "timber-seal": "/assets/projects/Untitled-1800-x-1440-px-4.jpg",
   "roof-repair": "/assets/projects/Untitled-1800-x-1440-px-2.jpg",
   "roof-maintenance": "/assets/projects/dji_fly_20250630_135554_733_1751306170083_photo.JPG",
-  "gutters": "/assets/projects/dji_fly_20251105_160008_416_1762439005458_photo.JPG",
-  "storm-damage": "/assets/projects/Untitled-1800-x-1440-px-3.jpg",
+  "gutters": "/assets/gutters/gutters-1.webp",
+  "storm-damage": "/assets/storm-damage/hail-storm-damage.webp",
   "commercial-roofing": "/assets/projects/dji_fly_20251105_155920_411_1762439016516_photo.JPG",
   "flat-roofing": "/assets/projects/dji_fly_20250630_140410_766_1751306661861_photo.JPG",
   "siding": "/assets/projects/dji_fly_20251105_160046_419_1762438984409_photo-1.JPG",
@@ -138,7 +140,7 @@ const localBusinessJsonLd = {
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: "5.0",
-    reviewCount: "231",
+    reviewCount: "270",
     bestRating: "5",
     worstRating: "1",
   },
@@ -304,6 +306,9 @@ const localBusinessJsonLd = {
     </SectionContainer>
   )}
 
+  {/* Local Optics geo-tagged map widget (helps map-pack ranking) */}
+  <LocalMapWidget cityName={area.name} />
+
   {/* City-specific Google Reviews (Tier 1 cities only) */}
   {tier1AreaFacts[slug as string] && <CityReviews city={area.name} />}
 
@@ -329,9 +334,9 @@ const localBusinessJsonLd = {
     <SectionContainer background="dark" padding="sm">
       <div class="text-center">
         {area.parentHub && (
-          <p class="text-text-muted mb-4">
+          <p class="text-white/80 mb-4">
             Part of our{" "}
-            <a href={`/areas/${area.parentHub.slug}`} class="text-accent hover:underline font-semibold">
+            <a href={`/areas/${area.parentHub.slug}`} class="text-accent-light hover:underline font-semibold">
               {area.parentHub.name}
             </a>{" "}
             service area
@@ -339,12 +344,12 @@ const localBusinessJsonLd = {
         )}
         {siblingAreas.length > 0 && (
           <div>
-            <p class="text-sm text-text-dim mb-3">Also serving nearby:</p>
+            <p class="text-sm text-white/70 mb-3">Also serving nearby:</p>
             <div class="flex flex-wrap justify-center gap-2">
               {siblingAreas.map((sibling: any) => (
                 <a
                   href={`/areas/${sibling.slug}`}
-                  class="inline-block px-4 py-2 bg-bg-card border border-border rounded-full text-sm text-text-muted hover:text-accent hover:border-accent/30 transition-colors"
+                  class="inline-block px-4 py-2 bg-white/10 border border-white/20 rounded-full text-sm text-white hover:bg-white/20 hover:border-white/40 transition-colors no-underline"
                 >
                   {sibling.name}
                 </a>
