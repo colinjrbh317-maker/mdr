@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testbench · MDR AI Sales Agent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            mdr: {
+              red:    '#C0392B',
+              amber:  '#D4A054',
+              dark:   '#1B1B1B',
+              bg:     '#FAFAF8',
+              warm:   '#F0EDE8',
+              card:   '#FFFFFF',
+              border: '#E5E1DA',
+              text:   '#1B1B1B',
+              body:   '#3D3D3D',
+              muted:  '#6B7280',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #FAFAF8; color: #1B1B1B; }
+    .tab-btn { border-bottom: 2px solid transparent; }
+    .tab-btn.active { border-bottom-color: #C0392B; color: #C0392B; font-weight: 600; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    select, input, textarea {
+      background: #fff;
+      border: 1px solid #E5E1DA;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 14px;
+      width: 100%;
+      color: #1B1B1B;
+    }
+    select:focus, input:focus, textarea:focus {
+      outline: 2px solid #C0392B;
+      outline-offset: 1px;
+    }
+    label { font-size: 12px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.5px; color: #6B7280; display: block; margin-bottom: 4px; }
+    .htmx-indicator { display: none; }
+    .htmx-request .htmx-indicator { display: inline-flex; }
+    .htmx-request .gen-btn-text { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="bg-mdr-dark text-white px-6 py-3 flex items-center gap-4 border-b-4 border-mdr-red">
+  <span class="font-black text-lg uppercase tracking-wide">MDR AI Sales Agent</span>
+  <span class="bg-white/10 px-3 py-1 rounded-full text-xs">Testbench</span>
+  <span class="bg-white/10 px-3 py-1 rounded-full text-xs">DRY_RUN={{ settings.dry_run }}</span>
+  <div class="ml-auto flex gap-4 text-sm">
+    <a href="/review" class="text-white/80 hover:text-white">Cadence Review</a>
+    <a href="/review/testbench/stats" target="_blank" class="text-white/80 hover:text-white" id="stats-link">Stats</a>
+    <a href="/review/testbench/export.json" class="text-white/80 hover:text-white">Download JSON</a>
+    <a href="/review/testbench/export.md" class="text-white/80 hover:text-white">Download MD</a>
+  </div>
+</header>
+
+<div class="max-w-[1280px] mx-auto px-6 py-6">
+
+  <!-- Page title + reviewer -->
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-black uppercase tracking-tight">Draft Review Testbench</h1>
+      <p class="text-mdr-muted text-sm mt-1">Pick a lead. Pick a layer. Generate a draft. Cast a verdict. Repeat.</p>
+    </div>
+    <div class="bg-white border border-mdr-border rounded-xl p-4 flex flex-col gap-2 min-w-[220px]">
+      <label>Reviewer</label>
+      <div class="flex gap-3" id="reviewer-group">
+        {% for name in ['Colin', 'Austin', 'Both'] %}
+        <label class="flex items-center gap-1.5 cursor-pointer text-sm font-normal normal-case tracking-normal text-mdr-body">
+          <input type="radio" name="reviewer_global" value="{{ name }}"
+                 {% if name == 'Colin' %}checked{% endif %}
+                 onchange="document.getElementById('reviewer_hidden').value=this.value"
+                 class="accent-mdr-red w-4 h-4">
+          {{ name }}
+        </label>
+        {% endfor %}
+      </div>
+      <div class="text-xs text-mdr-muted mt-1 border-t border-mdr-border pt-2">
+        <span class="font-semibold text-mdr-text" id="verdict-count">{{ today_count }}</span> verdicts cast today
+      </div>
+    </div>
+  </div>
+
+  <!-- Main control card -->
+  <div class="bg-white border border-mdr-border rounded-xl shadow-sm mb-6">
+
+    <!-- Tabs -->
+    <div class="border-b border-mdr-border px-4 flex gap-0">
+      {% for tab_id, tab_label in [('archetypes','Archetypes'), ('real','Real Leads'), ('custom','Custom')] %}
+      <button onclick="switchTab('{{ tab_id }}')"
+              id="tab-btn-{{ tab_id }}"
+              class="tab-btn {% if loop.first %}active{% endif %} px-5 py-3 text-sm cursor-pointer bg-transparent border-0">
+        {{ tab_label }}
+      </button>
+      {% endfor %}
+    </div>
+
+    <form id="draft-form"
+          hx-post="/review/testbench/draft"
+          hx-target="#results-panel"
+          hx-swap="innerHTML"
+          hx-indicator="#gen-spinner">
+
+      <!-- Hidden fields synced by JS -->
+      <input type="hidden" name="lead_kind" id="lead_kind_hidden" value="archetype">
+      <input type="hidden" name="reviewer" id="reviewer_hidden" value="Colin">
+
+      <div class="p-5 space-y-5">
+
+        <!-- Archetypes tab -->
+        <div class="tab-panel active" id="tab-archetypes">
+          <label>Select archetype</label>
+          <select name="archetype_id" id="archetype_select">
+            {% for a in archetypes %}
+            <option value="{{ a.id }}">{{ a.contact_name }} — {{ a.address.split(',')[1].strip() if ',' in a.address else 'VA' }} / {{ a.work_type }} / ${{ '{:,}'.format(a.estimate_total) if a.estimate_total else 'no estimate' }}</option>
+            {% endfor %}
+          </select>
+          <p class="text-xs text-mdr-muted mt-1">8 fake Virginia homeowners. Culturally diverse. No real MDR data.</p>
+        </div>
+
+        <!-- Real leads tab -->
+        <div class="tab-panel" id="tab-real">
+          <label>Select real lead (top 50 active, non-stopped)</label>
+          <select name="real_lead_id" id="real_lead_select">
+            {% if real_leads %}
+              {% for l in real_leads %}
+              <option value="{{ l.id }}">{{ l.name }} — {{ l.address[:40] if l.address else 'no address' }} / {{ l.milestone }}</option>
+              {% endfor %}
+            {% else %}
+              <option value="">No active leads found</option>
+            {% endif %}
+          </select>
+          <p class="text-xs text-mdr-muted mt-1">Real AccuLynx homeowner data. Results panel includes AccuLynx link for verification.</p>
+        </div>
+
+        <!-- Custom tab -->
+        <div class="tab-panel" id="tab-custom">
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label>Name</label>
+              <input type="text" name="custom_name" placeholder="e.g. John Smith">
+            </div>
+            <div>
+              <label>City / Address</label>
+              <input type="text" name="custom_address" placeholder="e.g. Christiansburg, VA">
+            </div>
+            <div>
+              <label>Work type</label>
+              <select name="custom_work_type">
+                {% for wt in ['Roof Replacement', 'Storm Damage', 'Insurance Claim', 'Roof Repair', 'Gutter Replacement'] %}
+                <option>{{ wt }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label>Estimate total ($)</label>
+              <input type="number" name="custom_estimate" placeholder="e.g. 18500">
+            </div>
+            <div>
+              <label>Lead source</label>
+              <input type="text" name="custom_lead_source" placeholder="e.g. Google, Referral">
+            </div>
+            <div>
+              <label>Agent context / Rep notes</label>
+              <input type="text" name="custom_agent_context" placeholder="e.g. waiting on insurance adjuster">
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer + touch + channel row -->
+        <div class="grid grid-cols-3 gap-4 pt-2 border-t border-mdr-border">
+          <div>
+            <label>Layer</label>
+            <select name="layer_name" id="layer_select" onchange="populateTouches(this.value)">
+              {% for layer in all_layers %}
+              <option value="{{ layer.name }}">{{ layer.name.replace('_', ' ') }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label>Touch</label>
+            <select name="touch_index" id="touch_select" onchange="autoSetChannel()">
+              <!-- Populated by JS on layer change -->
+            </select>
+          </div>
+          <div>
+            <label>Channel</label>
+            <select name="channel" id="channel_select">
+              <option value="text">Text / SMS</option>
+              <option value="email">Email</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Generate button -->
+        <div class="flex items-center gap-4 pt-1">
+          <button type="submit"
+                  class="bg-mdr-red hover:bg-[#9b2c1f] text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors flex items-center gap-2">
+            <span class="gen-btn-text">Generate Draft</span>
+            <span class="htmx-indicator items-center gap-2" id="gen-spinner">
+              <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              Drafting... (5-15s)
+            </span>
+          </button>
+          <span class="text-xs text-mdr-muted">First draft is slow (Claude API). Subsequent hits for same lead+layer are instant.</span>
+        </div>
+
+      </div><!-- /p-5 -->
+    </form>
+  </div><!-- /control card -->
+
+  <!-- Results panel — populated by HTMX -->
+  <div id="results-panel">
+    <div class="bg-white border border-mdr-border rounded-xl p-8 text-center text-mdr-muted">
+      <p class="text-lg font-medium">No draft generated yet</p>
+      <p class="text-sm mt-1">Select a lead, layer, and touch above, then click Generate Draft.</p>
+    </div>
+  </div>
+
+  <!-- Bottom actions -->
+  <div class="mt-6 flex items-center gap-4 text-sm border-t border-mdr-border pt-4">
+    <a href="/review/testbench/export.json"
+       class="bg-mdr-dark text-white px-4 py-2 rounded-lg hover:bg-[#333] transition-colors">
+      Download JSON
+    </a>
+    <a href="/review/testbench/export.md"
+       class="border border-mdr-border text-mdr-text px-4 py-2 rounded-lg hover:bg-mdr-warm transition-colors">
+      Download MD Report
+    </a>
+    <a href="/review/testbench/stats" target="_blank"
+       class="border border-mdr-border text-mdr-text px-4 py-2 rounded-lg hover:bg-mdr-warm transition-colors">
+      Stats JSON
+    </a>
+    <span class="ml-auto text-mdr-muted">
+      <span id="footer-count">{{ today_count }}</span> verdicts recorded today
+    </span>
+  </div>
+
+</div><!-- /max-w container -->
+
+<script>
+// Layer touch data from server
+const ALL_LAYERS = {{ all_layers | tojson }};
+const layerMap = {};
+ALL_LAYERS.forEach(l => { layerMap[l.name] = l.touches; });
+
+function populateTouches(layerName) {
+  const touches = layerMap[layerName] || [];
+  const sel = document.getElementById('touch_select');
+  sel.innerHTML = '';
+  touches.forEach((t, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Touch ${i+1} (Day ${t.day_offset}, ${t.channel.toUpperCase()}) — ${t.content_type}`;
+    opt.dataset.channel = t.channel;
+    sel.appendChild(opt);
+  });
+  autoSetChannel();
+}
+
+function autoSetChannel() {
+  const touchSel = document.getElementById('touch_select');
+  const channelSel = document.getElementById('channel_select');
+  const opt = touchSel.options[touchSel.selectedIndex];
+  if (opt && opt.dataset.channel) {
+    channelSel.value = opt.dataset.channel;
+  }
+}
+
+function switchTab(tabId) {
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.id === 'tab-btn-' + tabId);
+  });
+  // Show/hide panels
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === 'tab-' + tabId);
+  });
+  // Update hidden lead_kind field
+  document.getElementById('lead_kind_hidden').value = tabId === 'real' ? 'real' : tabId === 'custom' ? 'custom' : 'archetype';
+}
+
+// Init: populate touches for default layer
+document.addEventListener('DOMContentLoaded', function() {
+  const layerSel = document.getElementById('layer_select');
+  if (layerSel) {
+    populateTouches(layerSel.value);
+  }
+});
+
+// Update verdict count after HTMX swaps
+document.addEventListener('htmx:afterSwap', function() {
+  // Optionally refresh count display — could fetch from stats endpoint
+});
+</script>
+
+</body>
+</html>

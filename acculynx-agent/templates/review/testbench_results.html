@@ -1,0 +1,242 @@
+<!-- testbench_results.html — HTMX partial, injected into #results-panel -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .verdict-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 18px; border-radius: 8px; font-size: 14px;
+    font-weight: 600; cursor: pointer; border: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .verdict-btn:hover { transform: translateY(-1px); }
+  .verdict-btn.send  { background:#DCFCE7; color:#166534; border-color:#BBF7D0; }
+  .verdict-btn.send:hover  { background:#BBF7D0; }
+  .verdict-btn.edit  { background:#FEF9C3; color:#854D0E; border-color:#FDE68A; }
+  .verdict-btn.edit:hover  { background:#FDE68A; }
+  .verdict-btn.reject { background:#FEE2E2; color:#991B1B; border-color:#FECACA; }
+  .verdict-btn.reject:hover { background:#FECACA; }
+  .edit-area { display: none; margin-top: 12px; }
+  .edit-area.open { display: block; }
+  pre.draft-body {
+    white-space: pre-wrap; font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px; line-height: 1.6; background: #FAFAF8;
+    border: 1px solid #E5E1DA; border-radius: 8px; padding: 14px 16px;
+    margin: 0;
+  }
+</style>
+
+{% set d = draft %}
+
+<div class="bg-white border border-[#E5E1DA] rounded-xl shadow-sm overflow-hidden">
+
+  <!-- Results header bar -->
+  <div class="border-b border-[#E5E1DA] px-5 py-3 flex items-center gap-3 bg-[#FAFAF8]">
+    <span class="font-bold text-sm text-[#1B1B1B]">Draft generated</span>
+    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide
+      {% if d.channel == 'email' %}bg-blue-100 text-blue-700{% else %}bg-amber-100 text-amber-800{% endif %}">
+      {{ d.channel }}
+    </span>
+    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-[#F0EDE8] text-[#6B7280]">
+      {{ d.layer.replace('_', ' ') }} / Touch {{ d.touch_index + 1 }}
+    </span>
+    {% if d.postflight_ok %}
+    <span class="text-green-600 text-xs font-semibold flex items-center gap-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+      Postflight OK
+    </span>
+    {% else %}
+    <span class="text-red-600 text-xs font-semibold flex items-center gap-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+      Postflight FAIL
+      {% if d.postflight_reasons %}
+        <span class="font-normal">({{ d.postflight_reasons | join(', ') }})</span>
+      {% endif %}
+    </span>
+    {% endif %}
+    {% if d.regenerations > 0 %}
+    <span class="text-[#6B7280] text-xs">{{ d.regenerations }} regen{{ 's' if d.regenerations != 1 }}</span>
+    {% endif %}
+    <span class="ml-auto text-xs text-[#6B7280]">Reviewer: <b class="text-[#1B1B1B]">{{ d.reviewer }}</b></span>
+  </div>
+
+  <!-- Two-pane layout -->
+  <div class="flex divide-x divide-[#E5E1DA]">
+
+    <!-- Left pane: Lead context -->
+    <div class="w-[340px] flex-shrink-0 p-5 space-y-4">
+
+      <div class="border-l-4 border-[#D4A054] bg-[#FFF8F0] rounded-r-lg px-4 py-3">
+        <p class="text-xs font-bold uppercase tracking-wider text-[#D4A054] mb-1">Lead Context</p>
+        <p class="text-lg font-bold text-[#1B1B1B]">{{ d.display_lead.name }}</p>
+        {% if d.display_lead.address %}
+        <p class="text-sm text-[#3D3D3D]">{{ d.display_lead.address }}</p>
+        {% endif %}
+      </div>
+
+      <div class="space-y-2 text-sm">
+        <div class="flex gap-2">
+          <span class="text-[#6B7280] w-24 flex-shrink-0">Work type</span>
+          <span class="font-medium text-[#1B1B1B]">{{ d.display_lead.work_type or '—' }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-[#6B7280] w-24 flex-shrink-0">Lead source</span>
+          <span class="font-medium text-[#1B1B1B]">{{ d.display_lead.lead_source or '—' }}</span>
+        </div>
+        {% if d.display_lead.estimate_total %}
+        <div class="flex gap-2">
+          <span class="text-[#6B7280] w-24 flex-shrink-0">Estimate</span>
+          <span class="font-semibold text-[#1B1B1B]">${{ '{:,}'.format(d.display_lead.estimate_total) }}</span>
+        </div>
+        {% endif %}
+        <div class="flex gap-2">
+          <span class="text-[#6B7280] w-24 flex-shrink-0">Layer</span>
+          <span class="font-medium text-[#1B1B1B]">{{ d.layer.replace('_', ' ') }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-[#6B7280] w-24 flex-shrink-0">Touch</span>
+          <span class="font-medium text-[#1B1B1B]">{{ d.touch_index + 1 }} — {{ d.content_type or '?' }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-[#6B7280] w-24 flex-shrink-0">Lead kind</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-[#F0EDE8] text-[#3D3D3D]">{{ d.lead_kind }}</span>
+        </div>
+      </div>
+
+      {% if d.display_lead.agent_context %}
+      <div class="bg-[#F0EDE8] rounded-lg px-3 py-2.5">
+        <p class="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-1">Rep Notes</p>
+        <p class="text-sm text-[#3D3D3D]">{{ d.display_lead.agent_context }}</p>
+      </div>
+      {% endif %}
+
+      {% if d.display_lead.acculynx_url %}
+      <a href="{{ d.display_lead.acculynx_url }}" target="_blank"
+         class="flex items-center gap-2 text-sm font-semibold text-[#C0392B] hover:underline">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+        Open in AccuLynx
+      </a>
+      {% endif %}
+    </div>
+
+    <!-- Right pane: Draft + verdict -->
+    <div class="flex-1 p-5 space-y-4">
+
+      {% if d.subject %}
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-1">Subject</p>
+        <p class="font-bold text-[#1B1B1B] text-[15px]">{{ d.subject }}</p>
+      </div>
+      {% endif %}
+
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-2">Body</p>
+        <pre class="draft-body" id="draft-body-display">{{ d.body }}</pre>
+      </div>
+
+      <!-- Verdict buttons -->
+      <div class="border-t border-[#E5E1DA] pt-4">
+        <p class="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3">Cast verdict</p>
+        <div class="flex gap-3 flex-wrap">
+          <button type="button" class="verdict-btn send" onclick="castVerdict('send', this)">
+            Send
+          </button>
+          <button type="button" class="verdict-btn edit" onclick="openEditArea()">
+            Edit
+          </button>
+          <button type="button" class="verdict-btn reject" onclick="castVerdict('reject', this)">
+            Reject
+          </button>
+        </div>
+
+        <!-- Edit area: shown on Edit click -->
+        <div class="edit-area" id="edit-area">
+          <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#6B7280;display:block;margin-bottom:4px;">
+            Edit body
+          </label>
+          <textarea id="edit-body-textarea" rows="10"
+            style="width:100%;font-family:-apple-system,'Segoe UI',sans-serif;font-size:14px;padding:10px;border:1px solid #E5E1DA;border-radius:8px;line-height:1.6;"
+          >{{ d.body }}</textarea>
+          <button type="button" class="verdict-btn edit mt-2" onclick="castVerdict('edit', this)">
+            Save Edit
+          </button>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#6B7280;display:block;margin-bottom:4px;">
+          Notes (optional)
+        </label>
+        <textarea id="verdict-notes" rows="2"
+          placeholder="e.g. Too salesy, remove the guarantee mention..."
+          style="width:100%;font-family:-apple-system,'Segoe UI',sans-serif;font-size:14px;padding:8px 10px;border:1px solid #E5E1DA;border-radius:8px;"
+        ></textarea>
+      </div>
+
+      <!-- Verdict status -->
+      <div id="verdict-status"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Hidden: render timestamp for decision_ms tracking -->
+<input type="hidden" id="render-ts" value="{{ d.render_ts_ms }}">
+<input type="hidden" id="draft-id-stored" value="{{ d.draft_id }}">
+<input type="hidden" id="reviewer-stored" value="{{ d.reviewer }}">
+
+<script>
+function openEditArea() {
+  document.getElementById('edit-area').classList.add('open');
+  document.getElementById('edit-body-textarea').focus();
+}
+
+function castVerdict(verdict, btn) {
+  const renderTs = parseInt(document.getElementById('render-ts').value || '0');
+  const decisionMs = renderTs ? Date.now() - renderTs : 0;
+  const draftId = document.getElementById('draft-id-stored').value;
+  const reviewer = document.getElementById('reviewer-stored').value ||
+    (document.querySelector('input[name="reviewer_global"]:checked') || {}).value || 'Colin';
+  const notes = (document.getElementById('verdict-notes').value || '').trim();
+  const editedBody = verdict === 'edit'
+    ? (document.getElementById('edit-body-textarea').value || '').trim()
+    : '';
+
+  const statusEl = document.getElementById('verdict-status');
+  statusEl.innerHTML = '<p style="color:#6B7280;font-size:13px;">Saving...</p>';
+
+  const body = new URLSearchParams();
+  body.append('draft_id', draftId);
+  body.append('verdict', verdict);
+  body.append('edited_body', editedBody);
+  body.append('notes', notes);
+  body.append('reviewer', reviewer);
+  body.append('decision_ms', decisionMs);
+
+  fetch('/review/testbench/verdict', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString()
+  })
+  .then(r => r.text())
+  .then(html => {
+    statusEl.innerHTML = html;
+    // Disable all verdict buttons after recording
+    document.querySelectorAll('.verdict-btn').forEach(b => {
+      b.disabled = true;
+      b.style.opacity = '0.5';
+      b.style.cursor = 'not-allowed';
+    });
+    // Update verdict counter in header
+    const counter = document.getElementById('verdict-count');
+    const footer = document.getElementById('footer-count');
+    if (counter) counter.textContent = parseInt(counter.textContent || '0') + 1;
+    if (footer) footer.textContent = parseInt(footer.textContent || '0') + 1;
+  })
+  .catch(err => {
+    statusEl.innerHTML = '<p style="color:#DC2626;font-size:13px;">Error saving verdict: ' + err + '</p>';
+  });
+}
+</script>

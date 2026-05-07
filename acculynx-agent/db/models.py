@@ -210,3 +210,43 @@ class Approval(Base):
 
     # Timestamps
     created_at = Column(DateTime, default=func.now())
+
+
+class TestbenchVerdict(Base):
+    """Verdicts cast during the live testbench review session.
+
+    Foundation of self-annealing: edits captured here get diffed against
+    the original draft to surface voice patterns that need prompt fixes.
+    """
+    __tablename__ = "testbench_verdicts"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    # What was tested
+    layer = Column(String, nullable=False, index=True)
+    touch_index = Column(Integer, nullable=False)
+    content_type = Column(String, nullable=True)
+    channel = Column(String, nullable=False)
+
+    # The lead that fed it (archetype name like "james_hicks_christiansburg",
+    # OR a real AccuLynx job_id, OR "custom_<timestamp>" for one-off)
+    lead_ref = Column(String, nullable=False, index=True)
+    lead_kind = Column(String, nullable=False)  # "archetype" | "real" | "custom"
+
+    # The draft itself
+    draft_subject = Column(Text, nullable=True)
+    draft_body = Column(Text, nullable=False)
+    postflight_ok = Column(Boolean, default=True)
+    postflight_reasons = Column(Text, nullable=True)  # JSON-encoded list
+    regenerations = Column(Integer, default=0)
+    template_hash = Column(String, nullable=True)
+
+    # The verdict
+    verdict = Column(String, nullable=False, index=True)  # "send" | "edit" | "reject"
+    edited_body = Column(Text, nullable=True)
+    notes = Column(Text, nullable=True)
+    reviewer = Column(String, nullable=False)  # "Colin" | "Austin" | "Both"
+    decision_ms = Column(Integer, nullable=True)
+
+    # Timestamp
+    created_at = Column(DateTime, default=func.now(), index=True)
