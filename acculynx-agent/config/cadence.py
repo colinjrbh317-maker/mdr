@@ -178,22 +178,26 @@ LAYER_POST_INSTALL = Layer(
     ],
 )
 
-# ── Layer 9: DRIP ───────────────────────────────────────────────────────────
-# Post-close. Long-term upsell and referral drip. AI owns this.
+# ── Layer 9: DRIP — POST-CLOSE VALUE LADDER ────────────────────────────────
+# Post-close 4-touch value ladder. Each touch increases the offer:
+#   T1 (Day 30):  Soft check-in, gather info ("any other exterior issues?")
+#   T2 (Day 90):  Free gift (complimentary gutter / exterior tune-up)
+#   T3 (Day 180): $250 referral bounty
+#   T4 (Day 365): Anniversary multi-service bundle (gutters / siding / skylights)
 LAYER_DRIP = Layer(
     name="DRIP",
-    tone="Casual, appreciative, non-pushy",
-    goal="Stay front-of-mind, upsell services, generate referrals",
+    tone="Casual, appreciative, non-pushy. Each touch grows the offer.",
+    goal="Stay front-of-mind, build trust through value-ladder, surface upsell + referrals",
     exit_conditions=[
         "Refers someone → new lead enters FIRST_CONTACT",
         "Wants more work → new job enters FIRST_CONTACT",
         "Drip complete (1 year) → done",
     ],
     touches=[
-        Touch(30,  "text",  "satisfaction_check_in",          autonomous_ok=True),
-        Touch(90,  "email", "seasonal_checkup_cross_sell",    autonomous_ok=True),
-        Touch(180, "email", "referral_program_ask",           autonomous_ok=True),
-        Touch(365, "email", "anniversary_maintenance_offer",  autonomous_ok=True),
+        Touch(30,  "text",  "drip_t1_soft_checkin_exterior_issues",   autonomous_ok=True),
+        Touch(90,  "email", "drip_t2_complimentary_tuneup_offer",     autonomous_ok=True),
+        Touch(180, "email", "drip_t3_referral_program_offer",         autonomous_ok=True),
+        Touch(365, "email", "drip_t4_anniversary_bundle_offer",       autonomous_ok=True),
     ],
 )
 
@@ -242,6 +246,22 @@ LAYER_MAP: dict[str, Layer] = {
     "CLOSED":             LAYER_CLOSED,
     "RE_ENGAGEMENT":      LAYER_RE_ENGAGEMENT,
 }
+
+
+# ── DEMO_VISIBLE_LAYERS ─────────────────────────────────────────────────────
+# Layers shown in /review for the client-facing demo. The full LAYER_MAP
+# above remains intact so the scheduler/sync logic that depends on it keeps
+# working — this is a UI-only filter. Hidden layers (FIRST_CONTACT,
+# PRE_APPOINTMENT, POST_INSPECTION, PRE_INSTALL, CLOSED, RE_ENGAGEMENT) are
+# either handled by AccuLynx automations, are passive states, or are not in
+# scope for the v1 demo.
+DEMO_VISIBLE_LAYERS: list[str] = [
+    "ESTIMATE_FOLLOWUP",
+    "NURTURE",
+    "GOING_COLD",
+    "POST_INSTALL",
+    "DRIP",
+]
 
 
 # ── MILESTONE_TO_LAYER: AccuLynx milestone → default starting layer ─────────

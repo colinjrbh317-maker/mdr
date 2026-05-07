@@ -1,0 +1,55 @@
+{% extends "review/base.html" %}
+{% block title %}{{ lead.contact_name }} · What the agent knows{% endblock %}
+{% block content %}
+<h1>What the agent knows about {{ lead.contact_name or "this homeowner" }}</h1>
+<p class="subtitle">Every piece of context the agent reads from AccuLynx + our database when drafting a message. No black box.</p>
+
+<a href="/review/{{ lead.id }}" style="color: var(--accent);">← back to layer view</a>
+
+<h2 style="margin-top: 32px;">1. The auto-extracted context block</h2>
+<p class="lead-meta">This is the exact text the drafter pastes into Claude's prompt. The agent reads it before writing each message.</p>
+<pre style="background: var(--bg-warm, #F0EDE8); padding: 16px; border-radius: 8px; white-space: pre-wrap; font-family: monospace; font-size: 13px;">{{ auto_context }}</pre>
+
+<h2 style="margin-top: 32px;">2. What we synced from AccuLynx (our local DB)</h2>
+<table class="leads-table">
+  <tbody>
+    <tr><td><b>Milestone</b></td><td>{{ lead.milestone }}</td></tr>
+    <tr><td><b>Previous milestone</b></td><td>{{ lead.previous_milestone or "(never changed)" }}</td></tr>
+    <tr><td><b>Milestone changed at</b></td><td>{{ lead.milestone_changed_date or "(unknown)" }}</td></tr>
+    <tr><td><b>Lead source</b></td><td>{{ lead.lead_source or "—" }}</td></tr>
+    <tr><td><b>Lead dead reason</b></td><td>{{ lead.lead_dead_reason or "—" }}</td></tr>
+    <tr><td><b>Work type</b></td><td>{{ lead.work_type or "—" }}</td></tr>
+    <tr><td><b>Active?</b></td><td>{{ "yes" if lead.is_active else "no (cadence stopped)" }}</td></tr>
+    <tr><td><b>Paused?</b></td><td>{{ "yes — " ~ lead.pause_reason if lead.is_paused else "no" }}</td></tr>
+    <tr><td><b>Agent Status field</b></td><td>{{ lead.agent_status or "(default = Active)" }}</td></tr>
+    <tr><td><b>Agent Snooze Until</b></td><td>{{ lead.agent_snooze_until or "—" }}</td></tr>
+    <tr><td><b>Agent Context (manual)</b></td><td>{{ lead.agent_context or "(none — auto-extracted is used)" }}</td></tr>
+    <tr><td><b>Total contact attempts</b></td><td>{{ lead.total_contact_attempts or 0 }}</td></tr>
+  </tbody>
+</table>
+
+<h2 style="margin-top: 32px;">3. Live AccuLynx history</h2>
+<p class="lead-meta">Every event AccuLynx records on this job. <b>NOTE:</b> the API exposes labels + timestamps, not the contents of "Job Message Added" notes. Milestone-change comments DO surface here.</p>
+<table class="leads-table">
+  <thead>
+    <tr><th>When</th><th>Action</th></tr>
+  </thead>
+  <tbody>
+    {% for item in history_items %}
+      <tr>
+        <td style="white-space: nowrap;">{{ item.date or "—" }}</td>
+        <td>{{ item.action or "—" }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="2"><i>No history events.</i></td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2 style="margin-top: 32px;">4. Live job payload (raw fields from AccuLynx /jobs/{id})</h2>
+<details>
+  <summary style="cursor: pointer; padding: 8px 0;">Click to expand the full JSON</summary>
+  <pre style="background: var(--bg-warm, #F0EDE8); padding: 16px; border-radius: 8px; overflow: auto; font-size: 12px;">{{ job_payload | tojson(indent=2) }}</pre>
+</details>
+
+{% endblock %}

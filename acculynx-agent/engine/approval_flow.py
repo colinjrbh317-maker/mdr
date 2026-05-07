@@ -69,19 +69,97 @@ def _build_links(message_id: int, token: str) -> ApprovalLinks:
     )
 
 
-def _build_notification_email(
+async def _fetch_recent_interactions(lead_id: str, limit: int = 5) -> list[dict]:
+    """Pull the most recent rep interactions from AccuLynx so the rep
+    sees what was already said before approving the agent's draft."""
+    try:
+        from acculynx.internal_api import fetch_messages_for_job
+        msgs = await fetch_messages_for_job(lead_id)
+        return msgs[:limit]
+    except Exception:
+        log.exception("recent interactions fetch failed for %s", lead_id)
+        return []
+
+
+def _build_why_now(lead: Lead, message: MessageQueue) -> str:
+    """Return a plain-text one-liner explaining why this lead is up right now."""
+    name = lead.contact_name or "Homeowner"
+    layer = message.cadence_name or "?"
+    touch_n = (message.touch_index or 0) + 1
+    content_hint = (message.content_type or "").replace("-", " ") if message.content_type else ""
+
+    touch_part = f"Touch {touch_n} of {layer}"
+    if content_hint:
+        touch_part = f"{touch_part} ({content_hint})"
+
+    ref_date = getattr(lead, "acculynx_modified_date", None) or getattr(lead, "milestone_changed_date", None)
+    if ref_date:
+        if isinstance(ref_date, str):
+            try:
+                ref_date = datetime.fromisoformat(ref_date.rstrip("Z"))
+            except ValueError:
+                ref_date = None
+    if ref_date:
+        now = datetime.now(timezone.utc) if ref_date.tzinfo else datetime.utcnow()
+        days_ago = (now - ref_date).days
+        if days_ago == 0:
+            staleness = "updated today in AccuLynx"
+        elif days_ago == 1:
+            staleness = "1 day since the last AccuLynx update"
+        else:
+            staleness = f"{days_ago} days since the last AccuLynx update"
+    else:
+        staleness = "activity timing unknown"
+
+    raw_ctx = getattr(lead, "agent_context", None) or ""
+    if raw_ctx and len(raw_ctx) > 80:
+        raw_ctx = raw_ctx[:77] + "..."
+    notes_part = f"Rep notes: {raw_ctx}" if raw_ctx else "No rep notes."
+
+    sentence = f"{name} is on {touch_part}. {staleness.capitalize()}. {notes_part}"
+    if len(sentence) > 280:
+        sentence = sentence[:277] + "..."
+    return sentence
+
+
+async def _build_notification_email(
     *,
     lead: Lead,
     message: MessageQueue,
     rep: Rep,
     links: ApprovalLinks,
 ) -> tuple[str, str, str]:
-    """Returns (subject, body_text, body_html)."""
+    """Returns (subject, body_text, body_html). Includes recent rep
+    interactions pulled from AccuLynx so the rep has full context before
+    approving."""
     layer = message.cadence_name or "?"
     touch_n = (message.touch_index or 0) + 1
     name = lead.contact_name or "Homeowner"
+    accul_url = f"https://my.acculynx.com/jobs/{lead.id}"
+    review_url = f"{settings.app_base_url}/review/{lead.id}/context/full"
+
+    why_now = _build_why_now(lead, message)
+    recent = await _fetch_recent_interactions(lead.id, limit=5)
 
     subject = f"Draft for {name} ready for review ({layer}, Touch {touch_n})"
+
+    # ── Plain text version ──
+    interactions_text = ""
+    if recent:
+        lines = ["RECENT INTERACTIONS (from AccuLynx Communications tab):"]
+        for m in recent:
+            when = (m.get("created_date") or "")[:10]
+            who = m.get("created_by") or "?"
+            mtype = m.get("type") or "Note"
+            body = (m.get("body_text") or "").strip()
+            if len(body) > 250:
+                body = body[:247] + "..."
+            subj = m.get("subject")
+            subj_part = f" — Subject: {subj}" if subj else ""
+            lines.append(f"  [{when}] {mtype} by {who}{subj_part}")
+            if body:
+                lines.append(f"      {body}")
+        interactions_text = "\n".join(lines) + "\n\n"
 
     text = f"""Hey {rep.first_name or rep.name.split()[0]},
 
@@ -90,6 +168,11 @@ A new follow-up draft is ready for {name} ({lead.contact_email or lead.contact_p
 Layer: {layer} (Touch {touch_n})
 Channel: {message.channel}
 Lead address: {lead.address or 'unknown'}
+Open in AccuLynx: {accul_url}
+Full context page: {review_url}
+
+Why this lead now:
+  {why_now}
 
 --- DRAFT ---
 {('Subject: ' + message.subject + chr(10) + chr(10)) if message.subject else ''}{message.body}
@@ -101,15 +184,44 @@ Skip this one:   {links.skip_url}
 
 If you don't decide in 4 hours, this escalates to {settings.escalation_email or 'the manager'}.
 
+{interactions_text}
 Modern Day Roofing AI Sales Agent
 """
 
+    # ── HTML version ──
+    interactions_html = ""
+    if recent:
+        items_html: list[str] = []
+        for m in recent:
+            when = (m.get("created_date") or "")[:10]
+            who = (m.get("created_by") or "?").strip()
+            mtype = m.get("type") or "Note"
+            body = (m.get("body_text") or "").strip()
+            if len(body) > 350:
+                body = body[:347] + "..."
+            subj = m.get("subject")
+            subj_part = f" · <i>{subj}</i>" if subj else ""
+            badge_color = {"Email": "#0ea5e9", "Text Message": "#16a34a", "Comment": "#6B7280"}.get(mtype, "#6B7280")
+            items_html.append(
+                f'<div style="border-left:3px solid {badge_color};padding:6px 12px;margin-bottom:10px;background:#fafaf8;">'
+                f'<div style="font-size:11px;color:#6B7280;margin-bottom:2px;"><b>{mtype}</b> · {when} · by {who}{subj_part}</div>'
+                f'<div style="font-size:13px;color:#1B1B1B;white-space:pre-wrap;">{body}</div>'
+                f'</div>'
+            )
+        interactions_html = (
+            '<div style="margin-bottom:20px;">'
+            '<div style="font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;color:#6B7280;margin-bottom:8px;">'
+            'Recent Interactions (from AccuLynx)</div>'
+            f'{"".join(items_html)}'
+            '</div>'
+        )
+
     html = f"""<!DOCTYPE html>
 <html><body style="margin:0;padding:0;background:#f7f7f5;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1B1B1B;line-height:1.55;">
-<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #E5E1DA;">
+<div style="max-width:640px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #E5E1DA;">
   <div style="background:#1B1B1B;color:#fff;padding:18px 24px;border-bottom:4px solid #C0392B;">
     <div style="font-weight:800;letter-spacing:0.5px;text-transform:uppercase;font-size:14px;">Modern Day Roofing</div>
-    <div style="font-size:12px;opacity:0.7;">AI Sales Agent</div>
+    <div style="font-size:12px;opacity:0.7;">AI Sales Agent — draft ready for review</div>
   </div>
   <div style="padding:24px;">
     <h2 style="margin:0 0 6px;font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;">Draft ready for {name}</h2>
@@ -118,21 +230,33 @@ Modern Day Roofing AI Sales Agent
     <div style="background:#FAFAF8;border:1px solid #E5E1DA;border-radius:8px;padding:14px 16px;margin-bottom:18px;font-size:13px;">
       <b>To:</b> {lead.contact_email or lead.contact_phone or '(no contact)'}<br>
       <b>Address:</b> {lead.address or 'unknown'}<br>
-      <b>Milestone:</b> {lead.milestone or '?'}
+      <b>Milestone:</b> {lead.milestone or '?'}<br>
+      <a href="{accul_url}" style="color:#C0392B;text-decoration:none;font-weight:600;">→ Open job in AccuLynx</a>
+      &nbsp;·&nbsp;
+      <a href="{review_url}" style="color:#C0392B;text-decoration:none;font-weight:600;">→ Full agent context</a>
     </div>
 
+    <div style="background:#FFF8F0;border-left:4px solid #D4A054;padding:12px 16px;margin-bottom:18px;font-size:14px;line-height:1.5;color:#1B1B1B;">
+      <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#6B7280;margin-bottom:4px;">Why this lead now</div>
+      {why_now}
+    </div>
+
+    <div style="font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;color:#6B7280;margin-bottom:8px;">Proposed message</div>
     {"<div style='font-weight:700;font-size:15px;margin-bottom:6px;'>Subject: " + message.subject + "</div>" if message.subject else ""}
     <pre style="background:#FAFAF8;border:1px solid #E5E1DA;border-radius:8px;padding:14px 16px;white-space:pre-wrap;font-family:-apple-system,sans-serif;font-size:14px;line-height:1.55;margin:0 0 22px;">{message.body}</pre>
 
-    <table cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-bottom:14px;"><tr>
-      <td><a href="{links.approve_url}" style="display:block;background:#16a34a;color:#fff;padding:12px 16px;text-align:center;text-decoration:none;border-radius:8px;font-weight:600;">Approve and Send</a></td>
+    <table cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-bottom:18px;"><tr>
+      <td><a href="{links.approve_url}" style="display:block;background:#16a34a;color:#fff;padding:12px 16px;text-align:center;text-decoration:none;border-radius:8px;font-weight:600;">Approve &amp; Send</a></td>
       <td width="8"></td>
       <td><a href="{links.edit_url}" style="display:block;background:#fff;color:#1B1B1B;border:1px solid #E5E1DA;padding:12px 16px;text-align:center;text-decoration:none;border-radius:8px;font-weight:600;">Edit First</a></td>
       <td width="8"></td>
       <td><a href="{links.skip_url}" style="display:block;background:#fff;color:#6B7280;border:1px solid #E5E1DA;padding:12px 16px;text-align:center;text-decoration:none;border-radius:8px;font-weight:600;">Skip</a></td>
     </tr></table>
 
-    <p style="color:#9CA3AF;font-size:12px;margin:0;">If you don't decide within 4 hours, this escalates to {settings.escalation_email or 'the manager'}.</p>
+    <p style="color:#9CA3AF;font-size:12px;margin:0 0 24px;">If you don't decide within 4 hours, this escalates to {settings.escalation_email or 'the manager'}.</p>
+
+    <hr style="border:none;border-top:1px solid #E5E1DA;margin:0 0 18px;">
+    {interactions_html}
   </div>
 </div>
 </body></html>"""
@@ -189,7 +313,7 @@ async def create_approval_request(
         await session.commit()
 
         links = _build_links(msg.id, token)
-        notif_subject, text_body, html_body = _build_notification_email(
+        notif_subject, text_body, html_body = await _build_notification_email(
             lead=lead, message=msg, rep=rep, links=links,
         )
 
@@ -234,16 +358,48 @@ async def approve_and_send(message_id: int) -> dict:
         lead = result.scalar_one_or_none()
 
         body_to_send = msg.body_edited or msg.body
+
+        # ── Sender routing: thread-continuity override ──
+        # When use_thread_continuity_send is on, derive from_email + from_name
+        # + In-Reply-To from the most recent rep email on this AccuLynx job so
+        # the homeowner sees the follow-up land in the existing thread under
+        # the actual rep's address. Falls back to solo-sender if no thread.
+        from_email = settings.sendgrid_from_email
+        from_name = settings.sendgrid_from_name
+        threaded_subject = msg.subject
+        in_reply_to = None
+        references = None
+        if msg.channel == "email" and settings.use_thread_continuity_send:
+            try:
+                from acculynx.internal_api import get_thread_continuity_for_job
+                thread = await get_thread_continuity_for_job(msg.lead_id)
+                if thread:
+                    if thread.get("rep_email"):
+                        from_email = thread["rep_email"]
+                    if thread.get("rep_name"):
+                        from_name = thread["rep_name"].strip()
+                    prior_subj = (thread.get("subject") or "").strip()
+                    if prior_subj:
+                        re_prefix = "" if prior_subj.lower().startswith("re:") else "Re: "
+                        threaded_subject = f"{re_prefix}{prior_subj}"
+                    if thread.get("synthetic_msgid"):
+                        in_reply_to = thread["synthetic_msgid"]
+                        references = [in_reply_to]
+            except Exception:
+                log.exception("thread continuity sender override skipped for %s", msg.lead_id)
+
         send_result = dispatch(
             channel=msg.channel,
             to_email=msg.recipient_email,
             to_phone=msg.recipient_phone,
             to_name=lead.contact_name if lead else None,
-            subject=msg.subject,
+            subject=threaded_subject,
             body_text=body_to_send,
-            from_email=settings.sendgrid_from_email,
-            from_name=settings.sendgrid_from_name,
+            from_email=from_email,
+            from_name=from_name,
             lead_id=msg.lead_id,
+            in_reply_to=in_reply_to,
+            references=references,
         )
 
         if send_result.sent or send_result.dry_run:

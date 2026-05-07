@@ -104,11 +104,38 @@ async def inbound_email(request: Request) -> dict:
 
 @router.post("/acculynx")
 async def acculynx_webhook(request: Request) -> dict:
-    """Stub for AccuLynx real-time milestone change events.
+    """Receive an AccuLynx webhook event.
 
-    Until subscriptions are configured, the 15-min poll in sync_pipeline
-    catches everything. Wire this once webhook subscriptions are set up.
+    Auth: ``?token=<settings.acculynx_webhook_token>`` embedded in the
+    registered consumerUrl. AccuLynx does not provide an HMAC secret at
+    subscription creation (verified empirically), so we rely on the
+    token-in-URL pattern.
+
+    Subscribed topics: see ``acculynx.webhooks.DESIRED_TOPICS``.
     """
-    payload = await request.json()
-    log.info("AccuLynx webhook payload: %s", str(payload)[:500])
-    return {"ok": True, "received_keys": list(payload.keys()) if isinstance(payload, dict) else []}
+    from acculynx.webhooks import handle_event, parse_event
+
+    expected = settings.acculynx_webhook_token
+    if expected:
+        provided = request.query_params.get("token", "")
+        if provided != expected:
+            log.warning("acculynx webhook auth failed: token mismatch")
+            return {"ok": False, "error": "unauthorized"}
+
+    try:
+        payload = await request.json()
+    except Exception as e:
+        log.warning("acculynx webhook bad JSON: %s", e)
+        return {"ok": False, "error": "bad json"}
+
+    event = parse_event(payload)
+    log.info("acculynx webhook: topic=%s job=%s event_id=%s",
+             event.topic, event.job_id, event.event_id)
+
+    try:
+        result = await handle_event(event)
+    except Exception:
+        log.exception("acculynx webhook handler error")
+        return {"ok": False, "error": "handler exception"}
+
+    return result

@@ -53,6 +53,7 @@ class Lead(Base):
     assigned_rep_name = Column(String, nullable=True)
     lead_source = Column(String, nullable=True)
     work_type = Column(String, nullable=True)
+    lead_dead_reason = Column(String, nullable=True)         # AccuLynx leadDeadReason field
     sms_opt_out = Column(Boolean, default=False)
     twilio_stop = Column(Boolean, default=False)  # Customer replied STOP via Twilio
 
@@ -78,6 +79,16 @@ class Lead(Base):
     is_paused = Column(Boolean, default=False)              # Paused (escalation, manual hold)
     is_escalated = Column(Boolean, default=False)           # Escalation triggered
     pause_reason = Column(String, nullable=True)
+
+    # Agent control fields — populated from AccuLynx job custom fields via webhook.
+    # The agent reads these every cadence tick and respects them as authoritative.
+    agent_context = Column(Text, nullable=True)             # Free-text rep notes ("waiting on insurance")
+    agent_context_updated_at = Column(DateTime, nullable=True)
+    agent_snooze_until = Column(DateTime, nullable=True)    # Pause cadence until this date
+    agent_status = Column(String, nullable=True, index=True)  # Active | Paused | Stopped (default Active)
+
+    # AccuLynx primary contact ID — needed for some webhook lookups
+    primary_contact_id = Column(String, nullable=True)
 
     # Enrichment cache
     enriched_at = Column(DateTime, nullable=True)  # When contact data was last fetched

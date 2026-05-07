@@ -1,0 +1,350 @@
+"""AccuLynx internal API client (the one that powers the AccuLynx UI).
+
+The public REST API at api.acculynx.com/api/v2 does NOT expose the contents
+of rep notes, emails, or texts. The internal SPA backend at
+my.acculynx.com/api/v4 DOES expose them — that's what the Communications tab
+in the AccuLynx UI calls.
+
+We piggyback on a logged-in user's session cookies to authenticate. The
+cookies live in .env (see ACCULYNX_SESSION_COOKIE_RAW) and need to be
+refreshed manually when they expire (typically every 30-60 days). We
+detect expiry and surface a clear error so the operator knows to re-paste.
+
+USAGE: from acculynx.internal_api import fetch_messages_for_job
+
+The internal API is undocumented and could change without notice. We
+treat its responses defensively.
+"""
+
+from __future__ import annotations
+
+import logging
+import re
+from typing import Optional
+
+import httpx
+
+from config.settings import settings
+
+log = logging.getLogger(__name__)
+
+INTERNAL_BASE = "https://my.acculynx.com/api/v4"
+
+# Required cookie names (the ones that actually authenticate)
+AUTH_COOKIE_NAMES = (".ASPXAUTH", "ASP.NET_SessionId")
+# These help with anti-bot but aren't strictly required
+RECOMMENDED_COOKIE_NAMES = ("cf_clearance", "deviceThumbprint")
+
+USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+)
+
+
+def _parse_cookie_header(cookie_header: str) -> dict[str, str]:
+    """Parse a raw `Cookie:` header value into a dict.
+
+    Accepts either pasted Chrome DevTools format ("name=value; name2=value2;")
+    or our simpler ".env"-friendly format. Whitespace tolerant.
+    """
+    out: dict[str, str] = {}
+    if not cookie_header:
+        return out
+    for chunk in cookie_header.split(";"):
+        chunk = chunk.strip()
+        if not chunk or "=" not in chunk:
+            continue
+        k, _, v = chunk.partition("=")
+        out[k.strip()] = v.strip()
+    return out
+
+
+def _cookies() -> dict[str, str]:
+    raw = (settings.acculynx_session_cookie or "").strip()
+    if not raw:
+        return {}
+    return _parse_cookie_header(raw)
+
+
+def is_configured() -> bool:
+    """True if at least the auth cookies are present."""
+    cookies = _cookies()
+    return all(cookies.get(name) for name in AUTH_COOKIE_NAMES)
+
+
+def _client(referer_job_id: str = "") -> httpx.AsyncClient:
+    """Build a configured async HTTP client mimicking a logged-in browser."""
+    headers = {
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "User-Agent": USER_AGENT,
+        "X-Device-Time-Zone": "America/New_York",
+    }
+    if referer_job_id:
+        headers["Referer"] = f"https://my.acculynx.com/jobs/{referer_job_id}/communications"
+    return httpx.AsyncClient(
+        timeout=20,
+        cookies=_cookies(),
+        headers=headers,
+        follow_redirects=False,
+    )
+
+
+_HTML_TAG = re.compile(r"<[^>]+>")
+_NBSP = re.compile(r"&nbsp;|\xa0")
+_AMP = re.compile(r"&amp;")
+_QUOT = re.compile(r"&quot;")
+_LT = re.compile(r"&lt;")
+_GT = re.compile(r"&gt;")
+_APOS = re.compile(r"&#39;|&apos;")
+_WS = re.compile(r"\s+")
+
+
+def _html_to_text(html: str) -> str:
+    """Strip HTML tags and decode common entities. AccuLynx Message bodies
+    arrive as HTML (e.g. <p>Hi&nbsp;Tyler,</p>)."""
+    if not html:
+        return ""
+    s = _HTML_TAG.sub(" ", html)
+    s = _NBSP.sub(" ", s)
+    s = _AMP.sub("&", s)
+    s = _LT.sub("<", s)
+    s = _GT.sub(">", s)
+    s = _QUOT.sub('"', s)
+    s = _APOS.sub("'", s)
+    s = _WS.sub(" ", s).strip()
+    return s
+
+
+# ── Per-lead TTL cache ──────────────────────────────────────────────────────
+# Internal API calls are slow (1-3s each) and the same lead's messages get
+# fetched 4-8 times during a single layer-page load (4 touches * 2 paths:
+# build_agent_context + get_thread_continuity_for_job). A 3-minute TTL is
+# more than enough for /review usage and short enough that fresh CRM
+# activity shows up by the next click.
+import time as _time
+
+_MSG_CACHE: dict[str, tuple[float, list[dict]]] = {}
+_MSG_TTL_SECONDS = 180.0
+
+
+def invalidate_messages_cache(job_id: Optional[str] = None) -> None:
+    """Drop cached messages for a single lead, or all leads if no id given."""
+    if job_id is None:
+        _MSG_CACHE.clear()
+    else:
+        _MSG_CACHE.pop(job_id, None)
+
+
+async def fetch_messages_for_job(job_id: str) -> list[dict]:
+    """Pull every Communication (email + text + comment) on a job.
+
+    Returns a list of normalized dicts ordered most-recent-first:
+      {id, type, created_date, created_by, subject, body_text, recipients}
+
+    Returns [] silently on auth failure / network error so callers can
+    fall back to the public API context. Logs a warning so the operator
+    knows cookies need refreshing.
+
+    Memoized per-lead with a 3-minute TTL — see _MSG_CACHE above.
+    """
+    cached = _MSG_CACHE.get(job_id)
+    if cached is not None:
+        ts, msgs = cached
+        if (_time.time() - ts) < _MSG_TTL_SECONDS:
+            return msgs
+
+    if not is_configured():
+        log.debug("internal_api: cookies not configured, skipping")
+        return []
+
+    url = f"{INTERNAL_BASE}/jobs/{job_id}/messages"
+    try:
+        async with _client(referer_job_id=job_id) as c:
+            r = await c.get(url)
+        if r.status_code == 401 or r.status_code == 403:
+            log.warning(
+                "internal_api: AccuLynx session cookies appear EXPIRED "
+                "(status=%s). Refresh ACCULYNX_SESSION_COOKIE in .env.",
+                r.status_code,
+            )
+            return []
+        if r.status_code != 200:
+            log.warning("internal_api: unexpected status %s on %s", r.status_code, url)
+            return []
+        data = r.json()
+    except Exception as exc:
+        log.warning("internal_api: fetch failed for %s: %s", job_id, exc)
+        return []
+
+    sr = data.get("SearchResults", {}) or {}
+    raw_results = sr.get("results", []) if isinstance(sr, dict) else []
+    if not isinstance(raw_results, list):
+        return []
+
+    out: list[dict] = []
+    for m in raw_results:
+        if not isinstance(m, dict):
+            continue
+        msg_type = m.get("Type") or m.get("MessageType") or "Unknown"
+        body_text = _html_to_text(m.get("Message") or "")
+        recipients = m.get("Recipients") or []
+        if isinstance(recipients, list):
+            rec_str = ", ".join(
+                str(r.get("Name") or r.get("Email") or r) if isinstance(r, dict) else str(r)
+                for r in recipients[:5]
+            )
+        else:
+            rec_str = ""
+
+        out.append({
+            "id": m.get("Id"),
+            "type": msg_type,
+            "created_date": m.get("CreatedDate") or m.get("SentDate"),
+            "created_by": m.get("CreatedBy"),
+            "subject": (m.get("Subject") or "").strip() or None,
+            "body_text": body_text,
+            "recipients": rec_str,
+            "is_admin_message": bool(m.get("AdminMessage")),
+        })
+    # Most-recent first
+    out.sort(key=lambda x: x["created_date"] or "", reverse=True)
+    _MSG_CACHE[job_id] = (_time.time(), out)
+    return out
+
+
+async def get_thread_continuity_for_job(job_id: str) -> Optional[dict]:
+    """Pull the most recent OUTBOUND email from the rep so the agent's
+    follow-up can thread into the same conversation in the homeowner's
+    inbox.
+
+    Returns:
+      {
+        "rep_email":      paulvanwagoner@moderndayroof.com  (or None)
+        "rep_name":       "Paul VanWagoner"
+        "subject":        "Updated Estimates"
+        "synthetic_msgid": "<accuLynx-{Id}@my.acculynx.com>"  (for In-Reply-To)
+        "sent_date":      ISO timestamp
+        "recipient":      "rugertyler1496@gmail.com"
+      }
+    or None if no prior email exists.
+
+    Strategy: AccuLynx doesn't expose RFC Message-IDs but we generate a
+    synthetic one based on the AccuLynx message UUID. Most email clients
+    thread primarily by Subject + From — having In-Reply-To is bonus.
+    """
+    msgs = await fetch_messages_for_job(job_id)
+    if not msgs:
+        return None
+    # The first email-type message authored by an actual person (not the
+    # AccuLynx system / automation account) is the most recent rep email.
+    SYSTEM_SENDERS = {"acculynx", "system", "modern day roofing", ""}
+    rep_email = next(
+        (m for m in msgs
+         if m.get("type") == "Email"
+         and (m.get("created_by") or "").strip().lower() not in SYSTEM_SENDERS),
+        None,
+    )
+    if not rep_email:
+        # Fall back to the most recent Comment by a real person — these are
+        # rep notes on the job and tell us who's actively working it, even if
+        # no rep email has been sent yet (porch repairs, etc.). We still won't
+        # have a synthetic_msgid for threading, but voice/identity is right.
+        rep_email = next(
+            (m for m in msgs
+             if m.get("type") == "Comment"
+             and (m.get("created_by") or "").strip().lower() not in SYSTEM_SENDERS),
+            None,
+        )
+        if not rep_email:
+            return None
+
+    rep_name = " ".join((rep_email.get("created_by") or "").split())
+    subject = (rep_email.get("subject") or "").strip()
+    al_id = rep_email.get("id") or ""
+    synthetic_msgid = f"<accuLynx-{al_id}@my.acculynx.com>" if al_id else None
+
+    # Try to derive the rep's email from the name. Common pattern at MDR:
+    # firstnamelastname@moderndayroof.com (lowercased, no spaces).
+    rep_email_addr: Optional[str] = None
+    if rep_name:
+        cleaned = rep_name.lower().replace(" ", "").replace(".", "")
+        # Strip trailing whitespace/non-alpha
+        import re as _re
+        cleaned = _re.sub(r"[^a-z]", "", cleaned)
+        if cleaned:
+            rep_email_addr = f"{cleaned}@moderndayroof.com"
+
+    return {
+        "rep_email": rep_email_addr,
+        "rep_name": rep_name,
+        "subject": subject,
+        "synthetic_msgid": synthetic_msgid,
+        "sent_date": rep_email.get("created_date"),
+        "recipient": rep_email.get("recipients") or "",
+    }
+
+
+async def post_comment(job_id: str, message: str) -> Optional[str]:
+    """Post an internal Comment to a job's Communications tab.
+
+    Uses the internal v4 endpoint with session cookies (the only mechanism
+    that lands in the Communications tab where reps actually look).
+    Returns the new comment id, or None on failure (we degrade gracefully —
+    the agent keeps running, just without CRM-side audit trail).
+    """
+    if not is_configured():
+        log.debug("post_comment: cookies not configured, skipping")
+        return None
+    if not message or not message.strip():
+        return None
+    url = f"{INTERNAL_BASE}/jobs/{job_id}/messages"
+    body = {"Type": "Comment", "Message": message.strip()}
+    try:
+        async with _client(referer_job_id=job_id) as c:
+            r = await c.post(url, json=body)
+        if r.status_code == 200:
+            new_id = r.text.strip().strip('"')
+            return new_id or "ok"
+        if r.status_code in (401, 403):
+            log.warning(
+                "post_comment: AccuLynx session cookies appear EXPIRED "
+                "(status=%s). Refresh ACCULYNX_SESSION_COOKIE in .env.",
+                r.status_code,
+            )
+            return None
+        log.warning("post_comment: unexpected status %s on %s: %s", r.status_code, url, r.text[:200])
+        return None
+    except Exception as exc:
+        log.warning("post_comment: failed for %s: %s", job_id, exc)
+        return None
+
+
+def format_messages_for_context(
+    messages: list[dict],
+    *,
+    max_messages: int = 8,
+    max_chars_per_message: int = 400,
+) -> str:
+    """Format messages into a Claude-prompt-ready text block.
+
+    Most recent first, capped at max_messages. Each message body capped
+    at max_chars_per_message so a single 5,000-char email doesn't blow the
+    prompt budget."""
+    if not messages:
+        return ""
+    lines = ["RECENT COMMUNICATIONS (newest first, from AccuLynx Communications tab):"]
+    for m in messages[:max_messages]:
+        when = (m.get("created_date") or "")[:10]
+        who = m.get("created_by") or "Unknown"
+        msg_type = m.get("type") or "Note"
+        body = (m.get("body_text") or "").strip()
+        if len(body) > max_chars_per_message:
+            body = body[:max_chars_per_message - 3] + "..."
+        if not body:
+            continue
+        subject = m.get("subject")
+        subj_line = f" — Subject: {subject}" if subject else ""
+        lines.append(f"  [{when}] {msg_type} by {who}{subj_line}")
+        lines.append(f"      {body}")
+    return "\n".join(lines)

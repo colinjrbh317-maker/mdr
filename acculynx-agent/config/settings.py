@@ -58,6 +58,14 @@ class Settings(BaseSettings):
     # Flip to false after Austin onboards the team and reps.yaml has real per-rep entries.
     solo_sender_mode: bool = True
 
+    # ── Thread-continuity send identity ──
+    # When true, outbound homeowner emails are sent FROM the assigned rep's
+    # derived email address (e.g., paulvanwagoner@moderndayroof.com), pulled
+    # via acculynx.internal_api.get_thread_continuity_for_job. Threads into
+    # the same conversation in the homeowner's inbox via In-Reply-To headers.
+    # Flip off if SendGrid Domain Auth on moderndayroof.com is not yet set up.
+    use_thread_continuity_send: bool = True
+
     # ── Safety: dry run ──
     # When true, drafts are produced but no outbound mail is sent. Default safe.
     dry_run: bool = True
@@ -65,6 +73,11 @@ class Settings(BaseSettings):
     # ── Test allowlist ──
     # Comma-separated AccuLynx job IDs. When set, ONLY these leads can receive real sends.
     test_lead_allowlist: str = ""
+
+    # ── Test send recipient ──
+    # Demo "Send test to me" button in /review delivers here, bypassing DRY_RUN.
+    # Defaults to colinjrbh317@gmail.com so tomorrow's demo works out of the box.
+    test_recipient_email: str = "colinjrbh317@gmail.com"
 
     # ── Business Hours ──
     business_hours_start: int = 8
@@ -74,6 +87,10 @@ class Settings(BaseSettings):
     # ── Stale Lead Thresholds ──
     stale_threshold_hours: int = 48
     max_contact_attempts: int = 12
+
+    # Colin's freshness rule: leads stuck in milestone > 45 days are
+    # archaeology, not active deals. Cadence does not enroll them.
+    freshness_cap_days: int = 45
 
     # ── Database ──
     database_url: str = f"sqlite+aiosqlite:///{PROJECT_ROOT / 'data' / 'agent.db'}"
@@ -89,6 +106,27 @@ class Settings(BaseSettings):
 
     # ── App URL (Railway/local) for magic links ──
     app_base_url: str = "http://localhost:8000"
+
+    # ── AccuLynx webhook receiver auth ──
+    # Embedded as ?token=XXX in the consumerUrl we register with AccuLynx.
+    # Receiver rejects requests missing/wrong token. Generate fresh per env.
+    acculynx_webhook_token: str = ""
+
+    # ── AccuLynx internal API session cookies ──
+    # The public REST API does not expose Communications content (rep notes,
+    # rep emails, rep texts). The internal SPA backend at my.acculynx.com
+    # DOES, but requires the user's session cookies. Paste the full Cookie
+    # header from a logged-in Chrome DevTools session here. Refresh when
+    # session expires (every 30-60 days). Required cookies: .ASPXAUTH,
+    # ASP.NET_SessionId, plus cf_clearance + deviceThumbprint for anti-bot.
+    acculynx_session_cookie: str = ""
+
+    # ── AccuLynx login credentials for auto-relogin ──
+    # Used by scripts/refresh_cookies.py (Playwright headless) to refresh
+    # the session cookie without manual DevTools work. Recommended: use a
+    # dedicated AccuLynx bot user, NOT a human rep account.
+    acculynx_login_email: str = ""
+    acculynx_login_password: str = ""
 
     class Config:
         env_prefix = ""

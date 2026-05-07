@@ -8,6 +8,7 @@ Think of it as TSA for text messages. Every message gets screened.
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select, func as sqlfunc
@@ -16,6 +17,8 @@ from config.settings import settings
 from db.database import async_session
 from db.models import Lead, MessageQueue
 from engine.sync import check_recent_activity, get_sync_health
+
+log = logging.getLogger(__name__)
 
 
 # Volume limits
@@ -111,6 +114,55 @@ async def preflight_check(lead_data: dict) -> dict:
         "reason": reason,
         "check_results": checks,
     }
+
+
+async def drip_safety_check(lead_context: dict) -> dict:
+    """Gate for drip-campaign touches only.
+
+    Reads content_type from lead_context["touch"]["content_type"].  If the
+    touch is NOT a drip content type the gate is a no-op and returns ok.
+    If it IS a drip touch, calls check_drip_eligibility; on ineligibility
+    returns skip=True so the caller can advance the cadence and move on.
+
+    Args:
+        lead_context: The entry dict produced by find_leads_needing_followup(),
+                      which contains at minimum:
+                        lead_context["lead_id"]          -- str
+                        lead_context["touch"]["content_type"]  -- str (optional)
+
+    Returns:
+        {"ok": True,  "skip": False}                        -- proceed normally
+        {"ok": False, "skip": True, "reasons": [str, ...]}  -- skip this touch
+    """
+    # Defensive: if content_type is absent, treat as non-drip and let through.
+    touch = lead_context.get("touch") or {}
+    content_type: str = touch.get("content_type") or ""
+
+    from engine.drip_safety import check_drip_eligibility, is_drip_content_type
+
+    if not is_drip_content_type(content_type):
+        return {"ok": True, "skip": False}
+
+    lead_id: str = lead_context.get("lead_id", "unknown")
+    try:
+        result = await check_drip_eligibility(lead_id)
+    except Exception as exc:
+        # Fail-safe: block on any unexpected error so we never send a
+        # "love your roof" message to a customer with an active dispute.
+        log.exception(
+            "drip_safety_check: check_drip_eligibility raised for lead %s; blocking touch",
+            lead_id,
+        )
+        return {
+            "ok": False,
+            "skip": True,
+            "reasons": [f"drip eligibility check raised exception: {exc}"],
+        }
+
+    if result.ok:
+        return {"ok": True, "skip": False}
+
+    return {"ok": False, "skip": True, "reasons": result.reasons}
 
 
 async def _check_volume_limits() -> bool:

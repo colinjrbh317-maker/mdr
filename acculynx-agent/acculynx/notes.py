@@ -57,12 +57,15 @@ async def log_send_to_acculynx(
         body_preview=body,
         sent_via=sent_via,
     )
-    try:
-        await client.post_json(
-            f"/jobs/{job_id}/messages",
-            {"messageType": "Internal", "subject": "AI Follow-up", "body": note},
-        )
+    # Land the note in the AccuLynx Communications tab via the internal v4
+    # endpoint. The public REST API does not have a "create note/message"
+    # path — verified empirically. The internal-API Comment POST is the
+    # only path reps actually see. Cookie-dependent; degrades gracefully
+    # if cookies expire.
+    from acculynx.internal_api import post_comment
+    new_id = await post_comment(job_id, note)
+    if new_id:
+        log.info("AccuLynx note posted to job %s (comment_id=%s)", job_id, new_id)
         return True
-    except Exception as exc:
-        log.warning("AccuLynx note write failed for %s: %s", job_id, exc)
-        return False
+    log.warning("AccuLynx note write failed for %s (cookies expired or network)", job_id)
+    return False

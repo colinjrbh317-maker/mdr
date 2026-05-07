@@ -24,6 +24,7 @@
       <span style="margin-left: auto; display: flex; gap: 6px;">
         <button onclick="loadDraft('{{ lead.id }}', '{{ layer_name }}', {{ t.index }}, '{{ t.channel }}', true)">↻ Regenerate</button>
         <button onclick="openEditor('{{ layer_name }}', {{ t.index }}, '{{ t.channel }}')">✎ Edit template</button>
+        <button class="primary" onclick="testSend('{{ lead.id }}', '{{ layer_name }}', {{ t.index }}, '{{ t.channel }}', this)">📤 Send test to me</button>
       </span>
     </div>
     <div class="lead-meta" style="margin-bottom: 8px;"><i>Content type: {{ t.content_type }}</i></div>
@@ -118,6 +119,30 @@ async function saveTemplate() {
     loadDraft(leadId, layer, touch, channel, true);
   } catch (e) {
     alert(`Network error: ${e}`);
+  }
+}
+
+async function testSend(leadId, layerName, touchIndex, channel, btn) {
+  const original = btn.textContent;
+  btn.textContent = '⏳ sending…';
+  btn.disabled = true;
+  try {
+    const res = await fetch(`/review/test-send/${leadId}/${layerName}/${touchIndex}/${channel}`, {method: 'POST'});
+    const j = await res.json();
+    if (j.sent) {
+      btn.textContent = '✓ sent to ' + j.to;
+      btn.style.background = '#16a34a';
+      btn.style.color = '#fff';
+      setTimeout(() => { btn.textContent = original; btn.disabled = false; btn.style.background=''; btn.style.color=''; }, 5000);
+    } else {
+      alert('Send failed: ' + (j.error || j.reason || JSON.stringify(j)));
+      btn.textContent = original;
+      btn.disabled = false;
+    }
+  } catch (e) {
+    alert('Network error: ' + e);
+    btn.textContent = original;
+    btn.disabled = false;
   }
 }
 

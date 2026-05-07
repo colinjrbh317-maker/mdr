@@ -109,51 +109,80 @@ You can reach me at 540-553-6007 or just reply here.
 
 ## Layer 4: Estimate Follow-Up
 **Goal:** Answer questions, remove friction, get the contract signed. Highest-leverage layer.
-**Tone:** Helpful, patient, value-focused. Never pushy.
+**Tone:** Easy, unhurried. Trusted contractor voice: warm, human, outcome-focused. Never pushy.
 
 ### Touch 1, Text, Day 2 post-estimate
-**Winner:** v5 (Conversational)
-**Why:** Shortest and most natural check-in. No warranty facts, no urgency hooks, just a human asking if they looked at it yet.
+**Goal:** Open the door for questions. Keep it warm and human. ONE ask: "anything on the estimate you want me to walk through?"
+**Tone:** Easy, unhurried. Like a contractor who did good work and is making sure you have what you need.
+**Length target:** 35 to 70 words. Tight 3-line signature.
+**Voice:** Sounds like the actual rep typed it from their phone. Lead with the homeowner's situation, not MDR's credentials.
 
-> Hey [Name], just wanted to check in, did you get a chance to look over the estimate? Happy to answer any questions. [Rep], Modern Day Roofing
+> Hey [Name], it's [Rep] from Modern Day Roofing. Wanted to make sure you got the updated estimate okay. These numbers can bring up questions, so anything on there you want me to walk through?
+>
+> [Rep]
+> Modern Day Roofing
+> 540-553-6007
 
 ---
 
 ### Touch 2, Text, Day 5 post-estimate
-**Winner:** v5 (Conversational)
-**Why:** "No rush on my end" is the most natural no-pressure phrasing of all five versions. Clean, short, sounds texted.
+**Goal:** Name price shock directly. Give the homeowner a concrete path through it. ONE ask: "want me to run the financing numbers for you?"
+**Tone:** Understanding, not apologetic. The rep has seen this before and knows how to help.
+**Length target:** 40 to 75 words. Tight 3-line signature.
+**Voice:** First person, casual. Saying "a number like that catches people off guard" validates their reaction and signals the rep is human, not a script.
 
-> Hey [Name], following up on the estimate I sent over. No rush on my end, just want to make sure you have everything you need to make a decision. 540-553-6007
+> Hey [Name], [Rep] here. A number like that catches people off guard. It's a big purchase and most folks aren't expecting it. If the total is the sticking point, we can break it into monthly payments through our lender. Want me to run those numbers for you so you can see what it actually looks like?
+>
+> [Rep]
+> Modern Day Roofing
+> 540-553-6007
 
 ---
 
 ### Touch 3, Email, Day 10 post-estimate
-**Winner:** v1 (Direct Response)
-**Why:** Best balance of substance and brevity. Covers financing, warranty, and scheduling in clean bullet format without turning into a textbook (v3) or a fear pitch (v4). The bolded headers make it scannable.
+**Goal:** Make the full case, framed around what the homeowner gets. Three things: manageable monthly payment, warranty protection, and a process where they do almost nothing. ONE ask: "want me to get you on the calendar?"
+**Tone:** Easy and reassuring. The kind of email a contractor sends when they want you to feel good about the decision, not pressured into it.
+**Length target:** 120 to 175 words BODY (subject and signature don't count). Full signature block.
+**Voice:** First person, warm, scannable. Section headers as plain prose words on their own line ("The payment." "The warranty." "How it works.") with no asterisks, no bold, no markdown.
 
-**Subject:** A few things worth knowing before you decide
+**Subject:** A few things that might make this easier
 
 Hi [Name],
 
-I wanted to follow up on your estimate and share a couple of things that homeowners often find helpful when making this decision.
+I wanted to reach out with a couple of things that might help with the decision.
 
-**Financing:** We offer flexible payment options so you don't have to pay the full cost upfront. Many customers find this makes the project much more manageable.
+The payment.
+At your estimate level, financing runs as low as $[X]/month through our lending partner. A lot of people find it a lot easier to say yes to that than to one large number. I can send you the link today if you want to take a look.
 
-**Warranty:** Our installations come with a manufacturer material warranty as well as our own workmanship guarantee. We stand behind every job we complete.
+The warranty.
+Your roof comes with a 50-year material warranty and a 25-year workmanship guarantee. If anything goes wrong, you're covered. No runaround.
 
-**Scheduling:** Our install calendar fills up, especially heading into the busy season. If you're leaning toward moving forward, it's worth reaching out sooner so we can hold a spot for you.
+How it works.
+We handle the permit, deliver materials the day before, complete most installs in a single day, and haul everything away when we're done. You don't have to manage anything.
 
-If you have questions about the estimate or want to talk through your options, I'm available at [Phone] or by reply to this email.
+Want me to get you on the calendar? Just reply and I'll take it from there.
 
-[Signature]
+Best regards,
+[Rep Name]
+[Position]
+Modern Day Roofing
+540-553-6007
+[rep]@moderndayroof.com
+www.moderndayroof.com
 
 ---
 
 ### Touch 4, Text, Day 14 post-estimate
-**Winner:** v5 (Conversational)
-**Why:** Most relaxed and human of all five, "just wanted to stay in touch in case questions came up" is perfectly low-pressure for a day-14 check-in.
+**Goal:** Create honest stakes. Material and labor costs have genuinely increased. Give the homeowner a real binary choice. ONE ask: "want to lock the price in, or should I close this one out?"
+**Tone:** Straight and respectful. A contractor who respects their own time and the homeowner's. Not needy, not pushy; just honest.
+**Length target:** 45 to 80 words. Tight 3-line signature.
+**Voice:** First person, direct. The binary close forces a real answer. No soft language that signals the rep doesn't care.
 
-> Hey [Name], no pressure at all, just wanted to stay in touch in case questions came up. Still here when you're ready. [Rep], Modern Day Roofing, 540-553-6007
+> Hey [Name], [Rep] from Modern Day Roofing. Wanted to be straight with you before I close this out. Material and labor costs have gone up this year, and your estimate locks in today's price as long as it's active. Once I close the file that price isn't guaranteed. Want to lock it in, or should I go ahead and close this one out?
+>
+> [Rep]
+> Modern Day Roofing
+> 540-553-6007
 
 ---
 
@@ -373,71 +402,128 @@ Thanks again for choosing us.
 
 ---
 
-## Layer 9: Drip (Post-Close)
-**Goal:** Stay top of mind, generate referrals, surface upsell opportunities naturally.
-**Tone:** Casual, appreciative, non-pushy.
+## Layer 9: Drip (Post-Close Value Ladder)
+**Goal:** Turn a one-time customer into someone who calls MDR first for every exterior project and sends their neighbors over. Deliver real value at every step before asking for anything.
+**Tone:** Warm and natural. Each touch sounds like a trusted contractor staying in touch, not a campaign.
+**Ladder logic:**
+1. T1 (Day 30): No offer. Genuine check-in. Ask if everything is looking and performing the way it should. Trust-building only.
+2. T2 (Day 90): Real free service. Complimentary exterior tune-up ($150 value, on MDR). Low-friction: MDR does not need them home.
+3. T3 (Day 180): $250 referral. A check mailed to their door per signed referral. No cap.
+4. T4 (Day 365): Free annual inspection plus 10% off any add-on work booked at the same visit.
 
-### Touch 1, Text, Day 30 post-close
-**Winner:** v1 (Direct Response)
-**Why:** "How's the roof holding up through the weather?" is more specific and conversational than the generic check-ins in other versions. Ties the roof to a real thing (weather) which makes it feel like a genuine reason to text.
+Safety gate: before drafting any drip message, confirm job invoiced and paid in full, zero open punch-list items, and no unresolved disputes or active change orders. Any condition fails = ESCALATION_REQUIRED.
 
-> Hey [Name], this is [RepFirst] at Modern Day Roofing. Just checking in, how's the roof holding up through the weather? Hope everything is looking great. [Phone]
+Each touch must read as a continuation of the relationship, not a campaign. Reference the install in the opener, then deliver the touch's specific offer.
+
+### Touch 1, Text, Day 30 post-close - Soft check-in (no offer)
+**Goal:** Re-open the relationship as a trusted contractor who genuinely cares how the work held up. No offer, no ask for referrals, no mention of other products. ONE ask: "has anything caught your eye since the install?"
+**Tone:** Warm and natural. Like a contractor who takes pride in their work and wants to know how it performed.
+**Length target:** 30 to 65 words. Tight 3-line signature.
+**Voice:** First person, warm, casual. No offers yet. Not asking for anything at Day 30 is a deliberate trust move.
+
+> Hey [Name], it's [Rep] from Modern Day Roofing. It's been about a month since we wrapped up. Wanted to make sure everything is looking and performing the way it should. Has anything caught your eye since the install?
+>
+> [Rep]
+> Modern Day Roofing
+> 540-553-6007
 
 ---
 
-### Touch 2, Email, Day 90 post-close
-**Winner:** v1 (Direct Response)
-**Why:** Cleanest seasonal check-in. The gutter/downspout advice is practical without being a lecture. Offers a free inspection without making it feel like a sales call. V3's version is too long and technical for a day-90 drip.
+### Touch 2, Email, Day 90 post-close - Free exterior tune-up
+**Goal:** Deliver a real free service, $150 on MDR. Frame it as something every MDR customer gets in year one, not a promotional gimmick. ONE ask: "want me to get you on the schedule?"
+**Tone:** Generous and easy. The rep who did the job well, making sure it stays that way.
+**Length target:** 110 to 165 words BODY. Full signature block.
+**Voice:** First person. Name the dollar value so the gift feels real. Say "we don't need you home" to remove the biggest logistical objection.
 
-**Subject:** Fall checklist for your roof and gutters
+**Subject:** Your free tune-up is ready, we'll come to you
 
 Hi [Name],
 
-Hard to believe it's already been a few months since your roof installation. Hope it's been holding up well.
+Three months in. Hope the new roof has been everything you expected.
 
-A quick heads-up: fall is a good time to check gutters and downspouts before leaves start to pile up. Clogged gutters cause water to back up under the roofline, which can shorten the life of even a brand-new roof.
+Every MDR customer gets a complimentary exterior tune-up in year one. Yours is ready to schedule. This is a $150 service, on us:
 
-If you'd like us to come out for a gutter cleaning or a post-install inspection, just reply here or give us a call at 540-553-6007. We're happy to come take a look, no charge for the inspection.
+Roof.
+We walk the whole thing, every seal, flashing, and transition, to confirm it's sitting right after its first season of weather.
 
-[Signature]
+Gutters.
+Flow check and basic clean-out if needed. A clogged gutter is the fastest way to turn a new roof into a water damage problem.
 
----
+Vents and penetrations.
+Pipe boots, ridge caps, chimney transitions. Everything that takes the most stress in a freeze/thaw cycle.
 
-### Touch 3, Email, Day 180 post-close
-**Winner:** v5 (Conversational)
-**Why:** Most direct and readable referral ask. "We'll take care of the rest and get you your referral payment when the job closes" makes the process crystal clear. No filler about "how the best contractors grow."
+We don't need you home for it. Want me to get you on the schedule? Just reply with a couple of days that work and I'll take it from there.
 
-**Subject:** Know anyone who needs a roof?
-
-Hey [Name],
-
-Hope things are going well. Quick note, we have a referral program that pays $250 for anyone you send our way who signs a contract.
-
-If you know a neighbor, family member, or friend who's been putting off their roof, we'd love the introduction. You can just send them our way and mention your name, we'll take care of the rest and get you your referral payment when the job closes.
-
-Thanks for trusting us with your home. We don't take that lightly.
-
-[Signature]
+Best regards,
+[Rep Name]
+[Position]
+Modern Day Roofing
+540-553-6007
+[rep]@moderndayroof.com
+www.moderndayroof.com
 
 ---
 
-### Touch 4, Email, Day 365 post-close
-**Winner:** v5 (Conversational)
-**Why:** Most natural one-year check-in. "If you haven't noticed any issues, that's exactly what we like to hear" is a great line, affirming and warm. Practical gutter/flashing advice without turning into a maintenance manual.
+### Touch 3, Email, Day 180 post-close - Referral bounty
+**Goal:** Make the referral offer feel like a natural conversation. If they had a good experience, here is an easy way to share it and get $250 in the mail. ONE ask: "know anyone who might be dealing with the same thing?"
+**Tone:** Appreciative and easy. Like a contractor saying thank you and sharing something useful, not pitching a program.
+**Length target:** 105 to 155 words BODY. Full signature block.
+**Voice:** First person. "$250 check mailed to your door" is specific and tangible. Not a credit, not a gift card. That specificity makes people believe it.
 
-**Subject:** One year on your new roof
+**Subject:** If you know someone dealing with this...
 
-Hey [Name],
+Hi [Name],
 
-Hard to believe it's already been a year since we put your new roof on.
+Six months ago we put a new roof on your home. If we took care of you the way we should have, you probably know one or two people going through the same thing right now.
 
-If you haven't noticed any issues, that's exactly what we like to hear. To keep everything in good shape, it's worth having gutters cleaned out heading into fall and checking flashings around chimneys or vents once a year.
+Here's how it works if you want to send them our way:
 
-If you ever want us to come out and take a look, or if anything's come up since the install, just give us a call. 540-553-6007.
+Give them [Rep]'s number or forward this email.
+Have them mention your name when they reach out.
+Once they sign with MDR, we mail you a $250 check straight to your door.
 
-Thanks again for choosing Modern Day Roofing.
+No limit. Two neighbors, two checks.
 
-[Signature]
+Think of one person who might be dealing with a roof right now. That's all it takes. Reply with a name and I'll handle everything from there.
+
+Best regards,
+[Rep Name]
+[Position]
+Modern Day Roofing
+540-553-6007
+[rep]@moderndayroof.com
+www.moderndayroof.com
+
+---
+
+### Touch 4, Email, Day 365 post-close - Anniversary bundle
+**Goal:** Deliver the biggest offer on the ladder while making it feel like a natural milestone. Free annual inspection plus 10% off any add-on work booked at the same visit. ONE ask: "want to bundle anything onto the visit?"
+**Tone:** Warm and genuine. A contractor marking a real anniversary and bringing something valuable with them.
+**Length target:** 120 to 170 words BODY. Full signature block.
+**Voice:** First person. Lead with gutters and skylights (MDR's top-converting add-ons). Anchor the 10% to a dollar amount to make the offer feel concrete, not vague.
+
+**Subject:** One year on your roof: here's what you've got coming
+
+Hi [Name],
+
+A year ago MDR put a new roof on your home. It's been through heat, rain, ice, and everything Virginia throws at it. It's a good time to confirm it's still performing exactly the way it should.
+
+Your one-year inspection is on us. We'll walk the full roof, check all flashings and transitions, run the gutters, and clean them out if needed. Same thorough walk we do on new installs, no cost to you.
+
+And if there's anything else on the exterior you've been thinking about, now's a good time. Returning homeowners get 10% off any add-on work booked at the same visit. Our two most-requested right now:
+
+Gutters: seamless aluminum, color-matched. 10% saves you around $250.
+Skylights: Velux units with a 10-year no-leak guarantee.
+
+Want to bundle anything onto the visit? Reply here or call me directly.
+
+Best regards,
+[Rep Name]
+[Position]
+Modern Day Roofing
+540-553-6007
+[rep]@moderndayroof.com
+www.moderndayroof.com
 
 ---
 

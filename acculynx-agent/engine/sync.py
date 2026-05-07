@@ -43,6 +43,19 @@ OSCILLATION_COOLDOWN_HOURS = 1
 # Stale touch: skip touches overdue by more than this many days
 STALE_TOUCH_MAX_DAYS = 7
 
+# ── Residential job category allowlist ──
+# Only homeowner-facing categories qualify for the AI sales cadence.
+# AccuLynx may return slightly different casing or spacing — all checks go
+# through _normalize_category() so the set stays case/whitespace insensitive.
+def _normalize_category(s: str) -> str:
+    """Lowercase and collapse internal whitespace for a category string."""
+    return " ".join(s.strip().lower().split())
+
+RESIDENTIAL_JOB_CATEGORIES: frozenset[str] = frozenset({
+    _normalize_category("Residential Roof Repair / Service"),
+    _normalize_category("Roof Replacement - Retail"),
+})
+
 # Track sync health for pre-send checklist
 _last_sync_success: bool = False
 _last_sync_time: Optional[datetime] = None
@@ -56,10 +69,27 @@ def get_sync_health() -> dict:
     }
 
 
+def _is_residential(job: dict) -> bool:
+    """Return True only if the job's jobCategory is in the residential allowlist.
+
+    Handles jobCategory as either a dict ({"name": "..."}) or a bare string,
+    matching the same dual-format pattern used by _extract_string_field().
+    Returns False if the field is missing or not in RESIDENTIAL_JOB_CATEGORIES.
+    """
+    raw = job.get("jobCategory")
+    if isinstance(raw, dict):
+        name = raw.get("name", "")
+    elif raw:
+        name = str(raw)
+    else:
+        return False
+    return _normalize_category(name) in RESIDENTIAL_JOB_CATEGORIES
+
+
 async def sync_pipeline() -> dict:
     """Pull active pipeline from AccuLynx and update local database."""
     global _last_sync_success, _last_sync_time
-    stats = {"synced": 0, "new": 0, "updated": 0, "skipped_backfill": 0, "errors": 0}
+    stats = {"synced": 0, "new": 0, "updated": 0, "skipped_backfill": 0, "non_residential_skipped": 0, "errors": 0}
 
     try:
         jobs = await get_all_pages("/jobs", {}, page_size=10, max_pages=200)
@@ -81,6 +111,8 @@ async def sync_pipeline() -> dict:
                         stats["updated"] += 1
                     elif result == "skipped_backfill":
                         stats["skipped_backfill"] += 1
+                    elif result == "non_residential":
+                        stats["non_residential_skipped"] += 1
                     stats["synced"] += 1
             except Exception as e:
                 # Savepoint rolled back automatically, session still valid
@@ -95,7 +127,9 @@ async def sync_pipeline() -> dict:
     print(
         f"📡 Sync complete: {stats['synced']} jobs "
         f"({stats['new']} new, {stats['updated']} updated, "
-        f"{stats['skipped_backfill']} skipped backfill, {stats['errors']} errors)"
+        f"{stats['skipped_backfill']} skipped backfill, "
+        f"{stats['non_residential_skipped']} non-residential stopped, "
+        f"{stats['errors']} errors)"
     )
     return stats
 
@@ -130,11 +164,27 @@ async def _upsert_lead(session: AsyncSession, job: dict) -> str:
         existing.acculynx_modified_date = acculynx_modified
         existing.job_number = job.get("jobNumber") or existing.job_number
         existing.is_active = milestone not in ["Dead", "Cancelled"]
+        # Capture leadDeadReason — useful context when a rep closed the deal
+        ldr = (job.get("leadDeadReason") or "").strip()
+        if ldr:
+            existing.lead_dead_reason = ldr
 
         if contact_name:
             existing.contact_name = contact_name
         if address and not existing.address:
             existing.address = address
+
+        # ── Non-residential guard (existing leads) ──
+        # If a previously-residential lead now shows a non-residential category,
+        # stop it. We do NOT auto-resurrect non→residential (manual approval required).
+        if not _is_residential(job):
+            raw = job.get("jobCategory")
+            cat_name = raw.get("name", str(raw)) if isinstance(raw, dict) else str(raw or "unknown")
+            if existing.agent_status != "Stopped":
+                print(f"  🚫 Lead {job_id} switched to non-residential ({cat_name}), stopping.")
+                existing.is_active = False
+                existing.agent_status = "Stopped"
+                existing.pause_reason = f"Non-residential job category: {cat_name}"
 
         # ── Milestone change detection with oscillation guard (Fix 3) ──
         if old_milestone != milestone:
@@ -178,6 +228,33 @@ async def _upsert_lead(session: AsyncSession, job: dict) -> str:
         # ── CREATE new lead ──
         is_active = milestone not in ["Dead", "Cancelled"]
 
+        # ── Non-residential guard (new leads) ──
+        # We still record the lead for audit trail, but set it Stopped so it
+        # never enters the cadence. We don't need a separate DB column because
+        # agent_status="Stopped" is the sufficient gate in find_leads_needing_followup().
+        residential = _is_residential(job)
+        if not residential:
+            raw = job.get("jobCategory")
+            cat_name = raw.get("name", str(raw)) if isinstance(raw, dict) else str(raw or "unknown")
+            non_residential_lead = Lead(
+                id=job_id,
+                job_number=job.get("jobNumber"),
+                contact_name=contact_name,
+                address=address,
+                milestone=milestone,
+                acculynx_created_date=acculynx_created,
+                acculynx_modified_date=acculynx_modified,
+                milestone_changed_date=now,
+                lead_source=lead_source,
+                work_type=work_type,
+                lead_dead_reason=(job.get("leadDeadReason") or "").strip() or None,
+                is_active=False,
+                agent_status="Stopped",
+                pause_reason=f"Non-residential job category: {cat_name}",
+            )
+            session.add(non_residential_lead)
+            return "non_residential"
+
         new_lead = Lead(
             id=job_id,
             job_number=job.get("jobNumber"),
@@ -189,6 +266,7 @@ async def _upsert_lead(session: AsyncSession, job: dict) -> str:
             milestone_changed_date=now,
             lead_source=lead_source,
             work_type=work_type,
+            lead_dead_reason=(job.get("leadDeadReason") or "").strip() or None,
             is_active=is_active,
         )
 
@@ -217,9 +295,14 @@ async def find_leads_needing_followup() -> list[dict]:
     Includes safety checks: null dates, stale touch skip, channel switching.
     """
     due_leads = []
+    skipped_stale = 0
     now = datetime.now(timezone.utc)
 
     async with async_session() as session:
+        # Honor agent control fields:
+        #  - agent_status = "Stopped" → never enrolled (handled by is_active flip in webhook)
+        #  - agent_status = "Paused" → paused via is_paused
+        #  - agent_snooze_until in the future → skip
         result = await session.execute(
             select(Lead).where(
                 Lead.is_active == True,
@@ -227,6 +310,10 @@ async def find_leads_needing_followup() -> list[dict]:
                 Lead.cadence_name.isnot(None),
                 Lead.cadence_start_date.isnot(None),
                 Lead.total_contact_attempts < settings.max_contact_attempts,
+                # Snooze gate: either no snooze, or snooze date is in the past
+                ((Lead.agent_snooze_until.is_(None)) | (Lead.agent_snooze_until <= now)),
+                # Status gate: only Active or NULL (default) qualify
+                ((Lead.agent_status.is_(None)) | (Lead.agent_status == "Active")),
             )
         )
         leads = result.scalars().all()
@@ -260,6 +347,21 @@ async def find_leads_needing_followup() -> list[dict]:
             if days_overdue > STALE_TOUCH_MAX_DAYS:
                 continue  # Touch is too old, skip it
 
+            # ── Freshness cap (Colin's 45-day rule) ──
+            # Clock is "days since any AccuLynx activity" using acculynx_modified_date
+            # (the modifiedDate field from the job record). Falls back to
+            # milestone_changed_date only if acculynx_modified_date is unpopulated
+            # (legacy rows predating the field). Anything with no AccuLynx activity
+            # for > freshness_cap_days is archaeology, not an active deal.
+            activity_anchor = lead.acculynx_modified_date or lead.milestone_changed_date or layer_start
+            if activity_anchor:
+                if activity_anchor.tzinfo is None:
+                    activity_anchor = activity_anchor.replace(tzinfo=timezone.utc)
+                days_since_activity = (now - activity_anchor).days
+                if days_since_activity > settings.freshness_cap_days:
+                    skipped_stale += 1
+                    continue  # Stale prospect, do not enroll in active cadence
+
             # ── Channel switching for Twilio STOP ──
             channel = next_touch.channel
             if channel == "text" and lead.twilio_stop:
@@ -291,10 +393,14 @@ async def find_leads_needing_followup() -> list[dict]:
                 "days_since_cadence_start": (now - start).days,  # legacy alias
                 "total_attempts": lead.total_contact_attempts,
                 "sms_opt_out": lead.sms_opt_out,
+                # Agent context surface — populated by webhooks from rep-edited
+                # AccuLynx custom fields. Drafter injects this into the prompt.
+                "agent_context": lead.agent_context,
+                "agent_context_updated_at": lead.agent_context_updated_at,
                 "twilio_stop": lead.twilio_stop,
             })
 
-    print(f"🔍 Found {len(due_leads)} leads needing follow-up")
+    print(f"🔍 Found {len(due_leads)} leads needing follow-up ({skipped_stale} skipped stale)")
     return due_leads
 
 

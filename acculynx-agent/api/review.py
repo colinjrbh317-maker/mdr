@@ -28,7 +28,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 
 from ai.drafter import draft_message
-from config.cadence import LAYER_MAP
+from config.cadence import DEMO_VISIBLE_LAYERS, LAYER_MAP
 from config.settings import settings
 from db.database import async_session
 from db.models import Lead
@@ -68,16 +68,36 @@ def _save_overlay(data: dict) -> None:
 
 
 def _layer_summary() -> list[dict]:
-    """Quick metadata for the sidebar."""
+    """Quick metadata for the sidebar.
+
+    Filtered to DEMO_VISIBLE_LAYERS so the client-facing /review only shows
+    the layers we actually want to demo. Hidden layers (FIRST_CONTACT,
+    PRE_APPOINTMENT, POST_INSPECTION, PRE_INSTALL, CLOSED, RE_ENGAGEMENT)
+    still exist in LAYER_MAP for the scheduler — they just aren't surfaced
+    in the UI.
+    """
     return [
         {
             "name": name,
-            "tone": layer.tone,
-            "goal": layer.goal,
-            "touches": len(layer.touches),
+            "tone": LAYER_MAP[name].tone,
+            "goal": LAYER_MAP[name].goal,
+            "touches": len(LAYER_MAP[name].touches),
         }
-        for name, layer in LAYER_MAP.items()
+        for name in DEMO_VISIBLE_LAYERS
+        if name in LAYER_MAP
     ]
+
+
+def _display_layer(layer_name: Optional[str]) -> str:
+    """For the /review demo we only surface DEMO_VISIBLE_LAYERS. Anything
+    else (FIRST_CONTACT, PRE_APPOINTMENT, POST_INSPECTION, PRE_INSTALL,
+    CLOSED, RE_ENGAGEMENT) is normalized to ESTIMATE_FOLLOWUP for the
+    sake of the lead picker — the actual DB row is unchanged."""
+    if not layer_name:
+        return "ESTIMATE_FOLLOWUP"
+    if layer_name in DEMO_VISIBLE_LAYERS:
+        return layer_name
+    return "ESTIMATE_FOLLOWUP"
 
 
 async def _list_lead_choices(limit: int = 100) -> list[dict]:
@@ -97,7 +117,7 @@ async def _list_lead_choices(limit: int = 100) -> list[dict]:
                 "milestone": lead.milestone or "?",
                 "address": lead.address or "",
                 "email": lead.contact_email or "",
-                "layer": lead.layer_name or "(no layer)",
+                "layer": _display_layer(lead.layer_name),
             }
             for lead in result.scalars()
         ]
@@ -126,6 +146,10 @@ def _build_lead_context(lead: Lead, layer_name: str) -> dict:
         "days_since_layer_start": 0,
         "total_attempts": lead.total_contact_attempts or 0,
         "assigned_rep_id": "*",
+        # Pass agent control fields through so drafter can adapt
+        "agent_context": lead.agent_context,
+        "agent_context_updated_at": lead.agent_context_updated_at,
+        "agent_status": lead.agent_status or "Active",
     }
 
 
@@ -150,6 +174,18 @@ async def review_lead(request: Request, lead_id: str) -> Any:
     if not lead:
         raise HTTPException(404, f"Lead {lead_id} not found")
 
+    # Fire-and-forget: warm the AccuLynx + agent-context caches so by the
+    # time the user clicks a layer, the network round-trips are already
+    # done and the only remaining latency is the Claude API call.
+    import asyncio as _asyncio
+    async def _warm():
+        try:
+            from engine.context_builder import build_agent_context
+            await build_agent_context(lead_id)
+        except Exception:
+            pass
+    _asyncio.create_task(_warm())
+
     return templates.TemplateResponse(
         request,
         "review/lead.html",
@@ -157,7 +193,55 @@ async def review_lead(request: Request, lead_id: str) -> Any:
             "request": request,
             "lead": lead,
             "layers": _layer_summary(),
-            "current_layer": lead.layer_name or "FIRST_CONTACT",
+            "current_layer": _display_layer(lead.layer_name),
+            "settings": settings,
+        },
+    )
+
+
+@router.get("/{lead_id}/context/full", response_class=HTMLResponse)
+async def review_lead_context(request: Request, lead_id: str) -> Any:
+    """The "What does the agent know about this homeowner?" page.
+
+    Shows every piece of context the agent will read when drafting:
+    - Lead row from our DB
+    - Live AccuLynx history (every action with timestamp)
+    - Auto-extracted context block (what gets pasted into Claude's prompt)
+
+    Designed for the Austin meeting — proves there's no black box.
+    """
+    from acculynx.client import get_json
+    from engine.context_builder import build_agent_context
+
+    lead = await _get_lead(lead_id)
+    if not lead:
+        raise HTTPException(404, f"Lead {lead_id} not found")
+
+    # Live history from AccuLynx
+    try:
+        h = await get_json(f"/jobs/{lead_id}/history")
+        history_items = h.get("items", []) or []
+    except Exception:
+        history_items = []
+
+    # Live job payload (for the readable fields like leadDeadReason, priority)
+    try:
+        job = await get_json(f"/jobs/{lead_id}")
+    except Exception:
+        job = {}
+
+    # Auto-extracted context block — exactly what the drafter pastes into Claude
+    auto_ctx = await build_agent_context(lead_id)
+
+    return templates.TemplateResponse(
+        request,
+        "review/context.html",
+        {
+            "request": request,
+            "lead": lead,
+            "history_items": history_items,
+            "job_payload": job,
+            "auto_context": auto_ctx or "(no context extracted yet)",
             "settings": settings,
         },
     )
@@ -278,6 +362,121 @@ async def regenerate(lead_id: str, layer_name: str, touch_index: int, channel: s
     cache_key = (lead_id, layer_name, touch_index, channel, th)
     _draft_cache.pop(cache_key, None)
     return await review_draft(lead_id, layer_name, touch_index, channel)
+
+
+@router.post("/test-send/{lead_id}/{layer_name}/{touch_index}/{channel}")
+async def test_send(lead_id: str, layer_name: str, touch_index: int, channel: str) -> Any:
+    """Demo button: generate this draft, send it to settings.test_recipient_email,
+    bypassing DRY_RUN. The recipient is YOU, never the homeowner — used in the
+    Austin meeting to show 'this is exactly what would have hit Robert'."""
+    lead = await _get_lead(lead_id)
+    if not lead:
+        raise HTTPException(404, f"Lead {lead_id} not found")
+    layer = LAYER_MAP.get(layer_name)
+    if not layer or touch_index >= len(layer.touches):
+        raise HTTPException(404, f"Touch {touch_index} not found in {layer_name}")
+
+    # Reuse the cached draft if one exists; otherwise generate fresh
+    th = _template_hash()
+    cache_key = (lead_id, layer_name, touch_index, channel, th)
+    if cache_key in _draft_cache:
+        draft = _draft_cache[cache_key]
+    else:
+        draft_resp = await review_draft(lead_id, layer_name, touch_index, channel)
+        # review_draft returns JSONResponse; pull payload back from cache
+        draft = _draft_cache.get(cache_key)
+        if not draft:
+            # Fallback: re-decode JSONResponse body
+            import json as _json
+            draft = _json.loads(draft_resp.body)
+
+    # SMS is gated off until Twilio A2P approval, so "text" channel touches
+    # are rendered as email for the demo. The drafted body already ends with
+    # the tight 3-line text-style signature, so it reads correctly either way.
+
+    test_to = settings.test_recipient_email
+    if not test_to:
+        raise HTTPException(500, "TEST_RECIPIENT_EMAIL not configured")
+
+    # ── Thread continuity: pull the most recent rep email from AccuLynx so
+    # this follow-up appears as a reply to the same conversation in the
+    # homeowner's inbox. Falls back gracefully if no prior email exists. ──
+    thread = None
+    try:
+        from acculynx.internal_api import get_thread_continuity_for_job
+        thread = await get_thread_continuity_for_job(lead_id)
+    except Exception:
+        log.exception("thread continuity fetch failed")
+
+    real_name = lead.contact_name or "homeowner"
+    real_email = lead.contact_email or "no email on file"
+    # Text-channel drafts have no subject. Use a touch-appropriate fallback.
+    if channel == "text":
+        base_subject = "Quick check-in on your roof estimate"
+    else:
+        base_subject = (draft.get("subject") or "Following up on your roof estimate").strip()
+
+    # If there's a prior rep email, thread off it: Re: original subject
+    threaded_subject = base_subject
+    in_reply_to = None
+    rep_email_addr = None
+    rep_display_name = draft.get("rep_name") or settings.sendgrid_from_name
+    if thread:
+        prior_subj = (thread.get("subject") or "").strip()
+        if prior_subj:
+            re_prefix = "Re: " if not prior_subj.lower().startswith("re:") else ""
+            threaded_subject = f"{re_prefix}{prior_subj}"
+        in_reply_to = thread.get("synthetic_msgid")
+        rep_email_addr = thread.get("rep_email")
+        if thread.get("rep_name"):
+            rep_display_name = thread["rep_name"].strip()
+
+    demo_subject = f"[DEMO → would go to {real_name}] {threaded_subject}"
+    thread_note = ""
+    if thread:
+        thread_note = (
+            f"--- THREAD CONTEXT ---\n"
+            f"Most recent rep email: \"{thread.get('subject')}\" by {thread.get('rep_name')} on {(thread.get('sent_date') or '')[:10]}\n"
+            f"Replying as: {rep_email_addr or '(no rep email derived)'} ({rep_display_name})\n"
+            f"In-Reply-To: {in_reply_to or '(none)'}\n"
+            f"Threaded subject: {threaded_subject}\n"
+            f"------------------------\n\n"
+        )
+    demo_body = (
+        f"--- DEMO PREVIEW ---\n"
+        f"Real recipient (NOT actually sent): {real_name} <{real_email}>\n"
+        f"Layer: {layer_name}  ·  Touch {touch_index + 1}/{len(layer.touches)}  ·  {channel.upper()}\n"
+        f"Lead ID: {lead_id}\n"
+        f"--------------------\n\n"
+        f"{thread_note}"
+        f"{draft['body']}"
+    )
+
+    # Force-send: temporarily flip dry_run for THIS call only
+    from messaging.sendgrid_email import send_email
+    original_dry = settings.dry_run
+    settings.dry_run = False
+    try:
+        result = send_email(
+            to_email=test_to,
+            subject=demo_subject,
+            body_text=demo_body,
+            lead_id=lead_id,
+            from_name=rep_display_name,
+            in_reply_to=in_reply_to,
+            references=[in_reply_to] if in_reply_to else None,
+        )
+    finally:
+        settings.dry_run = original_dry
+
+    return {
+        "sent": result.sent,
+        "to": test_to,
+        "real_recipient": f"{real_name} <{real_email}>",
+        "subject": demo_subject,
+        "sendgrid_message_id": result.sendgrid_message_id,
+        "error": result.error,
+    }
 
 
 @router.get("/template-source/{layer_name}/{touch_index}/{channel}", response_class=PlainTextResponse)

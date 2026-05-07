@@ -8,7 +8,8 @@
   <b>Address:</b> {{ lead.address or "—" }}<br>
   <b>Milestone:</b> {{ lead.milestone or "—" }} ·
   <b>Current layer:</b> {{ lead.layer_name or "—" }} ·
-  <b>Job:</b> {{ lead.job_number or lead.id[:8] }}
+  <b>Job:</b> {{ lead.job_number or lead.id[:8] }}<br>
+  <a href="/review/{{ lead.id }}/context/full" style="color: var(--accent); font-weight: 600;">→ See exactly what the agent knows about this homeowner</a>
 </div>
 
 <h2>Walk through every layer</h2>

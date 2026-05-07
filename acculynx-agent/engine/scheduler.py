@@ -25,8 +25,8 @@ from db.database import async_session
 from db.models import Approval, Lead, MessageQueue
 from engine.approval_flow import approve_and_send, create_approval_request
 from engine.enrich import enrich_lead
-from engine.preflight import preflight_check
-from engine.sync import find_leads_needing_followup, is_business_hours, sync_pipeline
+from engine.preflight import drip_safety_check, preflight_check
+from engine.sync import advance_cadence, find_leads_needing_followup, is_business_hours, sync_pipeline
 
 log = logging.getLogger(__name__)
 _scheduler: AsyncIOScheduler | None = None
@@ -61,6 +61,18 @@ async def cadence_job() -> None:
                 pf = await preflight_check(lead, touch["channel"])
                 if not pf.get("safe", False):
                     log.info("preflight blocked %s: %s", lead_id, pf.get("reason"))
+                    continue
+                # Drip safety gate — runs BEFORE drafter to avoid wasting a Claude call
+                drip_check = await drip_safety_check(entry)
+                if drip_check.get("skip"):
+                    reasons = drip_check.get("reasons", [])
+                    log.info(
+                        "Drip blocked for lead %s: %s",
+                        lead_id,
+                        reasons,
+                    )
+                    print(f"Drip blocked for lead {lead_id}: {reasons}")
+                    await advance_cadence(lead_id)
                     continue
                 # Draft
                 draft = await draft_message(entry, touch, lead.milestone or "Lead")
@@ -123,6 +135,78 @@ async def escalation_job() -> None:
         log.exception("escalation_job failed")
 
 
+async def cookie_health_job() -> None:
+    """Daily check that the AccuLynx internal-API session cookie is valid.
+
+    On failure, attempt auto-refresh via Playwright (if login creds are
+    configured). If auto-refresh fails, email the escalation address.
+    """
+    try:
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from scripts.check_cookie import health_check
+        result = await health_check()
+        if result["ok"]:
+            log.info("cookie_health_job: ✓ %s", result["message"])
+            return
+
+        log.warning("cookie_health_job: ✗ %s — attempting auto-refresh", result["message"])
+
+        # ── Try Playwright auto-relogin first ──
+        auto_refresh_ok = False
+        if settings.acculynx_login_email and settings.acculynx_login_password:
+            try:
+                from scripts.refresh_cookies import login_and_capture, write_env
+                cookies = await login_and_capture(
+                    email=settings.acculynx_login_email,
+                    password=settings.acculynx_login_password,
+                    headless=True,
+                )
+                write_env(cookies)
+                # Re-import settings to pick up the fresh cookie value
+                import importlib
+                from config import settings as _s_mod
+                importlib.reload(_s_mod)
+                # Re-check
+                from scripts.check_cookie import health_check as _hc
+                result2 = await _hc()
+                if result2["ok"]:
+                    log.info("cookie_health_job: auto-refresh succeeded ✓")
+                    auto_refresh_ok = True
+                else:
+                    log.warning("cookie_health_job: auto-refresh ran but health check still failing: %s", result2["message"])
+            except Exception as exc:
+                log.warning("cookie_health_job: auto-refresh failed (%s) — falling back to manual", exc)
+        else:
+            log.info("cookie_health_job: ACCULYNX_LOGIN_EMAIL/PASSWORD not set, skipping auto-refresh")
+
+        if auto_refresh_ok:
+            return
+
+        # ── Notify a human ──
+        try:
+            from messaging.sendgrid_email import send_email
+            send_email(
+                to_email=settings.escalation_email or "colinjrbh317@gmail.com",
+                subject="[MDR Agent] AccuLynx session cookie EXPIRED — manual refresh needed",
+                body_text=(
+                    "Cookie health check failed and auto-refresh did not succeed.\n\n"
+                    f"Status: {result.get('status_code')}\n"
+                    f"Message: {result['message']}\n\n"
+                    "ACTION: re-capture cookies via Chrome DevTools and paste into "
+                    "ACCULYNX_SESSION_COOKIE in .env, OR confirm the bot account's "
+                    "credentials in ACCULYNX_LOGIN_EMAIL/PASSWORD are correct."
+                ),
+                from_email=settings.sendgrid_from_email,
+                from_name="MDR Agent Monitor",
+            )
+        except Exception:
+            log.exception("cookie_health_job: failed to send notification")
+    except Exception:
+        log.exception("cookie_health_job: top-level error")
+
+
 def start_scheduler() -> None:
     """Called from FastAPI lifespan startup."""
     global _scheduler
@@ -132,8 +216,11 @@ def start_scheduler() -> None:
     _scheduler.add_job(sync_job, IntervalTrigger(minutes=settings.acculynx_poll_interval_minutes), id="sync", replace_existing=True)
     _scheduler.add_job(cadence_job, IntervalTrigger(minutes=5), id="cadence", replace_existing=True)
     _scheduler.add_job(escalation_job, IntervalTrigger(minutes=30), id="escalation", replace_existing=True)
+    # Cookie health check at 09:00 ET daily — early enough that you can
+    # refresh during the workday if it fails
+    _scheduler.add_job(cookie_health_job, CronTrigger(hour=9, minute=0), id="cookie_health", replace_existing=True)
     _scheduler.start()
-    log.info("Scheduler started: sync=%dm, cadence=5m, escalation=30m",
+    log.info("Scheduler started: sync=%dm, cadence=5m, escalation=30m, cookie_health=09:00",
              settings.acculynx_poll_interval_minutes)
 
 
