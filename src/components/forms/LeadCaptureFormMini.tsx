@@ -126,7 +126,7 @@ export default function LeadCaptureFormMini({ source, ctaText = "Get A Free Quot
           className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-accent"
         />
         <span>
-          <strong>Optional:</strong> I agree to receive text messages from Modern Day Roofing, including appointment confirmations, estimate follow-ups, and service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent is not required to submit this form. See{" "}
+          <strong>Optional:</strong> I agree to receive text messages from Modern Day Roofing at the phone number provided, including appointment confirmations, inspection scheduling, estimate follow-ups, and service updates. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out or HELP for help. Consent is not required to submit this form or receive service. See{" "}
           <a href="/privacy" className="underline hover:text-text-muted transition-colors">Privacy Policy</a>
           {" "}and{" "}
           <a href="/terms" className="underline hover:text-text-muted transition-colors">Terms</a>.
