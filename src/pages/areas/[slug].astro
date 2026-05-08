@@ -16,6 +16,7 @@ import {
 import { urlForImage } from "@/sanity/lib/url-for-image";
 import ScrollReveal from "@/components/common/ScrollReveal.astro";
 import CityReviews from "@/components/common/CityReviews.astro";
+import LocalMapWidget from "@/components/blocks/LocalMapWidget.astro";
 import { areaFacts as tier1AreaFacts } from "@/data/area-content";
 import { GOOGLE_REVIEW_COUNT, GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
@@ -345,6 +346,9 @@ const localBusinessJsonLd = {
   {/* City-specific Google Reviews (Tier 1 cities only) */}
   {tier1AreaFacts[slug as string] && <CityReviews city={area.name} />}
 
+  {/* Live geo-tagged map (Pinparrot) — boosts local SEO ranking */}
+  <LocalMapWidget cityName={area.name} />
+
   {/* Lead Capture Form */}
   <SectionContainer background="warm" padding="md" id="get-estimate">
     <div class="max-w-2xl mx-auto">
@@ -382,7 +386,8 @@ const localBusinessJsonLd = {
               {siblingAreas.map((sibling: any) => (
                 <a
                   href={`/areas/${sibling.slug}`}
-                  class="inline-block px-4 py-2 bg-white border border-border rounded-full text-sm text-text-primary hover:text-accent hover:border-accent transition-colors"
+                  class="inline-block px-4 py-2 bg-white border border-border rounded-full text-sm font-medium hover:border-accent transition-colors"
+                  style="color: #0F172A;"
                 >
                   {sibling.name}
                 </a>
