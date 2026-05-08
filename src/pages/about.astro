@@ -4,6 +4,7 @@ import SectionContainer from "@/components/ui/SectionContainer.astro";
 import Button from "@/components/ui/Button.astro";
 import CertificationStrip from "@/components/home/CertificationStrip.astro";
 import Breadcrumb from "@/components/common/Breadcrumb.astro";
+import { GAF_MASTER_ELITE_LABEL, GAF_PRESIDENTS_CLUB_COPY } from "@/data/site-stats";
 
 const team = [
   { name: "Austin Hungate", title: "CEO & Founder", photo: "/assets/web/team-Austin-Hungate-CEO.jpg" },
@@ -13,7 +14,7 @@ const team = [
 ];
 ---
 
-<Layout title="About Modern Day Roofing | GAF Master Elite Contractor" description="Meet the team behind Modern Day Roofing — a GAF President's Club contractor serving Virginia's New River Valley and Roanoke since 2019. 1,000+ roofs completed.">
+<Layout title="About Modern Day Roofing | GAF Master Elite Contractor" description="Meet the team behind Modern Day Roofing, a GAF Master Elite and GAF 3-Star President's Club contractor serving Virginia's New River Valley and Roanoke since 2019.">
   <Breadcrumb items={[{ label: "About Us" }]} />
 
   {/* Hero Section */}
@@ -30,9 +31,9 @@ const team = [
           promise hasn't changed: do the job right, every time, for every home.
         </p>
         <p class="text-text-body text-lg leading-relaxed mb-6">
-          As a GAF President's Club member — a distinction held by only the top 1% of
-          roofing contractors nationwide — we don't just install roofs. We protect families,
-          preserve property values, and stand behind every project with lifetime warranties.
+          As a {GAF_MASTER_ELITE_LABEL} contractor and a GAF 3-Star President's Club member,
+          Modern Day Roofing is recognized nationally for installation quality, customer care,
+          and warranty-qualified work. {GAF_PRESIDENTS_CLUB_COPY}
         </p>
         <div class="flex flex-col sm:flex-row gap-4">
           <Button href="/contact" size="lg">Get a Free Estimate</Button>
@@ -47,8 +48,8 @@ const team = [
           loading="lazy"
         />
         <div class="absolute -bottom-4 -left-4 bg-accent text-white px-6 py-3 rounded-xl shadow-lg">
-          <p class="text-2xl font-bold">1,000+</p>
-          <p class="text-xs opacity-90">Roofs Completed</p>
+          <p class="text-2xl font-bold">GAF 3-Star</p>
+          <p class="text-xs opacity-90">President's Club 2026</p>
         </div>
       </div>
     </div>

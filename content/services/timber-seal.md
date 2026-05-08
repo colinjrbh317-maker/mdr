@@ -1,137 +1,90 @@
-# Timber Seal Services in Virginia: Professional Wood Preservation for Decks, Fences, and Log Homes
+# GAF TimberSteel Metal Shingle Roofing in Southwest Virginia
 
-Wood looks incredible on a home. A wide cedar deck, a natural fence line, a stained pergola — there's a warmth and character that no composite material can match. But wood left unprotected in Virginia's climate doesn't stay beautiful for long. Between our humid summers, freeze-thaw winters, and relentless UV exposure, bare or poorly sealed wood starts deteriorating faster than most homeowners expect.
+GAF TimberSteel gives homeowners the strength of steel in a shingle-style profile that feels at home on traditional Virginia houses. It is a premium metal roofing option for people who want longer service life, strong storm performance, and a finished look that is less modern than standing seam metal.
 
-That's where professional timber sealing comes in. We provide wood preservation services across Christiansburg, Blacksburg, Roanoke, and the New River Valley — and the difference between sealed and unsealed wood after two Virginia seasons is dramatic.
+Modern Day Roofing installs TimberSteel metal shingle systems in Christiansburg, Blacksburg, Roanoke, and throughout the New River Valley. As a GAF Master Elite contractor, our team installs the complete roofing system around the product: deck preparation, underlayment, flashing, ventilation, ridge detail, edge metal, and cleanup.
 
-## Why Wood Preservation Matters in Virginia's Climate
+## What Is TimberSteel?
 
-Virginia sits in a tough spot for exterior wood. We get all four seasons, and every one of them does damage in a different way.
+TimberSteel is a metal shingle from GAF. Instead of the tall vertical panels used on standing seam roofs, TimberSteel uses individual metal shingles that create a more traditional roofline. The result is a roof with metal durability and a shingle-style appearance.
 
-### Humidity and Moisture
+For many Southwest Virginia homes, that matters. Historic neighborhoods, brick ranches, farmhouses, and mountain homes often look better with a roof profile that feels closer to architectural shingles, while still gaining the advantages of steel.
 
-The New River Valley averages 70-80% relative humidity through summer. Wood absorbs that moisture, swells, and then contracts as it dries. Repeat that cycle hundreds of times and you get splitting, warping, and cupping. Unsealed deck boards that started out flat and tight will have visible gaps and raised grain within two years.
+## Why Homeowners Choose TimberSteel
 
-### Freeze-Thaw Cycles
+### Long-Term Durability
 
-Christiansburg and Blacksburg see 80-100 freeze-thaw cycles per winter. Water gets into the wood grain, freezes, expands, and cracks the fibers from the inside out. This is what causes that gray, splintery texture on old decks and fence posts. A quality sealer keeps water from penetrating the grain in the first place.
+Steel roofing resists many of the issues that shorten the life of standard asphalt shingles. It handles sun exposure, wind, rain, and freeze-thaw cycles with less granule loss, curling, or brittleness over time.
 
-### UV Degradation
+### Traditional Curb Appeal
 
-Ultraviolet light breaks down lignin — the natural glue that holds wood fibers together. That's why exposed wood turns gray. UV damage happens fastest at our elevation, where the thinner atmosphere filters less radiation. A deck in Christiansburg gets more UV damage than the same wood at sea level in Virginia Beach.
+Standing seam metal is a strong roof, but its clean vertical-panel look is not right for every home. TimberSteel gives homeowners another path: metal-roof performance with a shingle-style profile.
 
-### Mold, Mildew, and Algae
+### Fire Resistance
 
-Warm, humid conditions are perfect for biological growth. Green algae on north-facing deck boards, black mildew stains on fences, and mold colonies in shaded areas — all of it breaks down wood faster and creates slippery, unsafe surfaces.
+Metal roofing is naturally fire resistant, which can be important for homes near wooded lots, rural properties, and mountain settings where wind and dry conditions can raise risk.
 
-Professional-grade sealers contain mildewcides and fungicides that prevent biological growth for years. The stuff you buy at the hardware store? Most of it doesn't include these additives, or includes them in concentrations too low to matter.
+### Weather Performance
 
-## What Surfaces We Treat
+Southwest Virginia roofs deal with high winds, heavy rain, occasional hail, winter ice, and large temperature swings. A properly installed TimberSteel system is built for that kind of long-term exposure.
 
-We seal and preserve exterior wood surfaces on residential and commercial properties across the Roanoke and New River Valley area:
+## The Installation Still Matters
 
-- **Decks** — pressure-treated pine, cedar, redwood, ipe, and other hardwoods
-- **Fences** — privacy fences, split rail, board-on-board, picket
-- **Pergolas and arbors** — freestanding and attached structures
-- **Log homes** — full log and log-sided homes throughout the mountains around Blacksburg
-- **Docks and waterfront structures** — marine-grade products
-- **Exterior trim, siding, gazebos, and outbuildings**
+A premium roof is only as strong as the installation underneath it. We do not treat TimberSteel like a cosmetic upgrade over an old roof. Our process starts with a careful inspection of the existing roof deck and all roof penetrations.
 
-## Our Timber Seal Process
+On a typical TimberSteel project, we review:
 
-We don't just show up with a pump sprayer and a bucket of stain. There's a process, and skipping steps is how you end up with a seal job that peels, flakes, or fails within a year.
+- Roof decking condition and fastening
+- Underlayment and ice-and-water protection
+- Eaves, rakes, valleys, and edge metal
+- Chimney, skylight, wall, and pipe flashing
+- Attic ventilation and ridge detail
+- Trim, transitions, and accessory compatibility
 
-### Step 1: Professional Pressure Washing
+That system-first approach is what keeps a premium metal shingle roof performing after the crew leaves.
 
-We clean the wood with a pressure washer calibrated for the wood species — too much pressure damages softwoods like cedar and pine, too little leaves dirt and old finish embedded in the grain. For surfaces with heavy gray oxidation or previous stain failure, we use a wood-specific cleaning solution that lifts stains and kills mildew without harming surrounding plants.
+## TimberSteel vs. Standing Seam Metal
 
-### Step 2: Wood Brightener Application
+Both are metal roofing systems, but they solve different design problems.
 
-After cleaning, wood fibers are raised and the surface pH is elevated from the cleaning chemicals. We apply a wood brightener (oxalic acid-based solution) that restores the wood's natural color, closes the grain, and neutralizes the surface pH. This step is what separates a professional seal job from a weekend warrior project. Skipping the brightener is the single most common reason DIY stain jobs look blotchy and wear unevenly.
+Standing seam metal has a distinct vertical-panel appearance. It works well on modern homes, cabins, barns, and certain farmhouse styles. TimberSteel has a lower-profile shingle appearance, which works well when the homeowner wants metal performance without changing the character of the home.
 
-### Step 3: Dry Time
+If you are deciding between the two, we will walk you through both options, show you the visual difference, and explain the cost and performance tradeoffs clearly.
 
-The wood needs to dry thoroughly before sealer goes on — typically 24-48 hours depending on conditions. We schedule cleaning and sealing around weather windows: no rain in the forecast, temperatures between 50-85 degrees, moderate humidity. Applying sealer to damp wood traps moisture underneath and causes peeling.
+## Is TimberSteel Right for Your Home?
 
-### Step 4: Professional Spray Application with Back-Brushing
+TimberSteel is a strong fit when:
 
-We apply sealer with commercial airless spray equipment for fast, even coverage, then immediately back-brush by hand. Back-brushing works the sealer into the wood grain and eliminates runs, drips, and pooling. It's slower than spray-only application, but the penetration and finish quality are noticeably better.
+- You want a premium roof with a longer expected service life
+- You like the durability of metal but not the standing seam look
+- Your home has a traditional roofline or neighborhood aesthetic
+- You want stronger fire and weather resistance than standard shingles
+- You plan to stay in the home long enough to benefit from the upgrade
 
-For most applications, we put on two coats with a drying interval between them. The first coat soaks in and seals the grain. The second coat builds the protective surface layer.
+It may not be the right choice if the main priority is the lowest upfront price. In that case, GAF architectural shingles may be a better fit. We will tell you that directly if shingles make more sense for your roof, budget, and goals.
 
-## Why We Use Commercial-Grade Products
+## TimberSteel Service Area
 
-The stains and sealers available at big box stores are designed for occasional DIY use. They're fine for what they are, but they're not what we'd put on a customer's $15,000 deck.
+Modern Day Roofing installs TimberSteel metal shingle roofs throughout our Southwest Virginia service area, including Christiansburg, Blacksburg, Roanoke, Salem, Radford, Floyd, Vinton, Hollins, Cave Spring, Pearisburg, Giles County, and nearby New River Valley communities.
 
-We use commercial-grade, contractor-only products that differ from retail formulas in key ways:
+## Frequently Asked Questions About TimberSteel
 
-- **Higher solids content** — more pigment and resin per gallon means better coverage and longer protection
-- **Professional-strength UV inhibitors** — prevent color fade and lignin breakdown for 3-5 years instead of 1-2
-- **Mildewcides and fungicides** — at concentrations that actually work through multiple Virginia humid seasons
-- **Better penetration chemistry** — soaks into wood rather than sitting on top, so it wears gradually instead of peeling
+### Is TimberSteel a wood product?
 
-### Finish Options
+No. TimberSteel is a metal shingle roofing product from GAF, not a wood or deck sealing service.
 
-We offer three finish levels to match your taste and the look you want:
+### Does TimberSteel look like a standing seam roof?
 
-**Clear sealers** — Show off the natural wood grain with no color change. Best for new, high-quality wood species like cedar and ipe. Clear finishes offer the least UV protection, so expect to re-seal more often (every 1-2 years on sun-exposed surfaces).
+No. Standing seam uses long vertical metal panels. TimberSteel uses a shingle-style profile, so it keeps a more traditional residential appearance.
 
-**Semi-transparent stains** — Our most popular option. These add a hint of color while letting the wood grain show through. Semi-transparent finishes offer moderate UV protection and typically last 2-4 years depending on sun exposure and foot traffic. Great for pressure-treated decks where you want to add warmth without hiding the wood.
+### Is TimberSteel more expensive than asphalt shingles?
 
-**Solid-color stains** — Full coverage that hides the grain but keeps the wood texture visible. Maximum UV protection and longest wear (3-5 years). A good choice for older wood with surface imperfections, or when you want a specific color to match your home.
+Yes. TimberSteel is a premium roofing system. The tradeoff is a longer-life metal roof with strong weather performance and a different appearance than standard shingles or standing seam.
 
-## How Often Should Exterior Wood Be Re-Sealed?
+### Can TimberSteel be installed over my existing shingles?
 
-The honest answer: it depends on the finish type, sun exposure, foot traffic, and the specific product used. But here are good general guidelines for our area:
+We evaluate each roof individually, but we generally prefer a proper tear-off so we can inspect the decking, correct ventilation, and install the full system cleanly. That is the best path for long-term performance.
 
-- **High-traffic deck surfaces**: Every 2-3 years with semi-transparent, every 3-4 with solid
-- **Vertical surfaces (fences, railings, siding)**: Every 3-5 years
-- **Covered or shaded areas**: Every 4-6 years
-- **Log homes**: Every 3-5 years for walls, more often for south- and west-facing sections
+## Get a TimberSteel Roof Estimate
 
-### Signs It's Time to Re-Seal
-
-Don't wait for obvious failure. Watch for these early indicators:
-
-- Water no longer beads on the surface (do the splash test — pour a tablespoon of water on the wood; if it soaks in within 30 seconds, it's time)
-- Color has faded noticeably from the original application
-- Gray spots appearing, especially on horizontal surfaces
-- Mildew or algae returning despite previous treatment
-
-## Professional Timber Sealing vs. DIY
-
-We understand the appeal of doing it yourself. A gallon of stain, a brush, a free Saturday — how hard can it be?
-
-Here's what we see when we're called in to fix DIY seal jobs: blotchy color from skipping the brightener step, peeling within one season from wrong product selection, lap marks from working too slowly with a brush, and missed spots on undersides where water infiltrates and does real damage.
-
-Professional equipment makes a real difference. Our airless sprayers deliver consistent coverage across the entire surface, and we know which products perform best on which woods in this specific climate — because we seal hundreds of decks and fences across the Roanoke and New River Valley area every year.
-
-The cost difference between DIY and professional application is typically **$1.50-$3.00 per square foot**. On a 300 sq ft deck, that's the difference between fighting with a weekend project and getting a result that looks better and lasts twice as long. For log homes in the Christiansburg or Blacksburg area, professional treatment typically runs **$3,000-$8,000** depending on square footage, and a proper job lasts 4-6 years.
-
-## Frequently Asked Questions About Timber Seal Services
-
-### How often should I re-seal my deck?
-
-For most decks in the Christiansburg and New River Valley area, every 2-3 years with a semi-transparent finish is the sweet spot. Heavy sun exposure or high foot traffic may mean sooner. Covered porches and shaded surfaces can go 4-5 years. We'll give you a realistic timeline based on your situation and product choice.
-
-### Can you seal brand new wood?
-
-Yes, but timing matters. New pressure-treated lumber needs to dry out before accepting sealer — typically 3-6 months after installation, depending on weather and how wet the wood was at purchase. New cedar and redwood can usually be sealed sooner, within 2-4 weeks. We'll test the moisture content of your wood and let you know if it's ready. Sealing too early traps moisture and leads to peeling.
-
-### What's the best time of year to seal a deck or fence?
-
-Late spring and early fall are ideal in Virginia — temperatures between 50-85 degrees, low humidity, and a dry forecast for 48 hours after application. We schedule timber seal work from April through June and September through November. Mid-summer can work for shaded surfaces, but direct sun causes sealer to dry too fast and penetrate poorly.
-
-### How long after sealing until I can walk on my deck?
-
-Plan for 24-48 hours before foot traffic, depending on the product and weather. Keep furniture off for 72 hours to avoid imprinting. We'll give you a specific timeline when we finish the job.
-
-### Do you seal log homes?
-
-Absolutely. Log homes in the Virginia mountains face extra challenges — large horizontal surfaces collect water, and end grain wicks moisture aggressively. We use log-home-specific products with deep penetration formulas and borate-based additives that prevent insect damage and rot. Whether you have a full-log home near Mountain Lake or a log-sided cabin outside Blacksburg, we'll put together a preservation plan that keeps it protected.
-
-## Let's Talk About Your Wood Preservation Project
-
-Whether it's a backyard deck in Christiansburg, a privacy fence in Roanoke, or a log home up in the mountains, we'd like to take a look and give you an honest assessment.
-
-Call us at **(540) 553-6007** or reach out online for a free consultation. We'll evaluate your wood surfaces and walk you through what we'd recommend, what it costs, and how long the results will last. No pressure — just straight answers from people who do this work every day.
+If you are considering GAF TimberSteel for a home in Christiansburg, Blacksburg, Roanoke, or the New River Valley, call Modern Day Roofing at **(540) 553-6007** or request a free estimate online.

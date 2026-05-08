@@ -22,8 +22,6 @@ const gtmId =
       ? import.meta.env.PUBLIC_GTM_ID_GOOGLE
       : import.meta.env.PUBLIC_GTM_ID;
 
-const callrailId = import.meta.env.PUBLIC_CALLRAIL_ID;
-
 const siteTitle = title.includes("Modern Day Roofing") ? title : `${title} | Modern Day Roofing`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://moderndayroof.com");
 ---
@@ -118,10 +116,6 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
       </script>
     )}
 
-    {/* CallRail Dynamic Number Insertion */}
-    {callrailId && (
-      <script is:inline async src={`https://cdn.callrail.com/companies/${callrailId}/swap.js`}></script>
-    )}
   </head>
   <body class="min-h-screen flex flex-col bg-white">
     {gtmId && (

@@ -20,6 +20,8 @@
     { "source": "/lp", "destination": "https://lp.moderndayroof.com/branded", "permanent": true },
     { "source": "/lp/:campaign", "destination": "https://lp.moderndayroof.com/:campaign", "permanent": true },
     { "source": "/home/", "destination": "/", "permanent": true },
+    { "source": "/homepage", "destination": "/", "permanent": true },
+    { "source": "/homepage/", "destination": "/", "permanent": true },
     { "source": "/contact-us/", "destination": "/contact", "permanent": true },
     { "source": "/services/", "destination": "/services", "permanent": true },
     { "source": "/roof-replacement/", "destination": "/services/roof-replacement", "permanent": true },

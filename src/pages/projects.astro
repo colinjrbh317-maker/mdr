@@ -7,6 +7,7 @@ import LeadCaptureForm from "@/components/forms/LeadCaptureForm";
 import { loadQuery } from "@/sanity/lib/load-query";
 import { BEFORE_AFTER_PROJECTS_QUERY } from "@/sanity/lib/queries";
 import { urlForImage } from "@/sanity/lib/url-for-image";
+import { GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
 export const prerender = true;
 
@@ -25,8 +26,8 @@ const categories = [
 ];
 
 const stats = [
-  { number: "600+", label: "Roofs Completed" },
-  { number: "231", label: "Five-Star Reviews" },
+  { number: "5.0", label: "Google Rating" },
+  { number: GOOGLE_REVIEW_COUNT_LABEL, label: "Google Reviews" },
   { number: "15+", label: "Cities Served" },
 ];
 

@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button.astro";
 import Breadcrumb from "@/components/common/Breadcrumb.astro";
 import { loadQuery } from "@/sanity/lib/load-query";
 import { TESTIMONIALS_QUERY } from "@/sanity/lib/queries";
+import { GOOGLE_REVIEW_COUNT, GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
 export const prerender = true;
 
@@ -34,7 +35,7 @@ const jsonLd = {
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: "5.0",
-    reviewCount: "231",
+    reviewCount: String(GOOGLE_REVIEW_COUNT),
     bestRating: "5",
     worstRating: "1",
   },
@@ -43,7 +44,7 @@ const jsonLd = {
 
 <Layout
   title="Customer Reviews | Modern Day Roofing"
-  description="Read 231 five-star reviews from homeowners across Virginia's New River Valley and Roanoke. See why families trust Modern Day Roofing for their roofing projects."
+  description={`Read ${GOOGLE_REVIEW_COUNT_LABEL} reviews from homeowners across Virginia's New River Valley and Roanoke. See why families trust Modern Day Roofing for their roofing projects.`}
 >
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
@@ -78,8 +79,8 @@ const jsonLd = {
   <SectionContainer background="white" padding="md">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto text-center">
       <div>
-        <p class="text-4xl md:text-5xl font-display font-bold text-accent">231</p>
-        <p class="text-text-muted mt-1">Five-Star Reviews</p>
+        <p class="text-4xl md:text-5xl font-display font-bold text-accent">{GOOGLE_REVIEW_COUNT_LABEL}</p>
+        <p class="text-text-muted mt-1">Google Reviews</p>
       </div>
       <div>
         <p class="text-4xl md:text-5xl font-display font-bold text-accent">5.0</p>
@@ -146,7 +147,7 @@ const jsonLd = {
         Join Our Happy Customers
       </h2>
       <p class="mt-4 text-white/90 max-w-2xl mx-auto text-lg">
-        Get your free, no-obligation roof inspection and see why 231 homeowners gave us five stars.
+        Get your free, no-obligation roof inspection and see why homeowners across Southwest Virginia give Modern Day Roofing a 5.0 rating.
       </p>
       <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
         <Button href="/contact" variant="secondary" size="lg">Get Your Free Estimate</Button>

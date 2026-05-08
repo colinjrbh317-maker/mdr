@@ -8,6 +8,7 @@
  * looks empty. Exact matches always render first.
  */
 import { reviewsForCityWithFallback } from "@/data/reviews";
+import { GOOGLE_REVIEW_COUNT, GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
 interface Props {
   city: string;
@@ -57,7 +58,7 @@ const reviewsBlockSchema = {
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: "5.0",
-    reviewCount: 240,
+    reviewCount: GOOGLE_REVIEW_COUNT,
     bestRating: 5,
     worstRating: 1,
   },
@@ -91,7 +92,7 @@ const reviewsBlockSchema = {
             </svg>
           ))}
         </div>
-        <span class="text-text-muted text-sm">240+ reviews on Google</span>
+        <span class="text-text-muted text-sm">{GOOGLE_REVIEW_COUNT_LABEL} reviews on Google</span>
       </div>
 
       {hasNearby && (
@@ -149,7 +150,7 @@ const reviewsBlockSchema = {
         rel="noopener noreferrer"
         class="inline-flex items-center gap-2 text-accent font-semibold text-sm hover:underline transition-colors"
       >
-        Read All 240+ Reviews on Google
+        Read All {GOOGLE_REVIEW_COUNT_LABEL} Reviews on Google
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
         </svg>

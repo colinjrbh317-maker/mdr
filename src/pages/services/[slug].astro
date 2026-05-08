@@ -16,6 +16,7 @@ import {
 } from "@/sanity/lib/queries";
 import { urlForImage } from "@/sanity/lib/url-for-image";
 import ScrollReveal from "@/components/common/ScrollReveal.astro";
+import { GOOGLE_REVIEW_COUNT, GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
 export const prerender = true;
 
@@ -83,9 +84,9 @@ const heroImage = service.featuredImage
   ? urlForImage(service.featuredImage).width(1600).height(800).url()
   : fallbackImages[slug as string] || "/assets/projects/dji_fly_20251105_160154_425_1762438973026_photo.JPG";
 
-const seoTitle = service.seo?.metaTitle || `${service.name} Christiansburg, Roanoke & Blacksburg VA | 5★ 231 Reviews`;
+const seoTitle = service.seo?.metaTitle || `${service.name} Christiansburg, Roanoke & Blacksburg VA | 5★ ${GOOGLE_REVIEW_COUNT_LABEL} Reviews`;
 const seoDescription =
-  service.seo?.metaDescription || service.description || `Professional ${service.name.toLowerCase()} in Christiansburg, Roanoke & Blacksburg VA. GAF Master Elite, 5★ rated by 231 homeowners. Free estimates, call (540) 553-6007.`;
+  service.seo?.metaDescription || service.description || `Professional ${service.name.toLowerCase()} in Christiansburg, Roanoke & Blacksburg VA. GAF Master Elite, 5★ rated by ${GOOGLE_REVIEW_COUNT_LABEL} homeowners. Free estimates, call (540) 553-6007.`;
 
 // Breadcrumb items
 const breadcrumbItems = [
@@ -160,9 +161,9 @@ const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
     {q: "Do you offer maintenance plans?", a: "Yes. Our annual maintenance plans include a thorough inspection, minor repairs, gutter cleaning, and a written report. It's the easiest way to protect your investment and catch issues early."},
   ],
   "timber-seal": [
-    {q: "What is Timber Seal?", a: "Timber Seal is GAF's premium wood-look roofing option, it gives you the aesthetic of natural wood shakes with the durability and fire resistance of modern roofing materials. Beautiful appearance with none of the maintenance headaches."},
-    {q: "How does Timber Seal compare to real wood shakes?", a: "Timber Seal looks like wood but lasts longer, resists fire, won't rot or split, and requires far less maintenance. Real wood shakes need regular treatment and can be a fire hazard, Timber Seal eliminates those concerns."},
-    {q: "Is Timber Seal more expensive than standard shingles?", a: "Yes, it's a premium product. But for homeowners who want the wood-shake look, it's significantly less expensive and more durable than real wood. We can walk you through the cost comparison during your free estimate."},
+    {q: "What is GAF TimberSteel?", a: "TimberSteel is a GAF metal shingle designed to deliver the look of architectural shingles with the durability, fire resistance, and long service life of steel."},
+    {q: "How does TimberSteel compare to standing seam metal?", a: "Standing seam has a clean vertical-panel profile. TimberSteel has a shingle-style profile, so it works well for homeowners who want metal performance without changing the traditional look of the home."},
+    {q: "Is TimberSteel more expensive than standard shingles?", a: "Yes, TimberSteel is a premium system. The tradeoff is longer service life, strong weather performance, and a metal shingle appearance that can be a better fit for homes where standing seam feels too modern."},
   ],
   "commercial-roofing": [
     {q: "What types of commercial roofing does MDR install?", a: "We install TPO, EPDM, modified bitumen, commercial metal, and roof coating systems. We handle everything from small retail buildings to large commercial properties and HOA communities across the Roanoke and New River Valley areas."},
@@ -307,6 +308,408 @@ const serviceFaqs: Record<string, Array<{q: string, a: string}>> = {
 
 const currentFaqs = serviceFaqs[slug as string] || [];
 
+type FallbackSection = {
+  heading: string;
+  paragraphs: string[];
+  bullets?: string[];
+};
+
+type FallbackServiceContent = {
+  introHeading: string;
+  intro: string;
+  sections: FallbackSection[];
+};
+
+const fallbackServiceContent: Record<string, FallbackServiceContent> = {
+  "commercial-roof-repair": {
+    introHeading: "Commercial Roof Repair for Roanoke and the New River Valley",
+    intro: "Leaks, ponding water, failed seams, and storm damage can disrupt a business quickly. Modern Day Roofing repairs flat, low-slope, and metal commercial roofs throughout Roanoke, Christiansburg, Blacksburg, Salem, and the surrounding Southwest Virginia region.",
+    sections: [
+      {
+        heading: "Problems We Repair",
+        paragraphs: ["Our commercial repair work starts with a roof assessment, photos, and a clear scope. We identify the source of the leak instead of chasing stains from inside the building."],
+        bullets: ["TPO and EPDM seam failures", "Punctures around HVAC units and service paths", "Flashing leaks at curbs, parapets, and wall transitions", "Ponding water and blocked drain issues", "Storm damage to metal panels, membranes, and edge metal"],
+      },
+      {
+        heading: "A Repair Plan That Fits Your Property",
+        paragraphs: ["We coordinate around tenants, business hours, roof access, and safety requirements. If a temporary dry-in is needed, we stabilize the roof first, then schedule the permanent repair with minimal disruption."],
+      },
+      {
+        heading: "Maintenance After the Repair",
+        paragraphs: ["Commercial roofs last longer when small defects are found early. After repair, we can provide condition photos and maintenance recommendations so property owners and managers know what to budget for next."],
+      },
+    ],
+  },
+  "commercial-roof-replacement": {
+    introHeading: "Commercial Roof Replacement Built Around Your Building",
+    intro: "When repair is no longer the best financial choice, Modern Day Roofing replaces commercial roof systems with TPO, EPDM, modified bitumen, coating-ready assemblies, and metal systems designed for Virginia weather.",
+    sections: [
+      {
+        heading: "When Replacement Makes Sense",
+        paragraphs: ["A commercial roof usually needs replacement when leaks are widespread, insulation is saturated, seams are failing across large areas, or repeated repairs are no longer extending the roof's service life."],
+        bullets: ["Full tear-off or recover options where code and condition allow", "Deck and insulation evaluation", "Drainage and slope review", "Detailed phasing for occupied buildings", "Manufacturer-approved installation details"],
+      },
+      {
+        heading: "Low-Slope Systems We Install",
+        paragraphs: ["We help owners choose the right system for roof traffic, drainage, equipment layout, budget, and long-term plans. TPO is often a strong fit for reflective performance, EPDM is proven and repairable, and modified bitumen can be a good choice for complex details."],
+      },
+      {
+        heading: "Clear Communication From Start to Finish",
+        paragraphs: ["You get a written scope, project timeline, site protection plan, and closeout documentation. Our goal is to protect the building while keeping occupants, tenants, or customers informed throughout the project."],
+      },
+    ],
+  },
+  "commercial-roof-coatings": {
+    introHeading: "Commercial Roof Coatings That Extend Service Life",
+    intro: "A roof coating can add years of waterproofing and UV protection when the existing roof is still structurally sound. Modern Day Roofing applies commercial coating systems across Roanoke, Christiansburg, and the New River Valley.",
+    sections: [
+      {
+        heading: "Good Candidates for Coating",
+        paragraphs: ["Coatings are not a shortcut for failed roofs. We first confirm the roof has solid adhesion, manageable moisture levels, and details that can be repaired before coating."],
+        bullets: ["Aging TPO, EPDM, and modified bitumen roofs", "Metal roofs with minor fastener or seam leaks", "Commercial roofs with UV wear but sound structure", "Previously coated roofs ready for maintenance recoat"],
+      },
+      {
+        heading: "Preparation Matters",
+        paragraphs: ["Most coating failures come from poor prep. We clean the roof, repair open seams and penetrations, treat rust where needed, prime compatible surfaces, and apply the coating at the specified thickness."],
+      },
+      {
+        heading: "Lower Disruption Than Replacement",
+        paragraphs: ["For many businesses, coating can be completed with less noise, debris, and downtime than a full tear-off. It can also improve reflectivity and help lower rooftop heat during Virginia summers."],
+      },
+    ],
+  },
+  "hoa-roofing": {
+    introHeading: "HOA and Multi-Family Roofing With Clear Coordination",
+    intro: "Modern Day Roofing helps HOA boards, property managers, and multi-family owners plan roof repairs and replacements with consistent materials, phased scheduling, and clear communication for residents.",
+    sections: [
+      {
+        heading: "Built for Community Projects",
+        paragraphs: ["HOA roofing requires more than installation skill. It requires documentation, schedule control, resident communication, and a clean jobsite that respects shared spaces."],
+        bullets: ["Board-ready proposals and scopes", "Shingle and color matching across units", "Phased replacement plans", "Storm damage documentation", "Warranty registration and closeout records"],
+      },
+      {
+        heading: "Consistent Appearance and Performance",
+        paragraphs: ["We help communities standardize shingle profiles, ventilation details, flashing standards, and gutter solutions so each building looks consistent and performs the way it should."],
+      },
+      {
+        heading: "Less Disruption for Residents",
+        paragraphs: ["Our team plans access, parking, material staging, cleanup, and daily updates before work starts. Residents know what to expect, and managers have one point of contact throughout the project."],
+      },
+    ],
+  },
+  "tpo-roofing": {
+    introHeading: "TPO Roofing for Flat and Low-Slope Buildings",
+    intro: "TPO is a reflective single-ply membrane commonly used on commercial and low-slope roofs. Modern Day Roofing installs and repairs TPO systems for businesses, multi-family properties, and suitable residential applications in Southwest Virginia.",
+    sections: [
+      {
+        heading: "Why Property Owners Choose TPO",
+        paragraphs: ["TPO offers strong heat reflectivity, welded seams, and dependable waterproofing when installed over a properly prepared substrate."],
+        bullets: ["Reflective white membrane for summer heat control", "Heat-welded seams for watertight performance", "Good fit for many commercial flat roofs", "Compatible with many roof coating maintenance strategies"],
+      },
+      {
+        heading: "Installation Details That Matter",
+        paragraphs: ["A TPO roof is only as strong as its details. We focus on substrate prep, insulation layout, seam welding, edge metal, drains, curbs, and rooftop penetrations."],
+      },
+      {
+        heading: "TPO Repair and Maintenance",
+        paragraphs: ["We repair punctures, failed seams, flashing issues, and drainage problems. Routine inspections help catch small TPO issues before water reaches insulation or interior finishes."],
+      },
+    ],
+  },
+  "epdm-roofing": {
+    introHeading: "EPDM Rubber Roofing for Durable Low-Slope Protection",
+    intro: "EPDM is a proven rubber roofing membrane known for flexibility, durability, and long service life. Modern Day Roofing installs and repairs EPDM roofs across Roanoke, Christiansburg, and the New River Valley.",
+    sections: [
+      {
+        heading: "Where EPDM Works Well",
+        paragraphs: ["EPDM is a strong option for many flat and low-slope roofs where flexibility and repairability are priorities."],
+        bullets: ["Commercial flat roofs", "Low-slope residential additions", "Buildings with many penetrations or details", "Properties where future repairability matters"],
+      },
+      {
+        heading: "Common EPDM Issues We Fix",
+        paragraphs: ["Older EPDM roofs often fail at seams, edges, drains, and rooftop penetrations. We inspect the full assembly and recommend repair, restoration, or replacement based on actual roof condition."],
+      },
+      {
+        heading: "Long-Term Value",
+        paragraphs: ["With proper installation and maintenance, EPDM can provide decades of service. We help owners protect that investment with clean details, good drainage, and scheduled inspections."],
+      },
+    ],
+  },
+  "modified-bitumen": {
+    introHeading: "Modified Bitumen Roofing for Demanding Low-Slope Roofs",
+    intro: "Modified bitumen is a multi-layer asphalt-based roofing system that performs well on complex low-slope roofs. Modern Day Roofing installs and repairs modified bitumen systems for commercial and residential properties in Southwest Virginia.",
+    sections: [
+      {
+        heading: "Why Modified Bitumen Is Still Used",
+        paragraphs: ["Modified bitumen handles foot traffic, complex details, and Virginia's temperature swings well when the system is installed correctly."],
+        bullets: ["Multi-layer waterproof protection", "Good puncture resistance", "Strong choice around many penetrations", "Reliable performance on certain low-slope roof designs"],
+      },
+      {
+        heading: "Repair, Recover, or Replace",
+        paragraphs: ["We evaluate membrane condition, seams, flashings, drainage, and substrate moisture before recommending a plan. Some modified bitumen roofs can be repaired or coated, while others need replacement."],
+      },
+      {
+        heading: "Built Around Drainage",
+        paragraphs: ["Flat roofs fail faster when water sits. We look at scuppers, drains, slope, and ponding areas as part of every modified bitumen project."],
+      },
+    ],
+  },
+  "seamless-gutters": {
+    introHeading: "Seamless Gutter Installation for Virginia Homes",
+    intro: "Seamless gutters move water away from your roof edge, fascia, siding, foundation, and landscaping. Modern Day Roofing installs custom-fit seamless gutter systems across the New River Valley and Roanoke area.",
+    sections: [
+      {
+        heading: "Why Seamless Gutters Matter",
+        paragraphs: ["Sectional gutters have more joints, and every joint is a potential leak. Seamless gutters are fabricated to fit the home, which reduces weak points and gives the roofline a cleaner finished look."],
+        bullets: ["On-site custom fabrication", "Proper pitch for drainage", "Secure hidden hangers", "Downspout placement that moves water away from the home", "Color options to match trim or siding"],
+      },
+      {
+        heading: "Designed With the Roof System",
+        paragraphs: ["Gutters are part of the roof's water management system. We evaluate drip edge, fascia, roof valleys, and runoff volume so the gutter system can keep up during heavy Virginia rain."],
+      },
+      {
+        heading: "Gutter Guards and Maintenance",
+        paragraphs: ["For homes with trees, we can pair new seamless gutters with gutter guards to reduce clogs from leaves, pine needles, and shingle granules."],
+      },
+    ],
+  },
+  "gutter-guards": {
+    introHeading: "Gutter Guard Installation for Lower Maintenance",
+    intro: "Gutter guards help keep leaves, twigs, pine needles, and debris out of your gutter system. Modern Day Roofing installs gutter protection for homes across Christiansburg, Blacksburg, Roanoke, Salem, and nearby communities.",
+    sections: [
+      {
+        heading: "What Gutter Guards Help Prevent",
+        paragraphs: ["Clogged gutters can back water under the roof edge, rot fascia, overflow near the foundation, and create ice problems in winter."],
+        bullets: ["Overflow during heavy rain", "Fascia and soffit moisture damage", "Foundation washout", "Frequent ladder cleaning", "Debris buildup below roof valleys"],
+      },
+      {
+        heading: "Installed on New or Existing Gutters",
+        paragraphs: ["We can install gutter guards with a new seamless gutter system or add protection to existing gutters after cleaning, inspecting, and making any needed repairs."],
+      },
+      {
+        heading: "Still Inspect, Just Less Often",
+        paragraphs: ["No guard makes a gutter completely maintenance-free. The goal is to dramatically reduce debris buildup and make the system easier to keep clear."],
+      },
+    ],
+  },
+  "gutter-repair": {
+    introHeading: "Gutter Repair That Protects the Roofline",
+    intro: "Sagging, leaking, or overflowing gutters can damage more than landscaping. Modern Day Roofing repairs gutter systems so water moves away from your roof, fascia, siding, and foundation.",
+    sections: [
+      {
+        heading: "Common Gutter Repairs",
+        paragraphs: ["We inspect the full gutter run before recommending repairs. Sometimes one loose section is the issue; other times the system is undersized, pitched incorrectly, or pulling away from rotted fascia."],
+        bullets: ["Re-securing sagging gutters", "Fixing leaky seams and corners", "Replacing damaged downspouts", "Correcting pitch and drainage", "Repairing sections damaged by limbs or storms"],
+      },
+      {
+        heading: "Repair vs. Replacement",
+        paragraphs: ["If the gutter system is mostly sound, repair may be the best choice. If multiple runs are failing or the gutters are old and undersized, seamless replacement often makes more sense."],
+      },
+      {
+        heading: "Roof and Fascia Check",
+        paragraphs: ["Because gutter problems often hide wood damage, we also look at fascia, drip edge, and the roof edge while we are there."],
+      },
+    ],
+  },
+  "silicone-roof-coating": {
+    introHeading: "Silicone Roof Coating for Flat and Low-Slope Roofs",
+    intro: "Silicone roof coating creates a seamless, UV-resistant, waterproof surface over an eligible existing roof. Modern Day Roofing applies silicone coatings for commercial flat roofs, low-slope roofs, and metal roof restoration projects.",
+    sections: [
+      {
+        heading: "Why Silicone Is Often the Right Coating",
+        paragraphs: ["Silicone performs especially well where flat roofs experience ponding water and heavy UV exposure. It remains flexible and reflective through Virginia's hot summers and cold snaps."],
+        bullets: ["Strong ponding-water resistance", "High UV reflectivity", "Seamless waterproof membrane", "Can extend service life without full tear-off", "Good option for many commercial roofs"],
+      },
+      {
+        heading: "Inspection Before Application",
+        paragraphs: ["We check moisture, adhesion, roof condition, seams, penetrations, and drainage before coating. If the roof is too far gone, we will recommend repair or replacement instead of coating over a failing system."],
+      },
+      {
+        heading: "Preparation and Thickness",
+        paragraphs: ["The roof is cleaned, repaired, detailed, and coated to manufacturer specifications. Proper dry-film thickness is critical for long-term performance."],
+      },
+    ],
+  },
+  "vinyl-siding": {
+    introHeading: "Vinyl Siding Installation for Southwest Virginia Homes",
+    intro: "Modern vinyl siding gives homeowners a durable, lower-maintenance exterior that handles Virginia humidity, rain, and temperature swings. Modern Day Roofing installs vinyl siding throughout Roanoke, Christiansburg, Blacksburg, and the New River Valley.",
+    sections: [
+      {
+        heading: "Why Choose Vinyl Siding",
+        paragraphs: ["Vinyl siding is a practical option for homeowners who want a refreshed exterior without regular painting."],
+        bullets: ["Low maintenance", "Moisture and rot resistance", "Wide range of colors and profiles", "Budget-friendly exterior upgrade", "Works well with trim, gutters, and roofing updates"],
+      },
+      {
+        heading: "Installed With Moisture Management in Mind",
+        paragraphs: ["Good siding work is not just what you see from the curb. We pay attention to housewrap, flashing, transitions, and trim details so water is directed away from the wall assembly."],
+      },
+      {
+        heading: "A Complete Exterior Plan",
+        paragraphs: ["If your roof, gutters, and siding are aging together, we can help prioritize the work so the exterior is protected in the right order."],
+      },
+    ],
+  },
+  "fiber-cement-siding": {
+    introHeading: "Fiber Cement Siding for Long-Term Exterior Protection",
+    intro: "Fiber cement siding, including James Hardie products, is a premium exterior option for Virginia homes. It provides a substantial look with strong resistance to moisture, pests, fire, and impact.",
+    sections: [
+      {
+        heading: "Why Fiber Cement Fits Virginia Homes",
+        paragraphs: ["Southwest Virginia homes deal with humidity, storms, sun exposure, and seasonal temperature swings. Fiber cement is built for homeowners who want a more durable exterior than basic siding options."],
+        bullets: ["Resists rot and insects", "Strong impact resistance", "Crisp wood-look profiles", "Long service life", "Factory-finished color options available"],
+      },
+      {
+        heading: "Proper Flashing and Clearance",
+        paragraphs: ["Fiber cement performs best when installed to manufacturer requirements. We focus on clearances, flashing, fasteners, joints, and trim transitions so the siding can shed water correctly."],
+      },
+      {
+        heading: "Exterior Upgrades That Work Together",
+        paragraphs: ["Many homeowners pair fiber cement siding with new gutters, roof edge details, and trim repairs for a complete exterior refresh."],
+      },
+    ],
+  },
+  "siding-repair": {
+    introHeading: "Siding Repair for Storm, Moisture, and Impact Damage",
+    intro: "Damaged siding lets water, pests, and air reach parts of the wall that should stay protected. Modern Day Roofing repairs siding damage for homeowners throughout the New River Valley and Roanoke area.",
+    sections: [
+      {
+        heading: "Siding Problems We Fix",
+        paragraphs: ["We repair localized damage and tell you when replacement would be more practical. The goal is to protect the wall, not just cover the visible problem."],
+        bullets: ["Cracked or missing vinyl panels", "Loose siding after wind", "Storm and branch impact damage", "Moisture damage near roof and gutter transitions", "Trim, flashing, and accessory repairs"],
+      },
+      {
+        heading: "Matching Existing Siding",
+        paragraphs: ["We do our best to match profile and color, but older siding fades over time. If an exact match is not realistic, we explain the options before work begins."],
+      },
+      {
+        heading: "Check the Cause",
+        paragraphs: ["Siding damage is often related to gutter overflow, roof runoff, or flashing problems. We look for those causes so the repair lasts."],
+      },
+    ],
+  },
+  "skylight-repair": {
+    introHeading: "Skylight Repair and Leak Diagnosis",
+    intro: "A leaking skylight does not always mean the skylight itself has failed. Modern Day Roofing repairs skylight leaks, flashing issues, cracked seals, and surrounding roof problems for homeowners in Roanoke and the New River Valley.",
+    sections: [
+      {
+        heading: "What Causes Skylight Leaks",
+        paragraphs: ["Most skylight leaks start at flashing, sealants, fasteners, or the surrounding shingles rather than the glass itself."],
+        bullets: ["Failed or poorly installed flashing", "Cracked sealant around the curb", "Aged skylight gaskets", "Condensation from poor ventilation", "Roof wear around the skylight opening"],
+      },
+      {
+        heading: "Repair or Replace",
+        paragraphs: ["If the skylight is newer and the issue is flashing, repair may be enough. If the unit is old, fogged, cracked, or repeatedly leaking, replacement is often the smarter long-term solution."],
+      },
+      {
+        heading: "Roof-System Integration",
+        paragraphs: ["We tie skylight repairs into the surrounding roofing system so water is directed around the unit correctly."],
+      },
+    ],
+  },
+  "wind-damage-repair": {
+    introHeading: "Wind Damage Roof Repair in Southwest Virginia",
+    intro: "High winds in the New River Valley and Roanoke area can lift shingles, crease tabs, damage ridge caps, and expose your home to leaks. Modern Day Roofing provides wind damage inspections, emergency tarping, and permanent repairs.",
+    sections: [
+      {
+        heading: "Signs of Wind Damage",
+        paragraphs: ["Wind damage is not always obvious from the driveway. Lifted shingles can settle back down while still leaving the seal broken."],
+        bullets: ["Missing or creased shingles", "Lifted edges along eaves and rakes", "Damaged ridge caps", "Exposed nail heads", "New leaks after a storm"],
+      },
+      {
+        heading: "Fast Dry-In When Water Is Getting In",
+        paragraphs: ["If a storm opens the roof, we focus first on stopping active water intrusion. After the home is protected, we document the damage and recommend a permanent repair plan."],
+      },
+      {
+        heading: "Insurance Documentation",
+        paragraphs: ["For covered storm damage, we provide photos and repair scopes that help homeowners communicate clearly with their insurance carrier."],
+      },
+    ],
+  },
+  "hail-damage-repair": {
+    introHeading: "Hail Damage Roof Repair and Claim Support",
+    intro: "Hail can bruise shingles, knock away protective granules, dent soft metals, and shorten roof life even when the roof is not leaking yet. Modern Day Roofing inspects and repairs hail damage across Southwest Virginia.",
+    sections: [
+      {
+        heading: "What Hail Damage Looks Like",
+        paragraphs: ["Hail damage often shows up as circular bruising, granule loss, or dents on vents, gutters, and flashing. A roof can look normal from the ground and still have functional damage."],
+        bullets: ["Bruised asphalt shingles", "Granule loss at impact points", "Dented vents and flashing", "Damaged gutters and downspouts", "Exposed mat that ages faster over time"],
+      },
+      {
+        heading: "Inspection and Documentation",
+        paragraphs: ["We inspect the full roof, photograph damage, and explain whether repair, replacement, or monitoring is the right next step."],
+      },
+      {
+        heading: "Repair Before Damage Spreads",
+        paragraphs: ["A hail strike can compromise a shingle's waterproofing layer. Addressing damage early helps prevent leaks and supports a cleaner insurance process when coverage applies."],
+      },
+    ],
+  },
+  "emergency-roof-repair": {
+    introHeading: "Emergency Roof Repair When Your Home Needs Protection Now",
+    intro: "When water is actively entering your home or a storm has opened the roof, Modern Day Roofing responds with emergency roof repair, tarping, and temporary weatherproofing across Roanoke, Christiansburg, Blacksburg, and nearby communities.",
+    sections: [
+      {
+        heading: "What Counts as a Roof Emergency",
+        paragraphs: ["A roofing emergency is any roof problem that can allow immediate water intrusion or create a safety hazard."],
+        bullets: ["Active interior leaks", "Tree or limb impact", "Large areas of missing shingles", "Storm damage exposing underlayment or decking", "Roof openings around vents, chimneys, or skylights"],
+      },
+      {
+        heading: "Stabilize First, Repair Next",
+        paragraphs: ["The first goal is to stop additional water from entering the home. Once the roof is dry and safe, we provide a permanent repair or replacement recommendation."],
+      },
+      {
+        heading: "What Homeowners Should Do",
+        paragraphs: ["Move belongings away from active leaks, collect water in buckets, take photos, and avoid climbing on the roof. If there is sagging or electrical exposure, stay out of the affected area."],
+      },
+    ],
+  },
+  "insurance-claims-help": {
+    introHeading: "Roof Insurance Claims Help for Storm Damage",
+    intro: "Storm damage claims can be confusing. Modern Day Roofing helps homeowners document roof damage, understand repair scopes, and coordinate with insurance adjusters after wind, hail, and tree-impact events.",
+    sections: [
+      {
+        heading: "How We Help",
+        paragraphs: ["We do not sell insurance or decide coverage. Our role is to inspect the roof, document what we find, and provide a clear roofing scope that supports an accurate claim review."],
+        bullets: ["Free storm damage inspection", "Photos of damaged shingles, flashing, vents, and gutters", "On-site adjuster meetings when appropriate", "Repair or replacement estimates", "Clear explanation of approved work"],
+      },
+      {
+        heading: "Deductibles and Honest Scopes",
+        paragraphs: ["Your deductible is part of your insurance contract. We keep scopes honest, document real damage, and do not inflate claims or promise deductible waivers."],
+      },
+      {
+        heading: "From Approval to Installation",
+        paragraphs: ["Once the claim scope is settled, we schedule the work, install the approved roof system, and provide closeout documentation for your records."],
+      },
+    ],
+  },
+  "timber-seal": {
+    introHeading: "GAF TimberSteel Metal Shingle Roofing",
+    intro: "GAF TimberSteel gives homeowners the strength and fire resistance of steel in a shingle-style profile that fits traditional Virginia homes. Modern Day Roofing installs TimberSteel metal shingle systems in Christiansburg, Roanoke, Blacksburg, and across Southwest Virginia.",
+    sections: [
+      {
+        heading: "Metal Performance Without the Standing Seam Look",
+        paragraphs: ["Standing seam metal has a distinctive vertical-panel style. TimberSteel is different: it is a metal shingle designed to look closer to architectural shingles while delivering the long service life and weather resistance of steel."],
+        bullets: ["Steel durability in a shingle profile", "Strong fire and weather resistance", "Traditional curb appeal", "Long service-life potential", "Good fit for homeowners comparing premium shingles and metal roofing"],
+      },
+      {
+        heading: "Installed as a Complete Roof System",
+        paragraphs: ["A TimberSteel roof still depends on the system below it. We inspect the deck, install proper underlayment, flashing, ventilation, edge metal, and accessories so the finished roof performs as designed."],
+      },
+      {
+        heading: "Best Fit for Southwest Virginia Homes",
+        paragraphs: ["TimberSteel is a strong option for homeowners who want a premium roof that handles wind, rain, freeze-thaw cycles, and long-term sun exposure without committing to a modern standing seam appearance."],
+      },
+    ],
+  },
+};
+
+const fallbackContent =
+  slug === "timber-seal"
+    ? fallbackServiceContent["timber-seal"]
+    : service.body
+      ? null
+      : fallbackServiceContent[slug as string] || null;
+
 // Fetch all non-hub service areas for internal linking
 const allAreas = await loadQuery<any[]>(groq`*[_type == "serviceArea" && !isHubPage] | order(name asc) { name, "slug": slug.current }`);
 
@@ -325,7 +728,7 @@ const serviceJsonLd = {
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "5.0",
-      reviewCount: "231",
+      reviewCount: String(GOOGLE_REVIEW_COUNT),
       bestRating: "5",
       worstRating: "1",
     },
@@ -389,10 +792,34 @@ const serviceJsonLd = {
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
       {/* Main Content (2/3) */}
       <div class="lg:col-span-2">
-        {service.body && (
+        {service.body && slug !== "timber-seal" && (
           <ScrollReveal>
             <div class="prose prose-lg max-w-none text-text-body prose-headings:text-text-primary prose-headings:mt-10 prose-headings:mb-4 prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl prose-p:leading-relaxed prose-li:leading-relaxed">
               <PortableText value={service.body} />
+            </div>
+          </ScrollReveal>
+        )}
+
+        {fallbackContent && (
+          <ScrollReveal>
+            <div class="prose prose-lg max-w-none text-text-body prose-headings:text-text-primary prose-headings:mt-10 prose-headings:mb-4 prose-a:text-accent prose-strong:text-text-primary prose-p:leading-relaxed prose-li:leading-relaxed">
+              <h2>{fallbackContent.introHeading}</h2>
+              <p>{fallbackContent.intro}</p>
+              {fallbackContent.sections.map((section) => (
+                <>
+                  <h3>{section.heading}</h3>
+                  {section.paragraphs.map((paragraph) => (
+                    <p>{paragraph}</p>
+                  ))}
+                  {section.bullets && (
+                    <ul>
+                      {section.bullets.map((item) => (
+                        <li>{item}</li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              ))}
             </div>
           </ScrollReveal>
         )}

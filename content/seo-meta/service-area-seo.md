@@ -85,15 +85,15 @@ Apply via Sanity Studio or mutation script once write access is available.
 - **Meta Title:** `Roofing Contractor in Bedford, VA | Modern Day Roofing`
 - **Meta Description:** `Professional roofing for Bedford homeowners. Roof replacement, repair, metal roofing & storm damage. GAF Master Elite certified. Free estimates available.`
 
-### Lexington
-- **Document ID:** `f1c07002-3641-4631-b961-d5f4b754bd69`
-- **Meta Title:** `Roofing Services in Lexington, VA | Modern Day Roofing`
-- **Meta Description:** `Roofing for Lexington's historic and modern homes. Roof replacement, repair & preservation roofing. GAF Master Elite contractor. Free inspections.`
+### Hollins
+- **Document ID:** `804ebc6d-5ff1-4d08-941e-22428886a306`
+- **Meta Title:** `Roofing Services in Hollins, VA | Modern Day Roofing`
+- **Meta Description:** `Trusted roofing services for Hollins homeowners. Roof replacement, repair, gutters & storm damage. GAF Master Elite contractor. Free inspections.`
 
-### Covington
-- **Document ID:** `77cb115e-9049-478b-9e6b-1716da03bbcb`
-- **Meta Title:** `Roofing Contractor in Covington, VA | Modern Day Roofing`
-- **Meta Description:** `Durable roofing solutions for Covington and the Alleghany Highlands. Roof replacement, metal roofing & repairs built for mountain weather. Free estimates.`
+### Cave Spring
+- **Document ID:** `06fcab0c-86ea-414b-80d0-15bff0eece0b`
+- **Meta Title:** `Roofing Contractor in Cave Spring, VA | Modern Day Roofing`
+- **Meta Description:** `Professional roofing for Cave Spring homes. Roof replacement, roof repair, gutters & storm damage service. GAF Master Elite. Free estimates.`
 
 ### Smith Mountain Lake
 - **Document ID:** `9dbd7723-a1eb-40a1-aa58-b090a5464b21`
@@ -131,8 +131,8 @@ const areaSeo = [
   { id: 'aab2e2e6-2758-473c-bff3-12ea0b963e9b', title: 'Roofing Contractor in Vinton, VA | Modern Day Roofing', desc: 'Trusted roofing services for Vinton neighborhoods. Roof replacement, repair, gutters & storm damage. GAF lifetime warranties available. Free inspections.' },
   { id: '50466c01-5f3e-463f-90dd-f853610d7ca1', title: 'Roofing Services in Troutville, VA | Modern Day Roofing', desc: 'Expert roofing for Troutville and northern Botetourt County. Roof replacement, metal roofing & storm damage repair. GAF Master Elite. Free estimates.' },
   { id: 'faf4eaf4-5382-4a4a-8548-031763eea2ba', title: 'Roofing Contractor in Bedford, VA | Modern Day Roofing', desc: 'Professional roofing for Bedford homeowners. Roof replacement, repair, metal roofing & storm damage. GAF Master Elite certified. Free estimates available.' },
-  { id: 'f1c07002-3641-4631-b961-d5f4b754bd69', title: 'Roofing Services in Lexington, VA | Modern Day Roofing', desc: "Roofing for Lexington's historic and modern homes. Roof replacement, repair & preservation roofing. GAF Master Elite contractor. Free inspections." },
-  { id: '77cb115e-9049-478b-9e6b-1716da03bbcb', title: 'Roofing Contractor in Covington, VA | Modern Day Roofing', desc: 'Durable roofing solutions for Covington and the Alleghany Highlands. Roof replacement, metal roofing & repairs built for mountain weather. Free estimates.' },
+  { id: '804ebc6d-5ff1-4d08-941e-22428886a306', title: 'Roofing Services in Hollins, VA | Modern Day Roofing', desc: 'Trusted roofing services for Hollins homeowners. Roof replacement, repair, gutters & storm damage. GAF Master Elite contractor. Free inspections.' },
+  { id: '06fcab0c-86ea-414b-80d0-15bff0eece0b', title: 'Roofing Contractor in Cave Spring, VA | Modern Day Roofing', desc: 'Professional roofing for Cave Spring homes. Roof replacement, roof repair, gutters & storm damage service. GAF Master Elite. Free estimates.' },
   { id: '9dbd7723-a1eb-40a1-aa58-b090a5464b21', title: 'Roofing at Smith Mountain Lake, VA | Modern Day Roofing', desc: 'Specialized roofing for Smith Mountain Lake waterfront homes. Wind-resistant roof replacement, metal roofing & storm damage repair. Free lakeside estimates.' },
 ]
 

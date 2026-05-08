@@ -29,6 +29,7 @@
 
 <script>
   import { fetchStormAlert, formatStormDate } from "@/lib/storm-check";
+  import { GAF_MASTER_ELITE_LABEL, GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
   const bar = document.getElementById("announcement-bar");
   const container = document.getElementById("bar-messages");
@@ -50,7 +51,7 @@
           show: true,
         },
         {
-          text: "★ 231 Five-Star Google Reviews — Virginia's Most Trusted Roofer",
+          text: `★ ${GOOGLE_REVIEW_COUNT_LABEL} Google Reviews — Virginia's Most Trusted Roofer`,
           cta: "Book Free Inspection",
           href: "#hero-form",
           show: true,
@@ -62,7 +63,7 @@
           show: isStormSeason,
         },
         {
-          text: "GAF President's Club 2026 — Top 1% Contractor in America",
+          text: `GAF 3-Star President's Club 2026 — ${GAF_MASTER_ELITE_LABEL}`,
           cta: "See Our Work",
           href: "/gallery",
           show: true,

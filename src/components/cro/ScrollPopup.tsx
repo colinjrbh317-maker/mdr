@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
 /**
  * Redesigned scroll popup — slide-in toast from bottom-right instead of
@@ -73,11 +74,11 @@ export default function ScrollPopup() {
               <span key={i} className="text-amber-400 text-sm">★</span>
             ))}
           </div>
-          <span className="text-xs font-semibold text-text-muted">231 Reviews</span>
+          <span className="text-xs font-semibold text-text-muted">{GOOGLE_REVIEW_COUNT_LABEL} Reviews</span>
         </div>
 
         <h3 className="text-lg font-bold text-text-primary leading-tight mb-1">
-          Join 600+ Homeowners Who Trust Modern Day Roofing
+          Get an Honest Roof Inspection From Modern Day Roofing
         </h3>
         <p className="text-sm text-text-muted mb-4">
           Free inspections. GAF Golden Pledge warranty. $0 down financing available.

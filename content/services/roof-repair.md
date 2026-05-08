@@ -2,7 +2,7 @@
 
 When water stains start spreading across your ceiling or you hear dripping in the attic during a rainstorm, the last thing you need is guesswork. You need someone who can find the actual source of the problem, fix it with the right materials, and stand behind the work. That's exactly what we do at Modern Day Roofing.
 
-We've repaired hundreds of roofs across Christiansburg, Blacksburg, Roanoke, and the surrounding New River Valley. As a GAF Master Elite certified contractor — a distinction held by only 3% of roofing companies in the country — we bring manufacturer-level expertise to every repair, whether it's a single missing shingle or storm damage across an entire roof slope.
+We've repaired hundreds of roofs across Christiansburg, Blacksburg, Roanoke, and the surrounding New River Valley. As a GAF Master Elite certified contractor in the top 2% of roofers nationwide, we bring manufacturer-level expertise to every repair, whether it's a single missing shingle or storm damage across an entire roof slope.
 
 ## Common Roof Repair Problems in Virginia
 

@@ -1,5 +1,6 @@
 ---
 import { reviews, reviewCities } from "@/data/reviews";
+import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT, GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
 const cities = ["All", ...reviewCities];
 
@@ -9,7 +10,6 @@ const cities = ["All", ...reviewCities];
 // hurting LCP and Core Web Vitals. 30 visible reviews give plenty of
 // social proof; users who want more click through to Google.
 const visibleReviews = reviews.slice(0, 30);
-const totalReviewCount = reviews.length;
 
 // JSON-LD Review schema for top 3 reviews so SERPs can display
 // individual star ratings under the result. This is one of the
@@ -43,8 +43,8 @@ const reviewsAggregateSchema = {
   },
   aggregateRating: {
     "@type": "AggregateRating",
-    ratingValue: "5.0",
-    reviewCount: 240,
+    ratingValue: GOOGLE_RATING,
+    reviewCount: GOOGLE_REVIEW_COUNT,
     bestRating: 5,
     worstRating: 1,
   },
@@ -71,7 +71,7 @@ const reviewsAggregateSchema = {
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
-        <span class="text-4xl font-bold text-text-primary">4.9</span>
+        <span class="text-4xl font-bold text-text-primary">{GOOGLE_RATING}</span>
         <div class="flex gap-0.5">
           {[1,2,3,4,5].map(() => (
             <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -79,7 +79,7 @@ const reviewsAggregateSchema = {
             </svg>
           ))}
         </div>
-        <span class="text-text-muted text-sm">Based on 240+ reviews</span>
+        <span class="text-text-muted text-sm">Based on {GOOGLE_REVIEW_COUNT_LABEL} reviews</span>
       </div>
 
       {/* City Filter Tabs */}
@@ -171,7 +171,7 @@ const reviewsAggregateSchema = {
         rel="noopener noreferrer"
         class="inline-flex items-center gap-2 text-accent font-semibold text-sm hover:underline transition-colors"
       >
-        Read All 240+ Reviews on Google
+        Read All {GOOGLE_REVIEW_COUNT_LABEL} Reviews on Google
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
         </svg>

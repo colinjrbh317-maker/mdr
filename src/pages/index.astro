@@ -11,6 +11,10 @@ import ServicesAndGallery from "@/components/home/ServicesAndGallery.astro";
 import HeroErie from "@/components/home/HeroErie.astro";
 import GoogleReviews from "@/components/home/GoogleReviews.astro";
 import WhyMDR from "@/components/home/WhyMDR.astro";
+import {
+  GAF_MASTER_ELITE_LABEL,
+  GOOGLE_REVIEW_COUNT_LABEL,
+} from "@/data/site-stats";
 
 const homepageFaqs = [
   {
@@ -19,7 +23,7 @@ const homepageFaqs = [
   },
   {
     question: "What is a GAF Master Elite contractor?",
-    answer: "Only the top 1% of roofing contractors in the country earn GAF Master Elite certification. It means we've met rigorous standards for training, insurance, and customer satisfaction, and it qualifies us to offer GAF's strongest warranty, the Golden Pledge.",
+    answer: `GAF Master Elite status places Modern Day Roofing among the ${GAF_MASTER_ELITE_LABEL.toLowerCase()}. Modern Day Roofing is also one of only 127 contractors to earn 3-Star President's Club status with GAF in 2026. These credentials mean we've met rigorous standards for training, insurance, customer satisfaction, and warranty-qualified installation.`,
   },
   {
     question: "Do you offer financing for roof replacement?",
@@ -37,8 +41,8 @@ const homepageFaqs = [
 ---
 
 <Layout
-  title="Roofing Contractor Christiansburg, Roanoke & Blacksburg VA | 5★ 231 Reviews"
-  description="Modern Day Roofing, Christiansburg, Roanoke & Blacksburg's top-rated roofing contractor. Roof replacement, repair & storm damage. GAF Master Elite. 5★ 231 reviews. Free estimates. (540) 553-6007."
+  title={`Roofing Contractor Christiansburg, Roanoke & Blacksburg VA | 5★ ${GOOGLE_REVIEW_COUNT_LABEL} Reviews`}
+  description={`Modern Day Roofing, Christiansburg, Roanoke & Blacksburg's top-rated roofing contractor. Roof replacement, repair & storm damage. GAF Master Elite. 5★ ${GOOGLE_REVIEW_COUNT_LABEL} reviews. Free estimates. (540) 553-6007.`}
 >
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -150,7 +154,7 @@ const homepageFaqs = [
           </div>
           <div class="p-6">
             <h3 class="text-xl font-bold text-text-primary group-hover:text-accent transition-colors">Roanoke Area</h3>
-            <p class="text-text-muted text-sm mt-2">Roanoke, Salem, Vinton, Bedford, Hollins, Bonsack, Smith Mountain Lake, Troutville</p>
+            <p class="text-text-muted text-sm mt-2">Roanoke, Salem, Vinton, Bedford, Hollins, Cave Spring, Smith Mountain Lake, Troutville</p>
             <span class="inline-flex items-center text-accent font-semibold text-sm mt-3 group-hover:underline">
               View Roanoke Areas
               <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>

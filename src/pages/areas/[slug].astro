@@ -17,6 +17,7 @@ import { urlForImage } from "@/sanity/lib/url-for-image";
 import ScrollReveal from "@/components/common/ScrollReveal.astro";
 import CityReviews from "@/components/common/CityReviews.astro";
 import { areaFacts as tier1AreaFacts } from "@/data/area-content";
+import { GOOGLE_REVIEW_COUNT, GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
 export const prerender = true;
 
@@ -51,8 +52,9 @@ const areaHeroImages: Record<string, string> = {
   "wytheville": "/assets/areas/wytheville-hero.webp",
   "vinton": "/assets/areas/vinton-hero.webp",
   "troutville": "/assets/areas/troutville-hero.webp",
-  "lexington": "/assets/areas/lexington-hero.webp",
-  "covington": "/assets/areas/covington-hero.webp",
+  "hollins": "/assets/areas/hollins-hero.webp",
+  "cave-spring": "/assets/areas/cave-spring-hero.webp",
+  "pearisburg": "/assets/areas/pearisburg-hero.webp",
   "smith-mountain-lake": "/assets/areas/smith-mountain-lake-hero.webp",
   "new-river-valley": "/assets/areas/new-river-valley-hero.webp",
   "roanoke-area": "/assets/areas/roanoke-area-hero.webp",
@@ -63,9 +65,9 @@ const areaHeroImage = area.featuredImage
 const siblingAreas = area.siblingAreas || [];
 const servicesOffered = area.servicesOffered || [];
 
-const seoTitle = area.seo?.metaTitle || `${area.name} Roofing Contractor | 5★ 231 Reviews | Free Estimates`;
+const seoTitle = area.seo?.metaTitle || `${area.name} Roofing Contractor | 5★ ${GOOGLE_REVIEW_COUNT_LABEL} Reviews | Free Estimates`;
 const seoDescription =
-  area.seo?.metaDescription || area.description || `${area.name}'s top-rated roofing contractor. Roof replacement, roof repair & storm damage restoration. GAF Master Elite, 5★ rated by 231 homeowners. Free estimates, call (540) 553-6007.`;
+  area.seo?.metaDescription || area.description || `${area.name}'s top-rated roofing contractor. Roof replacement, roof repair & storm damage restoration. GAF Master Elite, 5★ rated by ${GOOGLE_REVIEW_COUNT_LABEL} homeowners. Free estimates, call (540) 553-6007.`;
 
 // Breadcrumb items
 const breadcrumbItems = [
@@ -138,7 +140,7 @@ const localBusinessJsonLd = {
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: "5.0",
-    reviewCount: "231",
+    reviewCount: String(GOOGLE_REVIEW_COUNT),
     bestRating: "5",
     worstRating: "1",
   },
@@ -202,6 +204,42 @@ const localBusinessJsonLd = {
     <SectionContainer background="white" padding="md" maxWidth="narrow">
       <div class="prose prose-lg max-w-none text-text-body prose-headings:text-text-primary prose-headings:mt-10 prose-headings:mb-4 prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl prose-p:leading-relaxed prose-li:leading-relaxed">
         <PortableText value={area.body} />
+      </div>
+    </SectionContainer>
+  )}
+
+  {/* Local Map */}
+  {area.mapEmbedUrl && (
+    <SectionContainer background="light" padding="md">
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,520px)] lg:items-center">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-wide text-accent">
+            Local Roofing Coverage
+          </p>
+          <h2 class="mt-3 text-2xl md:text-3xl font-bold text-text-primary">
+            Serving {area.name} and Nearby Virginia Communities
+          </h2>
+          <p class="mt-4 text-text-muted leading-relaxed">
+            Modern Day Roofing provides roof replacement, repair, storm damage restoration,
+            gutters, and inspections for homeowners throughout the {area.name} area.
+          </p>
+          <div class="mt-6 flex flex-col sm:flex-row gap-3">
+            <Button href="#get-estimate">Schedule an Inspection</Button>
+            <Button href="tel:5405536007" variant="outline">
+              Call (540) 553-6007
+            </Button>
+          </div>
+        </div>
+        <div class="overflow-hidden rounded-xl border border-border bg-bg-card shadow-sm">
+          <iframe
+            src={area.mapEmbedUrl}
+            title={`${area.name} service area map`}
+            class="block w-full min-h-[320px] aspect-[4/3]"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
+        </div>
       </div>
     </SectionContainer>
   )}

@@ -14,6 +14,7 @@ import {
 import { urlForImage } from "@/sanity/lib/url-for-image";
 import { areaFacts, formatZipList, formatNeighborhoodList } from "@/data/area-content";
 import CityReviews from "@/components/common/CityReviews.astro";
+import { GOOGLE_REVIEW_COUNT, GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
 export const prerender = true;
 
@@ -50,8 +51,8 @@ if (!area || !service) {
 }
 
 // --- SEO ---
-const seoTitle = `${service.name} ${area.name} VA | 5★ 231 Reviews | Modern Day Roofing`;
-const seoDescription = `${service.name} in ${area.name}, VA, licensed, insured, GAF Master Elite. 5★ rated by 231 homeowners. Free estimates. Call (540) 553-6007.`;
+const seoTitle = `${service.name} ${area.name} VA | 5★ ${GOOGLE_REVIEW_COUNT_LABEL} Reviews | Modern Day Roofing`;
+const seoDescription = `${service.name} in ${area.name}, VA, licensed, insured, GAF Master Elite. 5★ rated by ${GOOGLE_REVIEW_COUNT_LABEL} homeowners. Free estimates. Call (540) 553-6007.`;
 
 // --- Breadcrumbs ---
 const breadcrumbItems = [
@@ -127,7 +128,7 @@ const comboFaqs: Record<string, Array<{ q: string; a: string }>> = {
   "shingle-roofing": [
     { q: `What type of shingles work best in ${area.name}'s climate?`, a: `GAF Timberline HDZ architectural shingles are ideal for ${area.name}. They handle Virginia's temperature swings, resist winds up to 130 mph, and include algae resistance for the humidity. As a GAF Master Elite contractor, we back them with the industry's strongest warranty.` },
     { q: `How long do shingle roofs last in ${area.name}?`, a: `Quality architectural shingles last 25-30 years in ${area.name}'s climate. Proper installation of the full roofing system, underlayment, ventilation, flashing, and shingles, is what makes the difference between a 20-year and 30-year roof.` },
-    { q: `What warranty comes with shingle roofing in ${area.name}?`, a: `As a GAF Master Elite contractor, we offer the Golden Pledge warranty, 50-year material coverage and 25-year workmanship coverage, backed by GAF. Only 3% of roofers nationwide qualify for this certification.` },
+    { q: `What warranty comes with shingle roofing in ${area.name}?`, a: `As a GAF Master Elite contractor, we offer the Golden Pledge warranty, 50-year material coverage and 25-year workmanship coverage, backed by GAF. GAF Master Elite status places contractors among the top 2% of roofers nationwide.` },
   ],
   "metal-roofing": [
     { q: `Is metal roofing a good choice for ${area.name} homes?`, a: `Metal roofing is excellent for ${area.name}. It handles Virginia's severe weather, reflects heat in summer to reduce cooling costs, and lasts 50+ years with minimal maintenance. Standing seam metal roofs also increase home value.` },
@@ -150,16 +151,16 @@ const comboFaqs: Record<string, Array<{ q: string; a: string }>> = {
     { q: `Can maintenance extend my roof's lifespan in ${area.name}?`, a: `Significantly. A well-maintained roof in ${area.name} can last 5-10 years longer than a neglected one. Catching a $200 flashing repair early prevents a $5,000 water damage problem later. Our annual plans make it effortless.` },
   ],
   "timber-seal": [
-    { q: `Is Timber Seal available for homes in ${area.name}?`, a: `Yes. We install GAF Timber Seal throughout ${area.name} and the surrounding area. It gives you the premium wood-shake aesthetic with modern durability, fire resistance, and none of the maintenance headaches of real wood.` },
-    { q: `How does Timber Seal perform in ${area.name}'s weather?`, a: `Timber Seal is engineered for climates like ${area.name}'s. Unlike real wood shakes that can rot, split, and require constant treatment in Virginia's humidity, Timber Seal maintains its appearance and performance for decades.` },
-    { q: `What does Timber Seal cost compared to regular shingles?`, a: `Timber Seal is a premium product, priced higher than standard architectural shingles but significantly less than real wood shakes. For ${area.name} homeowners who want that distinctive wood-look, it's the best value. We'll walk you through exact pricing during your free estimate.` },
+    { q: `Is TimberSteel available for homes in ${area.name}?`, a: `Yes. We install GAF TimberSteel metal shingles throughout ${area.name} and the surrounding area. TimberSteel gives homeowners metal-roof durability in a shingle-style profile that works well on traditional Virginia homes.` },
+    { q: `How does TimberSteel perform in ${area.name}'s weather?`, a: `TimberSteel is built for long-term resistance to wind, rain, fire, and seasonal temperature swings. It is a strong fit for ${area.name} homeowners who want metal performance without the standing seam look.` },
+    { q: `What does TimberSteel cost compared to regular shingles?`, a: `TimberSteel is a premium metal shingle system, so it costs more than standard architectural shingles. The advantage is longer service life, steel durability, and a more traditional appearance than standing seam metal.` },
   ],
 };
 
 const currentFaqs = comboFaqs[serviceSlug as string] || [
   { q: `Do you offer ${service.name.toLowerCase()} in ${area.name}?`, a: `Yes. Modern Day Roofing provides professional ${service.name.toLowerCase()} services throughout ${area.name} and the surrounding Virginia communities. Contact us at (540) 553-6007 for a free estimate.` },
   { q: `How do I get started with ${service.name.toLowerCase()} in ${area.name}?`, a: `Call us at (540) 553-6007 or fill out our contact form for a free, no-obligation estimate. We'll schedule a convenient time to inspect your property and provide a detailed quote.` },
-  { q: `Why choose Modern Day Roofing for ${service.name.toLowerCase()} in ${area.name}?`, a: `We're a GAF Master Elite certified contractor, a distinction held by only 3% of roofers nationwide. We offer the industry's strongest warranties, transparent pricing, and a commitment to quality that ${area.name} homeowners trust.` },
+  { q: `Why choose Modern Day Roofing for ${service.name.toLowerCase()} in ${area.name}?`, a: `We're a GAF Master Elite certified contractor, a distinction held by the top 2% of roofers nationwide. We offer the industry's strongest warranties, transparent pricing, and a commitment to quality that ${area.name} homeowners trust.` },
 ];
 
 // --- JSON-LD ---
@@ -186,7 +187,7 @@ const localBusinessJsonLd = {
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: "5.0",
-    reviewCount: "231",
+    reviewCount: String(GOOGLE_REVIEW_COUNT),
     bestRating: "5",
     worstRating: "1",
   },
@@ -298,11 +299,11 @@ const serviceContent: Record<string, { intro: string; includes: string[] }> = {
     ],
   },
   "timber-seal": {
-    intro: `Give your ${area.name} home the premium look of natural wood shakes without the maintenance headaches. GAF Timber Seal delivers stunning aesthetics with modern performance and fire resistance.`,
+    intro: `Give your ${area.name} home the durability of metal roofing in a shingle-style profile. GAF TimberSteel delivers steel performance, fire resistance, and traditional curb appeal without the standing seam look.`,
     includes: [
-      "GAF Timber Seal premium shingle installation",
-      "Authentic wood-shake appearance",
-      "Fire-resistant and algae-resistant construction",
+      "GAF TimberSteel metal shingle installation",
+      "Traditional shingle-style appearance",
+      "Fire-resistant steel construction",
       "Full GAF roofing system underlayment",
       "Color-matched ridge caps and accessories",
       "Premium warranty backed by GAF",
@@ -359,7 +360,7 @@ const content = serviceContent[serviceSlug as string] || {
             </svg>
           ))}
         </div>
-        <span class="text-white/90 text-sm font-medium">5.0 stars from 231 reviews</span>
+        <span class="text-white/90 text-sm font-medium">5.0 stars from {GOOGLE_REVIEW_COUNT_LABEL} reviews</span>
       </div>
       <div class="mt-8 flex flex-col sm:flex-row gap-4">
         <Button href="#get-estimate" size="lg">Get Your Free Estimate</Button>
@@ -389,7 +390,7 @@ const content = serviceContent[serviceSlug as string] || {
 
             <h3>Why {area.name} Homeowners Choose Modern Day Roofing</h3>
             <p>
-              As a <strong>GAF Master Elite certified contractor</strong>, a distinction held by only 3% of roofers nationwide, we deliver the industry's highest standards right here in {area.name}. Every project comes with transparent pricing, respectful worksite management, and the strongest warranties available.
+              As a <strong>GAF Master Elite certified contractor</strong>, a distinction held by the top 2% of roofers nationwide, we deliver the industry's highest standards right here in {area.name}. Every project comes with transparent pricing, respectful worksite management, and the strongest warranties available.
             </p>
             <p>
               We've served the {area.parentHub ? area.parentHub.name : area.name} community for years, building a reputation on honest assessments and quality workmanship. When we say we'll take care of your home, we mean it.

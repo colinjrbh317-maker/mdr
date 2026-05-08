@@ -20,8 +20,9 @@ const SERVICE_CITIES = [
   "Pulaski",
   "Wytheville",
   "Bedford",
-  "Lexington",
-  "Covington",
+  "Hollins",
+  "Cave Spring",
+  "Pearisburg",
   "Other / Not Listed",
 ];
 

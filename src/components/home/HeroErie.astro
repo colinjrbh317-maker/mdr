@@ -2,6 +2,7 @@
 import HeroBackground from './HeroBackground';
 import LeadCaptureForm from '@/components/forms/LeadCaptureForm';
 import SmartCTA from '@/components/common/SmartCTA';
+import { GAF_MASTER_ELITE_LABEL, GAF_PRESIDENTS_CLUB_COPY, GOOGLE_REVIEW_COUNT_LABEL } from '@/data/site-stats';
 
 const heroVideoUrl = "/assets/hero/hero-video.mp4";
 const heroPosterUrl = "/assets/hero/hero-main.webp";
@@ -33,7 +34,7 @@ const heroPosterUrl = "/assets/hero/hero-main.webp";
       </h1>
 
       <p class="text-sm text-white/90 font-medium mb-5" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">
-        GAF Master Elite · 1,000+ roofs
+        {GAF_MASTER_ELITE_LABEL} · GAF 3-Star 2026
       </p>
 
       <div class="mb-5">
@@ -91,7 +92,7 @@ const heroPosterUrl = "/assets/hero/hero-main.webp";
           </p>
 
           <p class="text-lg text-white/90 leading-relaxed mb-8 max-w-lg hero-subtext">
-            GAF Master Elite® certified. 1,000+ roofs completed across the New River Valley and Roanoke. The warranty, craftsmanship, and crew that shows up on time.
+            {GAF_MASTER_ELITE_LABEL}. {GAF_PRESIDENTS_CLUB_COPY} The warranty, craftsmanship, and crew that shows up on time.
           </p>
 
           {/* Credential Badges */}
@@ -180,7 +181,7 @@ const heroPosterUrl = "/assets/hero/hero-main.webp";
               <span class="text-xs font-bold text-text-muted">5.0 Rating</span>
             </div>
             <div class="bg-bg-light rounded-full px-3 py-1.5">
-              <span class="text-xs font-bold text-text-muted">231+ Reviews</span>
+              <span class="text-xs font-bold text-text-muted">{GOOGLE_REVIEW_COUNT_LABEL} Reviews</span>
             </div>
             <div class="bg-bg-light rounded-full px-3 py-1.5">
               <span class="text-xs font-bold text-text-muted">BBB A+</span>

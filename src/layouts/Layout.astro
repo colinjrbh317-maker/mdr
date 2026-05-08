@@ -15,6 +15,7 @@ import SocialProofToast from "@/components/cro/SocialProofToast";
 import ChatWidget from "@/components/chat/ChatWidget";
 import Hotjar from "@/components/analytics/Hotjar.astro";
 import IntentTracker from "@/components/analytics/IntentTracker.astro";
+import { GOOGLE_REVIEW_COUNT, GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 // StickyMobileCTA removed, phone icon in header is sufficient
 import "@/styles/global.css";
 
@@ -28,7 +29,7 @@ interface Props {
 
 const {
   title,
-  description = "Modern Day Roofing, Christiansburg, Roanoke & Blacksburg's top-rated roofing contractor. Roof replacement, repair & storm damage restoration. GAF Master Elite. 5★ 231 reviews. Free estimates.",
+  description = `Modern Day Roofing, Christiansburg, Roanoke & Blacksburg's top-rated roofing contractor. Roof replacement, repair & storm damage restoration. GAF Master Elite. 5★ ${GOOGLE_REVIEW_COUNT_LABEL} reviews. Free estimates.`,
   ogImage,
 } = Astro.props;
 
@@ -95,7 +96,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "5.0",
-        "reviewCount": "231",
+        "reviewCount": String(GOOGLE_REVIEW_COUNT),
         "bestRating": "5",
         "worstRating": "1"
       },
@@ -175,10 +176,6 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     {!isStudio && <Hotjar />}
     {!isStudio && <IntentTracker />}
 
-    {/* CallRail Dynamic Number Insertion, swaps tel: links to tracking numbers */}
-    {!isStudio && import.meta.env.PUBLIC_CALLRAIL_ID && (
-      <script is:inline async src={`https://cdn.callrail.com/companies/${import.meta.env.PUBLIC_CALLRAIL_ID}/swap.js`}></script>
-    )}
   </head>
   <body class="min-h-screen flex flex-col">
     {/* Google Tag Manager (noscript) — must be first child of <body>. */}

@@ -1,5 +1,6 @@
 ---
 import SectionContainer from "@/components/ui/SectionContainer.astro";
+import { GOOGLE_REVIEW_COUNT } from "@/data/site-stats";
 
 interface Stat {
   value: number;
@@ -16,8 +17,8 @@ interface Props {
 
 const {
   stats = [
-    { value: 1000, suffix: "+", label: "Roofs Completed", icon: "home" },
-    { value: 1, suffix: "%", label: "Top of All Roofers Nationwide", icon: "trophy" },
+    { value: GOOGLE_REVIEW_COUNT, suffix: "+", label: "Google Reviews", icon: "star" },
+    { value: 2, suffix: "%", label: "Top Roofers Nationwide", icon: "trophy" },
     { value: 0, prefix: "$", suffix: "", label: "Down Financing Available", icon: "dollar" },
     { value: 24, suffix: "/7", label: "Storm Response", icon: "clock" },
   ],

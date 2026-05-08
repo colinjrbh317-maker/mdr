@@ -139,4 +139,4 @@ They're the same thing. "Dimensional" refers to the multi-dimensional appearance
 
 If you're comparing shingle options for a roof replacement in Christiansburg, Blacksburg, Radford, or anywhere in the New River Valley, we'd be happy to walk you through the choices in person. We'll inspect your current roof, talk through what makes sense for your home and budget, and give you a straightforward quote — no pressure, no surprises.
 
-**Call us at (540) 204-5787** or [request a free estimate](/contact) to get started.
+**Call us at (540) 553-6007** or [request a free estimate](/contact) to get started.

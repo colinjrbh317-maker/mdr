@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { GOOGLE_REVIEW_COUNT_LABEL } from "@/data/site-stats";
 
 /* ------------------------------------------------------------------ */
 /*  Lender config                                                      */
@@ -897,7 +898,7 @@ export default function FinancingFunnel() {
                     </svg>
                   ))}
                 </div>
-                <p className="text-xs text-text-dim">Trusted by 231+ homeowners</p>
+                <p className="text-xs text-text-dim">Trusted by {GOOGLE_REVIEW_COUNT_LABEL} reviewers</p>
               </div>
               <button onClick={resetFunnel} className="text-xs text-text-dim hover:text-accent transition-colors underline">
                 Start Over
