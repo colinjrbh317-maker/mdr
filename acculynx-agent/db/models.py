@@ -165,7 +165,11 @@ class MessageQueue(Base):
     # Status
     status = Column(String, default="pending")
     # Values: "pending", "approved", "auto_approved", "edited", "sent",
-    #         "skipped", "failed", "logged_to_acculynx"
+    #         "skipped", "failed", "logged_to_acculynx", "scheduled"
+
+    # Agent-scheduled future send. When set + status='scheduled', the
+    # scheduled_send_job fires the draft at this time (no rep approval).
+    scheduled_for = Column(DateTime, nullable=True, index=True)
 
     # Who approved/skipped
     approved_by = Column(String, nullable=True)      # Rep name

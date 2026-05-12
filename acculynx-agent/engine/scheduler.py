@@ -279,6 +279,41 @@ async def auto_send_at_deadline_job() -> None:
             log.exception("auto_send_at_deadline_job: per-approval failure for %s", approval.id)
 
 
+async def scheduled_send_job() -> None:
+    """Fire any agent-scheduled drafts whose `scheduled_for` is now <= now().
+
+    Runs every minute. A message gets here by either:
+      1. The drafter setting `MessageQueue.scheduled_for` + `status='scheduled'`
+         when the agent decides "send this Tuesday at 9am" (instead of "send now"
+         which goes into the rep approval queue), or
+      2. A rep manually scheduling a send from the portal (future v2).
+
+    Sends are dispatched via approve_and_send so all the normal preflight /
+    postflight / AccuLynx-note plumbing applies. No rep approval is required
+    because the schedule itself is the authorization.
+    """
+    from engine.approval_flow import approve_and_send
+
+    now = datetime.now(timezone.utc)
+    async with async_session() as session:
+        result = await session.execute(
+            select(MessageQueue).where(
+                MessageQueue.status == "scheduled",
+                MessageQueue.scheduled_for.is_not(None),
+                MessageQueue.scheduled_for <= now,
+            )
+        )
+        due = list(result.scalars().all())
+    if not due:
+        return
+    log.info("scheduled_send_job: %d due", len(due))
+    for msg in due:
+        try:
+            await approve_and_send(msg.id)
+        except Exception:
+            log.exception("scheduled_send_job: send failed for msg %s", msg.id)
+
+
 async def cookie_health_job() -> None:
     """Daily check that the AccuLynx internal-API session cookie is valid.
 
@@ -377,6 +412,13 @@ def start_scheduler() -> None:
             minute=settings.auto_send_minute,
         ),
         id="auto_send_at_deadline",
+        replace_existing=True,
+    )
+    # Agent-scheduled future sends — polls every minute.
+    _scheduler.add_job(
+        scheduled_send_job,
+        IntervalTrigger(minutes=1),
+        id="scheduled_send",
         replace_existing=True,
     )
     # Cookie health check at 09:00 ET daily — early enough that you can

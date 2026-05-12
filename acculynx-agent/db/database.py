@@ -44,6 +44,7 @@ async def init_db() -> None:
             ("approvals", "auto_sent_at", "DATETIME"),
             ("leads", "rilla_transcript", "TEXT"),
             ("leads", "rilla_uploaded_at", "DATETIME"),
+            ("message_queue", "scheduled_for", "DATETIME"),
         ]
         for table, col, decl in column_migrations:
             try:
