@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from api.approvals import router as approvals_router
+from api.portal_api import router as portal_router
 from api.review import router as review_router
 from api.webhooks import router as webhooks_router
 from config.settings import settings
@@ -61,10 +62,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Allow CORS for dashboard frontend
+# Portal CORS — comma-separated origins from PORTAL_CORS_ORIGINS env. We
+# can't use "*" because the portal sends a session cookie cross-origin.
+portal_origins = [
+    o.strip() for o in (settings.portal_cors_origins or "").split(",") if o.strip()
+]
+if not portal_origins:
+    portal_origins = ["http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Lock down in production
+    allow_origins=portal_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -73,6 +80,7 @@ app.add_middleware(
 app.include_router(review_router)
 app.include_router(approvals_router)
 app.include_router(webhooks_router)
+app.include_router(portal_router)
 
 
 @app.get("/")
