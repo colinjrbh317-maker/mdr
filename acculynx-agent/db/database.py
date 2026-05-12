@@ -25,9 +25,37 @@ async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit
 
 
 async def init_db() -> None:
-    """Create all tables if they don't exist."""
+    """Create all tables if they don't exist, then run additive column migrations.
+
+    SQLite doesn't support `CREATE TABLE IF NOT EXISTS` for *columns*, so we
+    keep a small idempotent migration table here. Every entry runs `PRAGMA
+    table_info` first to skip already-present columns. Drops + type changes
+    are intentionally NOT handled here — those still need a manual ALTER.
+    """
+    from sqlalchemy import text
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+        column_migrations = [
+            ("approvals", "nudge_count", "INTEGER DEFAULT 0"),
+            ("approvals", "last_nudge_at", "DATETIME"),
+            ("approvals", "auto_sent_at_deadline", "BOOLEAN DEFAULT 0"),
+            ("approvals", "auto_sent_at", "DATETIME"),
+            ("leads", "rilla_transcript", "TEXT"),
+            ("leads", "rilla_uploaded_at", "DATETIME"),
+        ]
+        for table, col, decl in column_migrations:
+            try:
+                rows = (await conn.execute(text(f"PRAGMA table_info({table})"))).fetchall()
+                existing = {r[1] for r in rows}
+                if col not in existing:
+                    await conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {decl}"))
+            except Exception:
+                # Best-effort: a brand-new install creates the column via
+                # Base.metadata.create_all already; PRAGMA-fail just means the
+                # table doesn't exist yet, which is harmless.
+                pass
 
 
 async def get_session() -> AsyncSession:

@@ -48,8 +48,14 @@ async def log_send_to_acculynx(
     body: str,
     subject: Optional[str] = None,
     sent_via: str = "SendGrid",
+    prefix_note: Optional[str] = None,
 ) -> bool:
-    """Post an internal note on the AccuLynx job timeline. Returns True on success."""
+    """Post an internal note on the AccuLynx job timeline. Returns True on success.
+
+    prefix_note attaches an extra leading tag like "AUTO-SENT (rep did not respond
+    by deadline)" so reps reviewing the AccuLynx timeline immediately see the
+    distinction between rep-approved sends and auto-sends.
+    """
     note = _build_message_note(
         channel=channel,
         contact_name=contact_name or "Homeowner",
@@ -57,6 +63,8 @@ async def log_send_to_acculynx(
         body_preview=body,
         sent_via=sent_via,
     )
+    if prefix_note:
+        note = f"{AI_PREFIX} {prefix_note} | " + note.replace(AI_PREFIX + " ", "", 1)
     # Land the note in the AccuLynx Communications tab via the internal v4
     # endpoint. The public REST API does not have a "create note/message"
     # path — verified empirically. The internal-API Comment POST is the

@@ -1,10 +1,11 @@
 """APScheduler wiring — the runtime loop.
 
 Started by api/main.py:lifespan. Runs:
-  sync_job        every 15 min — pulls pipeline state from AccuLynx
-  cadence_job     every 5  min — finds leads needing follow-up, drafts + creates approvals
-  escalation_job  every 30 min — escalates approvals stalled > 4h to Austin
-  cleanup_job     daily at 03:00 ET — purges stale tokens
+  sync_job              every 15 min — pulls pipeline state from AccuLynx
+  cadence_job           every 5  min — finds leads needing follow-up, drafts + creates approvals
+  approval_nudge_job    cron 17:00, 17:30, 17:45, 17:55 ET, Mon-Fri — escalating "please approve" reminders
+  auto_send_at_deadline_job cron 18:00 ET, Mon-Fri — sends still-pending drafts and logs to AccuLynx
+  cookie_health_job     cron 09:00 ET — checks the AccuLynx session cookie
 
 Built on AsyncIOScheduler so we can call our async sync/draft pipeline directly.
 """
@@ -16,6 +17,7 @@ from datetime import datetime, timedelta, timezone
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from sqlalchemy import select
 
@@ -117,26 +119,164 @@ async def cadence_job() -> None:
         log.exception("cadence_job top-level failure")
 
 
-async def escalation_job() -> None:
-    """Approvals open > 4h with no decision get a second email to escalation_email."""
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=settings.approval_timeout_hours)
-    try:
-        async with async_session() as session:
-            r = await session.execute(
-                select(Approval).where(
-                    Approval.decision.is_(None),
-                    Approval.escalated == False,
-                    Approval.created_at <= cutoff,
-                )
+async def _pending_approvals_today() -> list[tuple[Approval, MessageQueue, Lead]]:
+    """All approvals that are still pending decision AND were created today.
+
+    We restrict to "today" because a draft that's been pending for multiple
+    days has its own bigger problem (rep is unreachable, lead may be stale);
+    those get manual triage, not a 5pm nudge.
+    """
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    async with async_session() as session:
+        result = await session.execute(
+            select(Approval, MessageQueue, Lead)
+            .join(MessageQueue, Approval.message_id == MessageQueue.id)
+            .join(Lead, MessageQueue.lead_id == Lead.id)
+            .where(
+                Approval.decision.is_(None),
+                Approval.created_at >= today_start,
+                MessageQueue.status.in_(("pending", "edited")),
             )
-            stale = list(r.scalars())
-            for ap in stale:
-                ap.escalated = True
-                ap.escalated_at = datetime.now(timezone.utc)
-            await session.commit()
-        log.info("escalation_job: marked %d stale approvals (full email impl deferred to v2)", len(stale))
+        )
+        return list(result.all())
+
+
+async def approval_nudge_job() -> None:
+    """Send an escalating 'please approve' email to the rep for every still-pending
+    approval from today. Fires at 17:00 / 17:30 / 17:45 / 17:55 ET on business days.
+
+    Each nudge increments Approval.nudge_count and stamps last_nudge_at so we
+    can render the urgency in the email ("first reminder" vs "FINAL: auto-send in 5 min").
+    """
+    from config.reps import resolve_rep
+    from engine.approval_flow import _build_links, _build_why_now  # internal helpers
+    from messaging import dispatch
+
+    try:
+        pending = await _pending_approvals_today()
     except Exception:
-        log.exception("escalation_job failed")
+        log.exception("approval_nudge_job: pending lookup failed")
+        return
+
+    now = datetime.now(timezone.utc)
+    auto_send_clock = f"{settings.auto_send_hour:02d}:{settings.auto_send_minute:02d}"
+    log.info("approval_nudge_job: %d pending approvals", len(pending))
+
+    async with async_session() as session:
+        for approval, message, lead in pending:
+            try:
+                # Reload from session so the update is committed under this transaction.
+                ap = await session.get(Approval, approval.id)
+                if not ap:
+                    continue
+                ap.nudge_count = (ap.nudge_count or 0) + 1
+                ap.last_nudge_at = now
+                ap.escalated = True
+                ap.escalated_at = ap.escalated_at or now
+
+                rep = resolve_rep(getattr(lead, "assigned_rep_id", None))
+                links = _build_links(message.id, ap.token)
+                stage_word = "First reminder" if ap.nudge_count == 1 else (
+                    "Second reminder" if ap.nudge_count == 2 else (
+                        "Third reminder" if ap.nudge_count == 3 else "FINAL reminder"
+                    )
+                )
+                final = ap.nudge_count >= len(settings.approval_nudge_minutes)
+                why = _build_why_now(lead, message)
+                subj_prefix = "FINAL" if final else f"Reminder {ap.nudge_count}"
+                subject = (
+                    f"[{subj_prefix}] {lead.contact_name or 'Homeowner'} draft auto-sends at {auto_send_clock} ET"
+                )
+                body = (
+                    f"{stage_word}.\n\n"
+                    f"At {auto_send_clock} ET on business days, any draft still pending will auto-send to the homeowner as-is and get logged to AccuLynx.\n\n"
+                    f"Lead: {lead.contact_name or 'Homeowner'} ({message.cadence_name or 'cadence'}, "
+                    f"touch {(message.touch_index or 0) + 1})\n"
+                    f"Why this lead now: {why}\n\n"
+                    f"Approve:  {links.approve_url}\n"
+                    f"Edit:     {links.edit_url}\n"
+                    f"Skip:     {links.skip_url}\n"
+                )
+                cc_targets = [settings.escalation_cc_email] if settings.escalation_cc_email else None
+                dispatch(
+                    channel="email",
+                    to_email=rep.email,
+                    to_name=rep.name,
+                    cc=cc_targets if final else None,
+                    subject=subject,
+                    body_text=body,
+                    from_email=settings.sendgrid_from_email,
+                    from_name=settings.sendgrid_from_name,
+                    lead_id=lead.id,
+                )
+            except Exception:
+                log.exception("approval_nudge_job: per-approval failure for %s", approval.id)
+        await session.commit()
+
+
+async def auto_send_at_deadline_job() -> None:
+    """At the deadline (default 18:00 ET, Mon-Fri), every still-pending draft from
+    today gets auto-sent to the homeowner. The unedited draft is used so reps know
+    exactly what went out. An internal AccuLynx note is logged with reason
+    "auto-sent: rep did not respond by deadline".
+
+    Settings.auto_send_enabled is a kill-switch — when false, we only log what
+    WOULD have been sent.
+    """
+    from engine.approval_flow import approve_and_send
+
+    try:
+        pending = await _pending_approvals_today()
+    except Exception:
+        log.exception("auto_send_at_deadline_job: pending lookup failed")
+        return
+
+    log.info(
+        "auto_send_at_deadline_job: %d pending approvals (auto_send_enabled=%s)",
+        len(pending), settings.auto_send_enabled,
+    )
+
+    for approval, message, lead in pending:
+        try:
+            if not settings.auto_send_enabled:
+                log.info(
+                    "auto_send_at_deadline_job DRY: would auto-send msg %s for lead %s",
+                    message.id, lead.id,
+                )
+                continue
+
+            result = await approve_and_send(message.id)
+            sent = bool(result.get("sent") or result.get("dry_run"))
+
+            async with async_session() as session:
+                ap = await session.get(Approval, approval.id)
+                if ap and sent:
+                    ap.decision = "auto_approved"
+                    ap.decided_at = datetime.now(timezone.utc)
+                    ap.auto_sent_at_deadline = True
+                    ap.auto_sent_at = datetime.now(timezone.utc)
+                    await session.commit()
+
+            log.info(
+                "auto_send_at_deadline_job: msg %s lead %s sent=%s blocked=%s",
+                message.id, lead.id, sent, result.get("blocked_reason"),
+            )
+
+            if sent and not result.get("dry_run"):
+                try:
+                    from acculynx.notes import log_send_to_acculynx
+                    await log_send_to_acculynx(
+                        job_id=lead.id,
+                        channel=message.channel,
+                        contact_name=lead.contact_name or "Homeowner",
+                        body=(message.body_edited or message.body or ""),
+                        subject=message.subject,
+                        prefix_note="AUTO-SENT (rep did not respond by deadline)",
+                    )
+                except Exception:
+                    log.exception("auto_send_at_deadline_job: AccuLynx note write failed (non-fatal)")
+        except Exception:
+            log.exception("auto_send_at_deadline_job: per-approval failure for %s", approval.id)
 
 
 async def cookie_health_job() -> None:
@@ -219,13 +359,35 @@ def start_scheduler() -> None:
     _scheduler = AsyncIOScheduler(timezone="America/New_York")
     _scheduler.add_job(sync_job, IntervalTrigger(minutes=settings.acculynx_poll_interval_minutes), id="sync", replace_existing=True)
     _scheduler.add_job(cadence_job, IntervalTrigger(minutes=5), id="cadence", replace_existing=True)
-    _scheduler.add_job(escalation_job, IntervalTrigger(minutes=30), id="escalation", replace_existing=True)
+
+    # Escalating "please approve" nudges at 17:00 / 17:30 / 17:45 / 17:55 ET.
+    nudge_minutes = ",".join(str(m) for m in settings.approval_nudge_minutes) or "0,30,45,55"
+    _scheduler.add_job(
+        approval_nudge_job,
+        CronTrigger(day_of_week="mon-fri", hour=17, minute=nudge_minutes),
+        id="approval_nudge",
+        replace_existing=True,
+    )
+    # Deadline auto-send at 18:00 ET, business days only.
+    _scheduler.add_job(
+        auto_send_at_deadline_job,
+        CronTrigger(
+            day_of_week="mon-fri",
+            hour=settings.auto_send_hour,
+            minute=settings.auto_send_minute,
+        ),
+        id="auto_send_at_deadline",
+        replace_existing=True,
+    )
     # Cookie health check at 09:00 ET daily — early enough that you can
-    # refresh during the workday if it fails
+    # refresh during the workday if it fails.
     _scheduler.add_job(cookie_health_job, CronTrigger(hour=9, minute=0), id="cookie_health", replace_existing=True)
     _scheduler.start()
-    log.info("Scheduler started: sync=%dm, cadence=5m, escalation=30m, cookie_health=09:00",
-             settings.acculynx_poll_interval_minutes)
+    log.info(
+        "Scheduler started: sync=%dm, cadence=5m, nudge=17:%s mon-fri, auto_send=%02d:%02d mon-fri, cookie_health=09:00",
+        settings.acculynx_poll_interval_minutes, nudge_minutes,
+        settings.auto_send_hour, settings.auto_send_minute,
+    )
 
 
 def stop_scheduler() -> None:
@@ -234,3 +396,26 @@ def stop_scheduler() -> None:
         _scheduler.shutdown(wait=False)
         _scheduler = None
         log.info("Scheduler stopped")
+
+
+def schedule_one_shot(coro_fn, *, run_in_seconds: float, job_id: str | None = None) -> None:
+    """Schedule a coroutine to run once after `run_in_seconds`.
+
+    Used by the inbound auto-reply path to introduce the 2-3 minute random
+    delay before an AI reply hits the homeowner's inbox. Survives the request
+    lifecycle because the scheduler runs independently in the FastAPI app.
+
+    If the scheduler is not yet started, falls back to logging a warning and
+    skipping (test environments).
+    """
+    if _scheduler is None:
+        log.warning("schedule_one_shot called but scheduler not running; skipping %s", job_id or "<anon>")
+        return
+    run_at = datetime.now(timezone.utc) + timedelta(seconds=run_in_seconds)
+    _scheduler.add_job(
+        coro_fn,
+        DateTrigger(run_date=run_at),
+        id=job_id,
+        replace_existing=bool(job_id),
+        misfire_grace_time=600,
+    )

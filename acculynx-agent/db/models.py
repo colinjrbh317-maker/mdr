@@ -87,6 +87,13 @@ class Lead(Base):
     agent_snooze_until = Column(DateTime, nullable=True)    # Pause cadence until this date
     agent_status = Column(String, nullable=True, index=True)  # Active | Paused | Stopped (default Active)
 
+    # Rilla meeting transcript — pasted by rep via portal /upload, optionally
+    # auto-ingested from a forwarded Rilla recap email (Track C in the plan).
+    # Drafter loads this into the REP CONTEXT block as ground-truth conversation
+    # history when present.
+    rilla_transcript = Column(Text, nullable=True)
+    rilla_uploaded_at = Column(DateTime, nullable=True)
+
     # AccuLynx primary contact ID — needed for some webhook lookups
     primary_contact_id = Column(String, nullable=True)
 
@@ -207,6 +214,16 @@ class Approval(Base):
     # Escalation
     escalated = Column(Boolean, default=False)
     escalated_at = Column(DateTime, nullable=True)
+
+    # Approval nudge cascade (5:00 / 5:30 / 5:45 / 5:55 PM ET on business days).
+    # nudge_count is incremented every time we send a "please approve" reminder;
+    # last_nudge_at lets us dedupe within a minute window.
+    nudge_count = Column(Integer, default=0)
+    last_nudge_at = Column(DateTime, nullable=True)
+
+    # When the 6pm cron auto-sends the original (rep ran out of decision time).
+    auto_sent_at_deadline = Column(Boolean, default=False)
+    auto_sent_at = Column(DateTime, nullable=True)
 
     # Timestamps
     created_at = Column(DateTime, default=func.now())

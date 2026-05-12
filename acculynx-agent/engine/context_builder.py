@@ -235,6 +235,21 @@ async def build_agent_context(lead_id: str, max_chars: int = 1500) -> str:
     if lead.agent_context and lead.agent_context.strip():
         parts.insert(0, f"REP NOTE (manual override, treat as authoritative): {lead.agent_context.strip()}")
 
+    # ── Rilla meeting transcript (uploaded via portal, optionally auto-ingested) ──
+    # Higher signal than typed notes. Drafter treats this as ground-truth verbatim
+    # conversation history. Truncated to ~3000 chars (~750 tokens) so it never
+    # blows up the prompt budget; uploaded full text stays in the DB.
+    rilla = getattr(lead, "rilla_transcript", None)
+    if rilla and rilla.strip():
+        snippet = rilla.strip()
+        if len(snippet) > 3000:
+            snippet = snippet[:2970] + "\n...[transcript truncated]"
+        parts.insert(
+            0,
+            "RILLA MEETING TRANSCRIPT (verbatim record of the sales conversation; treat as ground truth):\n"
+            + snippet,
+        )
+
     # ── Internal API: actual content of rep emails / texts / comments ──
     # This is the GOLD layer. The public API hides comment/email content;
     # the internal API exposes full bodies. Requires session cookies.

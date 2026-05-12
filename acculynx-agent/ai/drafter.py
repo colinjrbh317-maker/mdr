@@ -22,7 +22,7 @@ from typing import Optional
 from anthropic import Anthropic
 
 from ai.sop_loader import load_real_message_samples, load_sops_for_layer
-from config.reps import resolve_rep
+from config.reps import Rep, resolve_rep
 from config.settings import settings
 from config.stats import stats_block_for_prompt
 from engine.financing import resolve_financing_phrase
@@ -590,4 +590,117 @@ async def draft_message(
         "postflight_ok": False,
         "postflight_reasons": last_reasons,
         "regenerations": MAX_REGENERATIONS,
+    }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# One-shot reply drafter for the inbound auto-reply path. Used when a homeowner
+# replies to a follow-up with an objective question the SOP can answer (warranty,
+# financing, hours, process) — the classifier triggers this, NOT the cadence.
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+INBOUND_REPLY_SYSTEM_PROMPT = """You are the assigned Modern Day Roofing (MDR) sales rep replying to a homeowner who responded to your follow-up. Reply in FIRST PERSON as the rep.
+
+CRITICAL RULES:
+
+1. SCOPE. Answer ONE question the homeowner asked using ONLY the facts in BUSINESS FACTS, SOP RULES, and AGENT CONTEXT. If you don't have a clear answer, DO NOT GUESS. Output exactly: "ESCALATE: <one-sentence reason>".
+2. VOICE. Plain, warm, contractor-direct. Same voice rules as the cadence drafter: NO em-dashes, NO en-dashes, NO asterisks/markdown, NO "follow up", NO "checking in", NO "just wanted to", NO "hopefully".
+3. LENGTH. Reply body 40-110 words. ONE follow-up ask at the end (e.g., "Want me to lock in your install slot?", "Want me to send the warranty PDF?"). Do not stack CTAs.
+4. SIGNATURE. End with a 3-line block exactly:
+   {rep_first}
+   Modern Day Roofing
+   {rep_phone}
+5. EMAIL OUTPUT FORMAT. First line "Subject: Re: <prior subject>" if a prior subject is provided, otherwise a fresh single-line subject. Then a blank line, then the body, then the signature block. Under 4000 chars total.
+6. NO PLACEHOLDERS. Substitute every bracket. If you don't have a value, omit the line rather than emit "[X]".
+7. NEVER quote dollar pricing without approval. Use "what we discussed in your estimate" if the homeowner asks about price.
+
+Return ONLY the reply, no preamble, no explanation, no JSON, no markdown fences."""
+
+
+async def draft_inbound_reply(
+    *,
+    lead_context: dict,
+    homeowner_message: str,
+    category: str,
+    rep: Rep,
+    prior_subject: Optional[str] = None,
+) -> dict:
+    """One-shot reply to a homeowner's inbound question. Returns the same shape
+    as draft_message for the safe categories the auto-reply path handles.
+
+    On ambiguity Claude emits "ESCALATE: ..." and we return escalation set so
+    the caller routes to the rep instead.
+    """
+    sop_text = load_sops_for_layer("ESTIMATE_FOLLOWUP")
+    stats = stats_block_for_prompt() or "BUSINESS FACTS (none configured)"
+    rep_notes = (lead_context.get("agent_context") or "").strip()
+
+    user_prompt = f"""Reply to this homeowner's question.
+
+--- HOMEOWNER QUESTION ---
+{homeowner_message.strip()[:3000]}
+
+--- TOPIC (classifier-assigned) ---
+{category}
+
+--- LEAD CONTEXT ---
+Name: {lead_context.get('contact_name', 'Homeowner')}
+City: {lead_context.get('city') or 'N/A'}
+Milestone: {lead_context.get('milestone', 'Lead')}
+{('--- AGENT CONTEXT ---\\n' + rep_notes) if rep_notes else ''}
+
+--- REP (THIS IS YOU) ---
+You ARE: {rep.name}
+First name: {rep.first_name}
+Phone: {rep.signature_phone}
+
+--- BUSINESS FACTS ---
+{stats}
+
+--- SOP RULES (use these to answer; do NOT invent facts) ---
+{sop_text}
+
+Compose the reply now. If you cannot answer confidently from the SOP/BUSINESS FACTS, output exactly "ESCALATE: <reason>"."""
+
+    try:
+        resp = client.messages.create(
+            model=settings.claude_model,
+            max_tokens=600,
+            system=INBOUND_REPLY_SYSTEM_PROMPT.replace("{rep_first}", rep.first_name).replace("{rep_phone}", rep.signature_phone),
+            messages=[{"role": "user", "content": user_prompt}],
+        )
+        raw = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text").strip()
+    except Exception as exc:
+        log.exception("draft_inbound_reply API call failed")
+        return {"channel": "email", "body": None, "subject": None,
+                "escalation": f"draft api error: {exc}", "rep": rep,
+                "postflight_ok": False, "postflight_reasons": ["api_error"]}
+
+    if raw.upper().startswith("ESCALATE"):
+        reason = raw.split(":", 1)[1].strip() if ":" in raw else raw
+        return {"channel": "email", "body": None, "subject": None,
+                "escalation": reason, "rep": rep,
+                "postflight_ok": False, "postflight_reasons": ["classifier_low_confidence"]}
+
+    subject, body = _parse_subject("email", raw)
+    if prior_subject and subject and not subject.lower().startswith("re:"):
+        subject = f"Re: {prior_subject}"
+    elif not subject and prior_subject:
+        subject = f"Re: {prior_subject}"
+
+    ok, reasons = check_draft(body or raw, channel="email", content_type="inbound_reply")
+    if not ok:
+        return {"channel": "email", "body": None, "subject": None,
+                "escalation": "postflight: " + ", ".join(reasons), "rep": rep,
+                "postflight_ok": False, "postflight_reasons": reasons}
+
+    return {
+        "channel": "email",
+        "body": body or raw,
+        "subject": subject,
+        "escalation": None,
+        "rep": rep,
+        "postflight_ok": True,
+        "postflight_reasons": [],
     }
