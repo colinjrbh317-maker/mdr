@@ -21,18 +21,23 @@
 #   alexbohm@moderndayroof.com         -> 0bb3a2a5-49fc-4f6d-8d89-a8c56855fc93  (CompanyAdmin)
 #   austin@moderndayroof.com           -> 88887648-9d02-4ece-ab42-56c0d64d07bc
 
-default_rep_email: colin@socialtheorymedia.com
+default_rep_email: colinryan@moderndayroof.com
 
 reps:
-  # Wildcard / solo-sender fallback. Used when SOLO_SENDER_MODE=true or when
-  # a lead has no matching assigned_rep_id below.
+  # Wildcard / admin entry. Has rep_id="*" which means:
+  #   1. _rep_owns_lead() returns True for every lead (admin sees everything
+  #      in the portal queue, sent log, leads search).
+  #   2. Used as the SOLO_SENDER_MODE fallback when that flag is on.
+  #   3. Used as the assignment fallback when an inbound lead's
+  #      assigned_rep_id doesn't match any specific rep entry below.
+  # Login email: colinryan@moderndayroof.com. Owns admin/global view.
   - rep_id: "*"
     name: Colin Ryan
     first_name: Colin
-    email: colin@socialtheorymedia.com
+    email: colinryan@moderndayroof.com
     title: Account Manager
     signature_phone: "540-553-6007"
-    sendgrid_sender_email: colin@socialtheorymedia.com
+    sendgrid_sender_email: colinryan@moderndayroof.com
     twilio_phone: ""
 
   - rep_id: "4ea127be-7494-4b8c-a603-4b99b209ab24"

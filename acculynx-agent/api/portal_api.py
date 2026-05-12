@@ -168,7 +168,10 @@ async def auth_callback(token: str = "") -> Response:
         max_age=SESSION_TTL_SECONDS,
         httponly=True,
         secure=True,
-        samesite="lax",
+        # Portal lives on app.moderndayroof.com (Vercel); API lives on the
+        # Railway subdomain. That's cross-site for cookie purposes, so we
+        # need SameSite=None+Secure for the browser to attach this on fetch.
+        samesite="none",
         path="/",
     )
     return redirect
