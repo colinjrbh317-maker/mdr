@@ -7,6 +7,9 @@ import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
   site: "https://moderndayroof.com",
+  redirects: {
+    "/policy": "/privacy",
+  },
   adapter: vercel({
     isr: {
       expiration: 60,
