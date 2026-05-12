@@ -44,7 +44,7 @@ reps:
     sendgrid_sender_email: aj@moderndayroof.com
     twilio_phone: ""
 
-  - rep_id: "TBD-chris-duncan"
+  - rep_id: "e6734403-bd3b-451e-b921-b605d0961960"
     name: Chris Duncan
     first_name: Chris
     email: chrisduncan@moderndayroof.com
@@ -53,7 +53,7 @@ reps:
     sendgrid_sender_email: chrisduncan@moderndayroof.com
     twilio_phone: ""
 
-  - rep_id: "TBD-jake-perdue"
+  - rep_id: "c9eb89df-2ea7-46fc-9613-211362a3f035"
     name: Jake Perdue
     first_name: Jake
     email: jakeperduemdr@gmail.com
@@ -62,7 +62,7 @@ reps:
     sendgrid_sender_email: jakeperduemdr@gmail.com
     twilio_phone: ""
 
-  - rep_id: "TBD-joe-furrow"
+  - rep_id: "76bd9e8b-b5c4-4955-a041-cbd390da0b73"
     name: Joe Furrow
     first_name: Joe
     email: joefurrow@moderndayroof.com
@@ -71,7 +71,7 @@ reps:
     sendgrid_sender_email: joefurrow@moderndayroof.com
     twilio_phone: ""
 
-  - rep_id: "TBD-paul-vanwagoner"
+  - rep_id: "dbea879b-892a-47a7-8034-ea801f40bebd"
     name: Paul VanWagoner
     first_name: Paul
     email: paulvanwagoner@moderndayroof.com
