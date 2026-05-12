@@ -1,24 +1,31 @@
-# Rep mapping. MVP bootstrap: every lead routes to Colin via solo-sender mode.
+# Rep mapping. Each AccuLynx user_id (`rep_id`) maps to one outbound identity.
 #
-# When solo_sender_mode=true (settings/.env), we use the rep with rep_id="*"
-# regardless of what AccuLynx's history says about lead ownership.
+# Solo-sender mode bypass:
+#   When SOLO_SENDER_MODE=true in .env, every lead routes to the rep with
+#   rep_id="*" regardless of AccuLynx assignment. Flip to false once the 5 real
+#   reps below are verified as SendGrid Single Senders and their AccuLynx UUIDs
+#   are filled in.
 #
-# Once Austin onboards real reps:
-#   1. Verify each rep's email as a SendGrid Single Sender (~5 min each)
-#   2. Replace the wildcard entry with one row per rep
-#   3. Match rep_id to the AccuLynx user.id from `/users` endpoint
-#      (Run: python scripts/inspect_rep_link.py to see all 16 users)
-#   4. Set SOLO_SENDER_MODE=false in .env
+# Bootstrap procedure for the 5 real reps:
+#   1. Verify each rep's email as a SendGrid Single Sender (Marketing → Senders).
+#      Each rep clicks the verification email from their inbox. ~5 min apiece.
+#   2. Run `python scripts/inspect_rep_link.py` against the live AccuLynx API
+#      to dump /users and grab each rep's UUID. Update the `rep_id` fields below.
+#   3. Allocate per-rep Twilio numbers (or leave blank to share twilio_phone_number
+#      from settings until A2P lands). Update the `twilio_phone` fields below.
+#   4. Set SOLO_SENDER_MODE=false in .env.
 #
-# AccuLynx user IDs already discovered (from /users):
-#   alexbohm@moderndayroof.com         → 0bb3a2a5-49fc-4f6d-8d89-a8c56855fc93 (CompanyAdmin)
-#   aliciaumberto@moderndayroof.com    → ecae74b2-a28d-4775-9c80-0851e6010ddb (LocationAdmin)
-#   aj@moderndayroof.com               → 4ea127be-7494-4b8c-a603-4b99b209ab24 (Sales)
-#   austin@moderndayroof.com (Austin Hungate) → 88887648-9d02-4ece-ab42-56c0d64d07bc
+# Known AccuLynx user IDs (from prior /users dump):
+#   aj@moderndayroof.com               -> 4ea127be-7494-4b8c-a603-4b99b209ab24
+#   aliciaumberto@moderndayroof.com    -> ecae74b2-a28d-4775-9c80-0851e6010ddb  (LocationAdmin)
+#   alexbohm@moderndayroof.com         -> 0bb3a2a5-49fc-4f6d-8d89-a8c56855fc93  (CompanyAdmin)
+#   austin@moderndayroof.com           -> 88887648-9d02-4ece-ab42-56c0d64d07bc
 
 default_rep_email: colin@socialtheorymedia.com
 
 reps:
+  # Wildcard / solo-sender fallback. Used when SOLO_SENDER_MODE=true or when
+  # a lead has no matching assigned_rep_id below.
   - rep_id: "*"
     name: Colin Ryan
     first_name: Colin
@@ -26,3 +33,49 @@ reps:
     title: Account Manager
     signature_phone: "540-553-6007"
     sendgrid_sender_email: colin@socialtheorymedia.com
+    twilio_phone: ""
+
+  - rep_id: "4ea127be-7494-4b8c-a603-4b99b209ab24"
+    name: Aric Jaklitsch
+    first_name: Aric
+    email: aj@moderndayroof.com
+    title: Sales
+    signature_phone: ""
+    sendgrid_sender_email: aj@moderndayroof.com
+    twilio_phone: ""
+
+  - rep_id: "TBD-chris-duncan"
+    name: Chris Duncan
+    first_name: Chris
+    email: chrisduncan@moderndayroof.com
+    title: Sales
+    signature_phone: ""
+    sendgrid_sender_email: chrisduncan@moderndayroof.com
+    twilio_phone: ""
+
+  - rep_id: "TBD-jake-perdue"
+    name: Jake Perdue
+    first_name: Jake
+    email: jakeperduemdr@gmail.com
+    title: Sales
+    signature_phone: ""
+    sendgrid_sender_email: jakeperduemdr@gmail.com
+    twilio_phone: ""
+
+  - rep_id: "TBD-joe-furrow"
+    name: Joe Furrow
+    first_name: Joe
+    email: joefurrow@moderndayroof.com
+    title: Sales
+    signature_phone: ""
+    sendgrid_sender_email: joefurrow@moderndayroof.com
+    twilio_phone: ""
+
+  - rep_id: "TBD-paul-vanwagoner"
+    name: Paul VanWagoner
+    first_name: Paul
+    email: paulvanwagoner@moderndayroof.com
+    title: Sales
+    signature_phone: ""
+    sendgrid_sender_email: paulvanwagoner@moderndayroof.com
+    twilio_phone: ""

@@ -62,11 +62,14 @@ def dispatch(
     to_email: Optional[str] = None,
     to_phone: Optional[str] = None,
     to_name: Optional[str] = None,
+    cc: Optional[list[str]] = None,
+    bcc: Optional[list[str]] = None,
     subject: Optional[str] = None,
     body_text: str,
     body_html: Optional[str] = None,
     from_email: Optional[str] = None,
     from_name: Optional[str] = None,
+    from_phone: Optional[str] = None,
     lead_id: Optional[str] = None,
     in_reply_to: Optional[str] = None,
     references: Optional[list[str]] = None,
@@ -104,6 +107,7 @@ def dispatch(
             )
         result: SendResult = send_email(
             to_email=to_email, to_name=to_name,
+            cc=cc, bcc=bcc,
             subject=subject or "(no subject)",
             body_text=body_text, body_html=body_html,
             from_email=from_email, from_name=from_name,
@@ -118,11 +122,33 @@ def dispatch(
         )
 
     if channel == "sms":
+        if not to_phone:
+            return DispatchResult(
+                channel="sms", sent=False, dry_run=False,
+                blocked_reason="missing to_phone", external_message_id=None,
+                rfc_message_id=None, status_code=None, error=None,
+            )
+        try:
+            from .twilio_sms import send_sms
+        except ImportError:
+            return DispatchResult(
+                channel="sms", sent=False, dry_run=False,
+                blocked_reason="twilio_sms module missing",
+                external_message_id=None, rfc_message_id=None,
+                status_code=None, error=None,
+            )
+        sms_result = send_sms(
+            to_phone=to_phone,
+            body=body_text,
+            from_phone=from_phone,
+            lead_id=lead_id,
+        )
         return DispatchResult(
-            channel="sms", sent=False, dry_run=False,
-            blocked_reason="SMS not implemented; awaiting Twilio A2P",
-            external_message_id=None, rfc_message_id=None,
-            status_code=None, error=None,
+            channel="sms", sent=sms_result.sent, dry_run=sms_result.dry_run,
+            blocked_reason=None,
+            external_message_id=sms_result.twilio_message_sid,
+            rfc_message_id=None,
+            status_code=sms_result.status_code, error=sms_result.error,
         )
 
     return DispatchResult(

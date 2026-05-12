@@ -78,8 +78,9 @@ async def inbound_email(request: Request) -> dict:
         await session.commit()
         log.info("Inbound persisted: msg_id=%s, lead %s paused", inbound_row.id, lead.id)
 
-    # Notify the rep via email
+    # Notify the rep via email, with Sierra on CC so she stays in the loop.
     rep = resolve_rep(lead.assigned_rep_id)
+    cc_targets = [settings.escalation_cc_email] if settings.escalation_cc_email else None
     body = (
         f"{lead.contact_name or 'Homeowner'} replied to your follow-up.\n\n"
         f"From: {payload.from_email}\n"
@@ -92,6 +93,7 @@ async def inbound_email(request: Request) -> dict:
         channel="email",
         to_email=rep.email,
         to_name=rep.name,
+        cc=cc_targets,
         subject=f"{lead.contact_name or 'Homeowner'} replied",
         body_text=body,
         from_email=settings.sendgrid_from_email,

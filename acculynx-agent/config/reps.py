@@ -39,6 +39,7 @@ class Rep:
     title: str
     signature_phone: str
     sendgrid_sender_email: str
+    twilio_phone: str = ""
 
     @property
     def display(self) -> str:
@@ -60,12 +61,13 @@ def _row_to_rep(row: dict) -> Rep:
         first_name=(row.get("first_name") or row.get("name", "").split()[0] if row.get("name") else "").strip(),
         email=row.get("email", "").strip(),
         title=row.get("title", "").strip(),
-        signature_phone=row.get("signature_phone", "540-553-6007").strip(),
+        signature_phone=(row.get("signature_phone") or "540-553-6007").strip(),
         sendgrid_sender_email=(
             row.get("sendgrid_sender_email")
             or row.get("email")
             or settings.sendgrid_from_email
         ).strip(),
+        twilio_phone=(row.get("twilio_phone") or "").strip(),
     )
 
 
@@ -101,6 +103,7 @@ def resolve_rep(acculynx_user_id: Optional[str] = None) -> Rep:
         title="",
         signature_phone="540-553-6007",
         sendgrid_sender_email=settings.sendgrid_from_email,
+        twilio_phone="",
     )
 
 

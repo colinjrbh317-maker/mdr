@@ -80,6 +80,20 @@ CRITICAL RULES:
 
 7. PERSONALIZATION. Reference ONE concrete detail from the rep's most recent CRM activity (rep notes / last email / agent context), e.g. "the metal vs. shingle options we walked through", "the Platinum Pledge we talked about". Do not invent details. If no concrete detail is available, keep the message generic but human.
 
+7a. REFERENCE THE LAST POINT OF CONTACT WITH SPECIFIC TIMING. Every draft MUST anchor to the most recent rep-to-homeowner touchpoint and name when it happened, using language like "after we sent the gold and silver options a couple weeks back", "since Paul left you a voicemail Tuesday", "from our walk-through last Thursday". Read the AGENT CONTEXT block — it contains dated rep notes and the body of recent rep emails/texts/comments pulled directly from AccuLynx. Pick the most recent meaningful event and name its approximate timing. If no timing data exists in context, OMIT the timing reference rather than inventing one ("when we last connected" is acceptable as a last resort). Drafts that fail to anchor to a real recent touchpoint when one is available will be rejected by postflight.
+
+7b. MDR ACRONYM GLOSSARY (for INTERPRETING the AGENT CONTEXT — never expose these acronyms to the homeowner). When the rep's notes use one of these shorthand tokens, translate it into plain prose in the homeowner-facing message:
+   - VM = voicemail (e.g. note "Left VM 5/12" → message "after my voicemail Monday")
+   - HO = homeowner (e.g. "HO wants FR" → "you mentioned wanting a full replacement")
+   - FR = full replacement
+   - RR = roof repair / repair only
+   - EST = estimate / proposal
+   - PP = Platinum Pledge (GAF warranty)
+   - GAF = GAF (the shingle manufacturer — keep the brand name)
+   - LSA = local services ads (internal only, never mention)
+   - ALC = Acculynx (internal only, never mention)
+   Treat any unknown abbreviation as if it were typed in full — pull intent from context, do not echo the acronym back.
+
 8. NO PLACEHOLDERS. Never leave brackets like [Name], [Position], [Coordinator], [current season], [Google Review Link], [rep]@moderndayroof.com in the output. Substitute every placeholder using the LEAD CONTEXT, REP, or BUSINESS FACTS blocks. If a value is missing, omit that line gracefully rather than emitting the bracket.
 
 9. NO emojis. NO ALL CAPS. No specific dollar pricing without approval. Never write the homeowner's full address.
@@ -149,10 +163,18 @@ def _build_user_prompt(
 
     if is_tight:
         length_directive = (
-            "TARGET LENGTH: 30 to 80 words. ONE ask. Read it out loud — "
+            "TARGET LENGTH: 30 to 80 words. ONE ask. Read it out loud, "
             "if it takes more than 25 seconds, cut it."
         )
-        signature_directive = f"""SIGNATURE (tight, on its own three lines, exactly this format, no asterisks):
+        # SMS (text channel) gets a single first name only, no phone, no company,
+        # because the homeowner already sees the rep's per-rep Twilio number and
+        # the opener identifies the company ("Hey Natalie, it's Chris from MDR...").
+        # Tight email-as-SMS replacements keep the 3-line block.
+        if channel == "text":
+            signature_directive = f"""SIGNATURE (SMS, exactly one line):
+{rep_first_name}"""
+        else:
+            signature_directive = f"""SIGNATURE (tight, on its own three lines, exactly this format, no asterisks):
 {rep_first_name}
 Modern Day Roofing
 {rep_phone}"""

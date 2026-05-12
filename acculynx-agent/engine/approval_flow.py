@@ -388,6 +388,9 @@ async def approve_and_send(message_id: int) -> dict:
             except Exception:
                 log.exception("thread continuity sender override skipped for %s", msg.lead_id)
 
+        rep_for_send = resolve_rep(getattr(lead, "assigned_rep_id", None) if lead else None)
+        from_phone = rep_for_send.twilio_phone or None
+
         send_result = dispatch(
             channel=msg.channel,
             to_email=msg.recipient_email,
@@ -397,6 +400,7 @@ async def approve_and_send(message_id: int) -> dict:
             body_text=body_to_send,
             from_email=from_email,
             from_name=from_name,
+            from_phone=from_phone,
             lead_id=msg.lead_id,
             in_reply_to=in_reply_to,
             references=references,

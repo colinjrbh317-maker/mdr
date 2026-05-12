@@ -16,6 +16,8 @@ from typing import Optional
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
+    Bcc,
+    Cc,
     Email,
     Header,
     Mail,
@@ -64,6 +66,8 @@ def send_email(
     body_text: str,
     body_html: Optional[str] = None,
     to_name: Optional[str] = None,
+    cc: Optional[list[str]] = None,
+    bcc: Optional[list[str]] = None,
     from_email: Optional[str] = None,
     from_name: Optional[str] = None,
     lead_id: Optional[str] = None,
@@ -117,6 +121,15 @@ def send_email(
     )
     mail.reply_to = ReplyTo(reply_to)
 
+    for cc_addr in cc or []:
+        cc_addr = (cc_addr or "").strip()
+        if cc_addr and cc_addr.lower() != to_email.lower():
+            mail.add_cc(Cc(cc_addr))
+    for bcc_addr in bcc or []:
+        bcc_addr = (bcc_addr or "").strip()
+        if bcc_addr and bcc_addr.lower() != to_email.lower():
+            mail.add_bcc(Bcc(bcc_addr))
+
     mail.add_header(Header("Message-ID", rfc_message_id))
     if in_reply_to:
         mail.add_header(Header("In-Reply-To", in_reply_to))
@@ -128,8 +141,8 @@ def send_email(
 
     if settings.dry_run:
         log.info(
-            "DRY_RUN: would send to=%s subject=%r from=%r reply_to=%s message_id=%s",
-            to_email, subject, f"{sender_name} <{sender}>", reply_to, rfc_message_id,
+            "DRY_RUN: would send to=%s cc=%s bcc=%s subject=%r from=%r reply_to=%s message_id=%s",
+            to_email, cc or [], bcc or [], subject, f"{sender_name} <{sender}>", reply_to, rfc_message_id,
         )
         return SendResult(
             sent=False, dry_run=True,

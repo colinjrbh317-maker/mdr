@@ -20,6 +20,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from sqlalchemy import select
 
 from ai.drafter import draft_message
+from config.reps import resolve_rep
 from config.settings import settings
 from db.database import async_session
 from db.models import Approval, Lead, MessageQueue
@@ -83,6 +84,7 @@ async def cadence_job() -> None:
                     log.info("postflight failed for %s: %s", lead_id, draft.get("postflight_reasons"))
                     continue
                 # Decide: autonomous or approval-gated?
+                rep = resolve_rep(getattr(lead, "assigned_rep_id", None))
                 if touch.get("autonomous_ok") and not is_business_hours():
                     # After-hours autonomous send: queue + dispatch immediately
                     result = await create_approval_request(
@@ -93,6 +95,7 @@ async def cadence_job() -> None:
                         cadence_name=entry["layer_name"],
                         touch_index=touch["touch_index"],
                         content_type=touch["content_type"],
+                        rep=rep,
                     )
                     # Auto-approve since touch.autonomous_ok and after-hours
                     await approve_and_send(result["message_id"])
@@ -106,6 +109,7 @@ async def cadence_job() -> None:
                         cadence_name=entry["layer_name"],
                         touch_index=touch["touch_index"],
                         content_type=touch["content_type"],
+                        rep=rep,
                     )
             except Exception:
                 log.exception("cadence_job entry failed for %s", entry.get("lead_id"))

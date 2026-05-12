@@ -104,8 +104,36 @@ class Settings(BaseSettings):
     escalation_email: str = ""
     jwt_secret: str = ""
 
+    # ── Escalation CC (Sierra, the office manager) ──
+    # CC'd on every inbound escalation email so she stays in the loop when a
+    # homeowner objects, asks about pricing, or otherwise needs a human rep.
+    # Per the 5/8 meeting, Austin chose this routing (rep TO, Sierra CC) over
+    # routing through sales@moderndayroof.com (which he said is "gummed up").
+    escalation_cc_email: str = "sierraduncanmdr@gmail.com"
+
+    # ── Auto-send-at-6pm and approval nudge cascade ──
+    # Reps have until 6pm ET on a business day to Approve / Edit / Skip a draft.
+    # At each of these minute marks in the 17:00 hour, an escalating reminder
+    # email goes out. At 18:00 ET the unsent draft auto-fires to the homeowner.
+    approval_nudge_minutes: list[int] = [0, 30, 45, 55]
+    auto_send_hour: int = 18
+    auto_send_minute: int = 0
+    # Flag for kill-switch in case Austin changes his mind in training. When
+    # false, 18:00 cron only logs which drafts WOULD have been sent.
+    auto_send_enabled: bool = True
+
+    # ── Inbound auto-reply (high-confidence objective questions) ──
+    inbound_auto_reply_min_confidence: float = 0.90
+    inbound_auto_reply_min_delay_seconds: int = 120
+    inbound_auto_reply_max_delay_seconds: int = 180
+
     # ── App URL (Railway/local) for magic links ──
     app_base_url: str = "http://localhost:8000"
+
+    # ── Rep portal URL (Next.js on Vercel) ──
+    # Magic-link emails redirect here; CORS allowlist on the backend.
+    portal_base_url: str = "https://app.moderndayroof.com"
+    portal_cors_origins: str = "https://app.moderndayroof.com,http://localhost:3000"
 
     # ── AccuLynx webhook receiver auth ──
     # Embedded as ?token=XXX in the consumerUrl we register with AccuLynx.
