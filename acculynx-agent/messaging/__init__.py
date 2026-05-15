@@ -70,6 +70,9 @@ def dispatch(
     lead_id: Optional[str] = None,
     in_reply_to: Optional[str] = None,
     references: Optional[list[str]] = None,
+    # SMS-specific args (ignored for email channel)
+    acculynx_job_id: Optional[str] = None,
+    acculynx_correspondent_id: Optional[str] = None,
 ) -> DispatchResult:
     """Route an outbound message to the right channel.
 
@@ -118,11 +121,70 @@ def dispatch(
         )
 
     if channel == "sms":
+        # Native AccuLynx SMS via internal v3 endpoint - messages thread into
+        # the rep's existing conversation with the homeowner and land in the
+        # Communications tab. Requires the bot session to have all 4 cookies
+        # (including cf_clearance + deviceThumbprint).
+        if settings.dry_run:
+            return DispatchResult(
+                channel="sms", sent=False, dry_run=True, blocked_reason=None,
+                external_message_id=None, rfc_message_id=None,
+                status_code=None, error=None,
+            )
+        if not to_phone:
+            return DispatchResult(
+                channel="sms", sent=False, dry_run=False,
+                blocked_reason="missing to_phone", external_message_id=None,
+                rfc_message_id=None, status_code=None, error=None,
+            )
+        if not acculynx_job_id or not acculynx_correspondent_id:
+            return DispatchResult(
+                channel="sms", sent=False, dry_run=False,
+                blocked_reason="missing acculynx_job_id or acculynx_correspondent_id",
+                external_message_id=None, rfc_message_id=None,
+                status_code=None, error=None,
+            )
+
+        from acculynx.send_text import send_text_sync
+        from acculynx.internal_api import post_comment_sync
+
+        result = send_text_sync(
+            job_id=acculynx_job_id,
+            correspondent_id=acculynx_correspondent_id,
+            phone=to_phone,
+            body_text=body_text,
+        )
+
+        # Success path
+        if result.sent:
+            log.info("SMS sent via AccuLynx v3 (job=%s msg=%s)",
+                     acculynx_job_id, result.message_id)
+            return DispatchResult(
+                channel="sms", sent=True, dry_run=False, blocked_reason=None,
+                external_message_id=result.message_id, rfc_message_id=None,
+                status_code=result.status_code, error=None,
+            )
+
+        # Failure path: ALWAYS land a Comment on the job so the rep sees the
+        # proposed text and can copy/paste it manually. Message must never be
+        # silently lost. The Comment is internal-only (homeowner won't see it).
+        log.warning(
+            "SMS send FAILED (job=%s, error=%s, status=%s) - falling back to Comment",
+            acculynx_job_id, result.error, result.status_code,
+        )
+        fallback_note = (
+            f"[AI Agent] DRAFT TEXT to {to_name or to_phone} — SEND FAILED "
+            f"(error: {result.error}). Please send manually via the Texts tab.\n\n"
+            f"Proposed body:\n{body_text}"
+        )
+        post_comment_sync(acculynx_job_id, fallback_note)
+
         return DispatchResult(
             channel="sms", sent=False, dry_run=False,
-            blocked_reason="SMS not implemented; awaiting Twilio A2P",
+            blocked_reason=f"v3_send_failed:{result.error}",
             external_message_id=None, rfc_message_id=None,
-            status_code=None, error=None,
+            status_code=result.status_code,
+            error=f"{result.error}; fallback Comment posted to job",
         )
 
     return DispatchResult(

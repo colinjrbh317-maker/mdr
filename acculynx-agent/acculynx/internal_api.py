@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import datetime, timezone
 from typing import Optional
 
 import httpx
@@ -162,11 +163,14 @@ async def fetch_messages_for_job(job_id: str) -> list[dict]:
     try:
         async with _client(referer_job_id=job_id) as c:
             r = await c.get(url)
-        if r.status_code == 401 or r.status_code == 403:
+        if r.status_code in (302, 401, 403):
+            # 302 = redirected to login page (cookies expired silently).
+            # 401/403 = explicit auth rejection.
             log.warning(
                 "internal_api: AccuLynx session cookies appear EXPIRED "
-                "(status=%s). Refresh ACCULYNX_SESSION_COOKIE in .env.",
+                "(status=%s, redirect=%s). Run: python scripts/refresh_cookies.py",
                 r.status_code,
+                r.headers.get("location", ""),
             )
             return []
         if r.status_code != 200:
@@ -285,6 +289,36 @@ async def get_thread_continuity_for_job(job_id: str) -> Optional[dict]:
     }
 
 
+def post_comment_sync(job_id: str, message: str) -> Optional[str]:
+    """Synchronous wrapper around post_comment for sync callers (the
+    messaging dispatcher). Same behavior, blocks instead of awaits.
+    """
+    if not is_configured() or not message or not message.strip():
+        return None
+    url = f"{INTERNAL_BASE}/jobs/{job_id}/messages"
+    body = {"Type": "Comment", "Message": message.strip()}
+    try:
+        with httpx.Client(
+            timeout=20,
+            cookies=_cookies(),
+            headers={
+                "Accept": "application/json, text/plain, */*",
+                "User-Agent": USER_AGENT,
+                "X-Device-Time-Zone": "America/New_York",
+                "Referer": f"https://my.acculynx.com/jobs/{job_id}/communications",
+            },
+            follow_redirects=False,
+        ) as c:
+            r = c.post(url, json=body)
+        if r.status_code == 200:
+            return r.text.strip().strip('"') or "ok"
+        log.warning("post_comment_sync: status %s on %s: %s", r.status_code, url, r.text[:200])
+        return None
+    except Exception as exc:
+        log.warning("post_comment_sync: failed for %s: %s", job_id, exc)
+        return None
+
+
 async def post_comment(job_id: str, message: str) -> Optional[str]:
     """Post an internal Comment to a job's Communications tab.
 
@@ -320,6 +354,131 @@ async def post_comment(job_id: str, message: str) -> Optional[str]:
         return None
 
 
+# Channel message types — these reach the homeowner's inbox/phone.
+# Only these count toward "last MDR outbound" for time anchors and the
+# 3-day quiet-period gate. Comments / notes / job-messages are INTERNAL
+# CRM artifacts the homeowner never saw and must not be treated as
+# something we "sent" to them.
+_CHANNEL_TYPE_HINTS = ("email", "text", "sms")
+_INTERNAL_NOTE_HINTS = ("comment", "note", "job message", "phone call", "call log", "task")
+_INBOUND_TYPE_HINTS = ("incoming", "inbound", "received", "reply from")
+
+
+def _parse_iso(s: Optional[str]) -> Optional[datetime]:
+    if not s:
+        return None
+    try:
+        return datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+    except Exception:
+        return None
+
+
+def _classify(m: dict) -> str:
+    """Return 'outbound' | 'inbound' | 'note' for a single AccuLynx message.
+
+    Rules (homeowner-visibility first):
+    - 'note' if Type matches an internal-note hint. Notes/comments/phone-call
+      logs are CRM artifacts the homeowner never saw — they must NEVER be
+      treated as outbound for time-anchor or quiet-period purposes.
+    - 'inbound' if Type matches an inbound hint (Incoming Email, Reply from…).
+    - 'outbound' if it's a channel message (email/text/sms) AND posted by an
+      MDR admin (is_admin_message true).
+    - 'note' as the conservative fallback when classification is ambiguous —
+      we'd rather LOSE a recency anchor than FABRICATE one.
+    """
+    t = (m.get("type") or "").lower()
+    if any(k in t for k in _INTERNAL_NOTE_HINTS):
+        return "note"
+    if any(k in t for k in _INBOUND_TYPE_HINTS):
+        return "inbound"
+    is_channel = any(k in t for k in _CHANNEL_TYPE_HINTS)
+    if is_channel and m.get("is_admin_message"):
+        return "outbound"
+    if is_channel and not m.get("is_admin_message"):
+        # Channel message NOT marked admin → likely homeowner reply
+        return "inbound"
+    return "note"
+
+
+def _is_outbound(m: dict) -> bool:
+    """Backwards-compatible: True only for channel-message outbounds the
+    homeowner actually received."""
+    return _classify(m) == "outbound"
+
+
+def summarize_recency(messages: list[dict]) -> dict:
+    """Compute last-comm timestamps + relative-day counts for the prompt + UI.
+
+    Returns:
+      {
+        "last_outbound_at":  ISO str | None,
+        "last_outbound_days_ago": int | None,
+        "last_outbound_weekday":  "Thursday" | None,
+        "last_outbound_date_str": "2026-05-04" | None,
+        "last_inbound_at":   ISO str | None,
+        "last_inbound_days_ago":  int | None,
+        "last_inbound_weekday":   "Monday" | None,
+        "last_inbound_date_str":  "2026-05-06" | None,
+        "days_since_last_comm":   int | None,   # min of inbound/outbound
+        "quiet_period_violated":  bool,         # True if days_since_last_comm < 3
+      }
+    Empty inputs → all None / False.
+    """
+    out = {
+        "last_outbound_at": None,
+        "last_outbound_days_ago": None,
+        "last_outbound_weekday": None,
+        "last_outbound_date_str": None,
+        "last_inbound_at": None,
+        "last_inbound_days_ago": None,
+        "last_inbound_weekday": None,
+        "last_inbound_date_str": None,
+        "days_since_last_comm": None,
+        "quiet_period_violated": False,
+    }
+    if not messages:
+        return out
+
+    now = datetime.now(timezone.utc)
+    last_out: Optional[datetime] = None
+    last_in: Optional[datetime] = None
+
+    for m in messages:
+        when = _parse_iso(m.get("created_date"))
+        if not when:
+            continue
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+        cls = _classify(m)
+        # Internal notes / phone-call logs / comments are NOT homeowner-visible
+        # comms — they don't anchor "estimate sent Sunday" claims and they
+        # don't trigger the quiet-period gate. Only channel emails/texts count.
+        if cls == "outbound":
+            if last_out is None or when > last_out:
+                last_out = when
+        elif cls == "inbound":
+            if last_in is None or when > last_in:
+                last_in = when
+
+    def _fill(prefix: str, dt: Optional[datetime]) -> None:
+        if not dt:
+            return
+        out[f"{prefix}_at"] = dt.isoformat()
+        out[f"{prefix}_days_ago"] = (now.date() - dt.date()).days
+        out[f"{prefix}_weekday"] = dt.strftime("%A")
+        out[f"{prefix}_date_str"] = dt.strftime("%Y-%m-%d")
+
+    _fill("last_outbound", last_out)
+    _fill("last_inbound", last_in)
+
+    candidates = [d for d in (out["last_outbound_days_ago"], out["last_inbound_days_ago"]) if d is not None]
+    if candidates:
+        days = min(candidates)
+        out["days_since_last_comm"] = days
+        out["quiet_period_violated"] = days < 3
+    return out
+
+
 def format_messages_for_context(
     messages: list[dict],
     *,
@@ -330,14 +489,39 @@ def format_messages_for_context(
 
     Most recent first, capped at max_messages. Each message body capped
     at max_chars_per_message so a single 5,000-char email doesn't blow the
-    prompt budget."""
+    prompt budget. Each entry includes (Nd ago, weekday) so the AI can
+    refer to dates the way a human rep would ("the estimate I sent
+    Thursday" only when Thursday actually was the send date).
+    """
     if not messages:
         return ""
-    lines = ["RECENT COMMUNICATIONS (newest first, from AccuLynx Communications tab):"]
+
+    now = datetime.now(timezone.utc)
+    today_str = now.strftime("%A %Y-%m-%d")
+    lines = [
+        f"RECENT ACTIVITY (newest first, from AccuLynx; today is {today_str}).",
+        "Direction key:",
+        "  OUT  = email or text MDR actually sent to the homeowner (homeowner saw it)",
+        "  IN   = email or text the homeowner sent to MDR",
+        "  NOTE = internal CRM note / phone-call log / comment — homeowner did NOT see this. "
+        "Use NOTE entries for situational context only. NEVER reference a NOTE as if you sent the homeowner anything on that day.",
+    ]
     for m in messages[:max_messages]:
-        when = (m.get("created_date") or "")[:10]
+        when_dt = _parse_iso(m.get("created_date"))
+        if when_dt and when_dt.tzinfo is None:
+            when_dt = when_dt.replace(tzinfo=timezone.utc)
+        if when_dt:
+            days_ago = (now.date() - when_dt.date()).days
+            weekday = when_dt.strftime("%A")
+            date_str = when_dt.strftime("%Y-%m-%d")
+            stamp = f"{date_str} ({weekday}, {days_ago}d ago)"
+        else:
+            stamp = (m.get("created_date") or "")[:10] or "unknown date"
+
         who = m.get("created_by") or "Unknown"
         msg_type = m.get("type") or "Note"
+        cls = _classify(m)
+        direction = {"outbound": "OUT", "inbound": "IN", "note": "NOTE"}.get(cls, "NOTE")
         body = (m.get("body_text") or "").strip()
         if len(body) > max_chars_per_message:
             body = body[:max_chars_per_message - 3] + "..."
@@ -345,6 +529,6 @@ def format_messages_for_context(
             continue
         subject = m.get("subject")
         subj_line = f" — Subject: {subject}" if subject else ""
-        lines.append(f"  [{when}] {msg_type} by {who}{subj_line}")
+        lines.append(f"  [{stamp}] {direction} {msg_type} by {who}{subj_line}")
         lines.append(f"      {body}")
     return "\n".join(lines)

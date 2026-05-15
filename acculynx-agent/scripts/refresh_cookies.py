@@ -48,18 +48,85 @@ ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 ENV_KEY = "ACCULYNX_SESSION_COOKIE"
 
 
+PROFILE_DIR = Path(__file__).resolve().parent.parent / ".chrome_profile"
+
+
 async def login_and_capture(*, email: str, password: str, headless: bool = True) -> dict:
+    """Login flow using a PERSISTENT Chrome profile.
+
+    Why persistent: Cloudflare's cf_clearance and AccuLynx's deviceThumbprint
+    are only set when Cloudflare actually CHALLENGES the request (JS proof of
+    work). A pure-headless Playwright session looks too clean and skips the
+    challenge -> no clearance cookie -> v3 send endpoint 401s. The fix: keep a
+    long-lived Chrome profile on disk. First run (--headed, manual login if
+    needed) earns the cookies; subsequent headless runs reuse the profile
+    and refresh just the .ASPXAUTH ticket via re-login.
+
+    Falls back to ephemeral context when the persistent profile is locked
+    (e.g. another instance is already running).
+    """
+    use_persistent = PROFILE_DIR.exists() or not headless
+    PROFILE_DIR.mkdir(parents=True, exist_ok=True)
+
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=headless)
-        context = await browser.new_context(
-            user_agent=(
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/147.0.0.0 Safari/537.36"
-            ),
-            viewport={"width": 1280, "height": 800},
+        common_args = [
+            "--disable-blink-features=AutomationControlled",
+            "--disable-features=IsolateOrigins,site-per-process",
+            "--no-sandbox",
+        ]
+        user_agent = (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/147.0.0.0 Safari/537.36"
+        )
+
+        if use_persistent:
+            context = await p.chromium.launch_persistent_context(
+                user_data_dir=str(PROFILE_DIR),
+                headless=headless,
+                args=common_args,
+                user_agent=user_agent,
+                viewport={"width": 1280, "height": 800},
+                locale="en-US",
+                timezone_id="America/New_York",
+            )
+            browser = None  # persistent context manages its own browser
+        else:
+            browser = await p.chromium.launch(headless=headless, args=common_args)
+            context = await browser.new_context(
+                user_agent=user_agent,
+                viewport={"width": 1280, "height": 800},
+                locale="en-US",
+                timezone_id="America/New_York",
+            )
+        await context.add_init_script(
+            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
         )
         page = await context.new_page()
+
+        # First visit the homepage (not the login form) so Cloudflare gets
+        # the chance to challenge a fresh session before any form interaction.
+        # On a persistent profile with valid cookies this just no-ops.
+        try:
+            await page.goto("https://my.acculynx.com/", wait_until="domcontentloaded", timeout=30000)
+            await page.wait_for_timeout(2000)
+        except Exception:
+            pass
+
+        # Detect: are we already logged in from a previous persistent session?
+        # If so, skip the credential dance entirely.
+        try:
+            if "/jobs" in page.url or "/dashboard" in page.url or (
+                "/signin" not in page.url and "/login" not in page.url and "my.acculynx.com" in page.url
+            ):
+                # Try to navigate somewhere protected; if it sticks, we're in.
+                test_url = "https://my.acculynx.com/dashboard"
+                await page.goto(test_url, wait_until="domcontentloaded", timeout=15000)
+                if "/signin" not in page.url and "/login" not in page.url:
+                    print("Persistent session still valid - skipping credential entry")
+                    return await _capture_cookies_after_warmup(page, context, browser)
+        except Exception:
+            pass
 
         await page.goto(LOGIN_URL, wait_until="domcontentloaded")
 
@@ -90,14 +157,14 @@ async def login_and_capture(*, email: str, password: str, headless: bool = True)
 
         email_input = await first_visible(email_selector_candidates)
         if not email_input:
-            await browser.close()
+            await (browser.close() if browser else context.close())
             raise RuntimeError("Could not find email input on login page")
 
         await email_input.fill(email)
 
         password_input = await first_visible(password_selector_candidates)
         if not password_input:
-            await browser.close()
+            await (browser.close() if browser else context.close())
             raise RuntimeError("Could not find password input on login page")
 
         await password_input.fill(password)
@@ -126,22 +193,57 @@ async def login_and_capture(*, email: str, password: str, headless: bool = True)
         # Wait for navigation away from /login (success signal)
         try:
             await page.wait_for_url(
-                lambda url: POST_LOGIN_DETECT in url and "/login" not in url,
+                lambda url: POST_LOGIN_DETECT in url and "/login" not in url and "/signin" not in url,
                 timeout=30000,
             )
         except Exception:
-            await browser.close()
+            await (browser.close() if browser else context.close())
             raise RuntimeError("Login did not complete (still on login page after submit). 2FA, CAPTCHA, or wrong creds.")
 
-        # Pull cookies
-        all_cookies = await context.cookies()
-        captured = {c["name"]: c["value"] for c in all_cookies if c["name"] in COOKIES_TO_CAPTURE}
-        await browser.close()
+        return await _capture_cookies_after_warmup(page, context, browser)
 
-        missing = [n for n in COOKIES_TO_CAPTURE if n not in captured]
-        if ".ASPXAUTH" not in captured or "ASP.NET_SessionId" not in captured:
-            raise RuntimeError(f"Login appeared to succeed but core auth cookies missing: {missing}")
-        return captured
+
+async def _capture_cookies_after_warmup(page, context, browser) -> dict:
+    """Visit a real job page so AccuLynx JS sets deviceThumbprint, then
+    return the 4 cookies we care about. Used by both the fresh-login and
+    persistent-session paths."""
+    warmup_job_id = os.environ.get(
+        "ACCULYNX_WARMUP_JOB_ID",
+        "b54f39d8-ba98-4a79-97df-1112ab3a3ca8",  # TEST TEST - safe target
+    )
+    try:
+        await page.goto(
+            f"https://my.acculynx.com/jobs/{warmup_job_id}/communications",
+            wait_until="networkidle",
+            timeout=30000,
+        )
+        await page.wait_for_timeout(2500)
+    except Exception as exc:
+        print(f"WARN: warmup navigation failed: {exc}", file=sys.stderr)
+
+    all_cookies = await context.cookies()
+    captured = {c["name"]: c["value"] for c in all_cookies if c["name"] in COOKIES_TO_CAPTURE}
+    if browser is not None:
+        await browser.close()
+    else:
+        await context.close()
+
+    # Hard requirement: core auth cookies. cf_clearance + deviceThumbprint
+    # are recoverable; warn but don't crash so email/comment paths still
+    # work, just SMS will fail until those are populated.
+    missing = [n for n in COOKIES_TO_CAPTURE if n not in captured]
+    if ".ASPXAUTH" not in captured or "ASP.NET_SessionId" not in captured:
+        raise RuntimeError(f"Login succeeded but core auth cookies missing: {missing}")
+    if missing:
+        print(
+            f"WARN: Captured only {sorted(captured.keys())}; missing {missing}. "
+            "SMS send (v3 endpoint) will 401 until these are populated. "
+            "First-time setup: run with --headed and log in manually; the "
+            "persistent profile at .chrome_profile/ will then carry the "
+            "Cloudflare clearance for subsequent headless runs.",
+            file=sys.stderr,
+        )
+    return captured
 
 
 def write_env(cookies: dict) -> None:
