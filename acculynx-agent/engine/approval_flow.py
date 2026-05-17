@@ -388,8 +388,33 @@ async def approve_and_send(message_id: int) -> dict:
             except Exception:
                 log.exception("thread continuity sender override skipped for %s", msg.lead_id)
 
+        # ── SMS rep-impersonation routing ──
+        # For SMS, pull the rep tied to lead.assigned_rep_id, resolve their
+        # acculynx_profile_slug, and look up the contact's CorrespondentID
+        # at send time (we don't store it locally). Dispatcher uses
+        # rep_slug to pick the right session cookies so the text comes
+        # from the rep's own AccuLynx phone number.
+        sms_rep_slug = None
+        sms_rep_name = None
+        sms_correspondent_id = None
+        if msg.channel in ("sms", "text"):
+            try:
+                from config.reps import resolve_rep
+                from acculynx.internal_api import get_sms_correspondent_id_sync
+                rep_for_sms = resolve_rep(lead.assigned_rep_id if lead else None)
+                sms_rep_slug = rep_for_sms.acculynx_profile_slug or None
+                sms_rep_name = rep_for_sms.name
+                if msg.recipient_phone:
+                    sms_correspondent_id = get_sms_correspondent_id_sync(
+                        job_id=msg.lead_id,
+                        phone=msg.recipient_phone,
+                        rep_slug=sms_rep_slug,
+                    )
+            except Exception:
+                log.exception("SMS rep/correspondent resolution failed for %s", msg.lead_id)
+
         send_result = dispatch(
-            channel=msg.channel,
+            channel="sms" if msg.channel in ("sms", "text") else msg.channel,
             to_email=msg.recipient_email,
             to_phone=msg.recipient_phone,
             to_name=lead.contact_name if lead else None,
@@ -400,6 +425,10 @@ async def approve_and_send(message_id: int) -> dict:
             lead_id=msg.lead_id,
             in_reply_to=in_reply_to,
             references=references,
+            acculynx_job_id=msg.lead_id if msg.channel in ("sms", "text") else None,
+            acculynx_correspondent_id=sms_correspondent_id,
+            rep_slug=sms_rep_slug,
+            rep_name=sms_rep_name,
         )
 
         if send_result.sent or send_result.dry_run:

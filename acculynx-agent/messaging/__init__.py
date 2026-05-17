@@ -73,6 +73,8 @@ def dispatch(
     # SMS-specific args (ignored for email channel)
     acculynx_job_id: Optional[str] = None,
     acculynx_correspondent_id: Optional[str] = None,
+    rep_slug: Optional[str] = None,
+    rep_name: Optional[str] = None,
 ) -> DispatchResult:
     """Route an outbound message to the right channel.
 
@@ -121,10 +123,12 @@ def dispatch(
         )
 
     if channel == "sms":
-        # Native AccuLynx SMS via internal v3 endpoint - messages thread into
-        # the rep's existing conversation with the homeowner and land in the
-        # Communications tab. Requires the bot session to have all 4 cookies
-        # (including cf_clearance + deviceThumbprint).
+        # Native AccuLynx SMS via internal v3 endpoint. Sent through the rep's
+        # OWN session so the homeowner sees the rep's real AccuLynx number and
+        # the message threads into the existing conversation. Falls back to
+        # the bot account if the rep has no session. ANY failure posts a
+        # Comment so the rep sees the proposed text + emails Colin so he can
+        # remediate before more leads are affected.
         if settings.dry_run:
             return DispatchResult(
                 channel="sms", sent=False, dry_run=True, blocked_reason=None,
@@ -137,54 +141,136 @@ def dispatch(
                 blocked_reason="missing to_phone", external_message_id=None,
                 rfc_message_id=None, status_code=None, error=None,
             )
-        if not acculynx_job_id or not acculynx_correspondent_id:
-            return DispatchResult(
-                channel="sms", sent=False, dry_run=False,
-                blocked_reason="missing acculynx_job_id or acculynx_correspondent_id",
-                external_message_id=None, rfc_message_id=None,
-                status_code=None, error=None,
-            )
 
         from acculynx.send_text import send_text_sync
         from acculynx.internal_api import post_comment_sync
+        from acculynx.opt_in_check import check_opt_in_sync
+        from messaging.sms_alerts import alert_sms_failure, log_sms_success
+
+        # Block-with-fallback when we can't resolve the AccuLynx routing keys.
+        # We post a Comment so the rep still sees the draft + email Colin so
+        # he knows the resolution path is broken.
+        if not acculynx_job_id or not acculynx_correspondent_id:
+            missing_what = "job_id" if not acculynx_job_id else "correspondent_id"
+            fallback_note = (
+                f"[AI Agent] DRAFT TEXT to {to_name or to_phone} — NOT SENT "
+                f"(missing AccuLynx {missing_what}; agent couldn't resolve the contact). "
+                f"Please send manually via the Texts tab.\n\nProposed body:\n{body_text}"
+            )
+            if acculynx_job_id:
+                try:
+                    post_comment_sync(acculynx_job_id, fallback_note)
+                except Exception:
+                    log.exception("Comment fallback failed on missing correspondent")
+            try:
+                from acculynx.send_text import TextSendResult as _TSR
+                stub = _TSR(False, None, None, None, f"missing_{missing_what}", None, rep_slug or "")
+                alert_sms_failure(
+                    job_id=acculynx_job_id or "?", rep_slug=rep_slug or "",
+                    rep_name=rep_name, to_phone=to_phone, to_name=to_name,
+                    body_text=body_text, result=stub,
+                    fallback_comment_posted=bool(acculynx_job_id),
+                )
+            except Exception:
+                log.exception("alert_sms_failure raised on missing routing keys")
+            return DispatchResult(
+                channel="sms", sent=False, dry_run=False,
+                blocked_reason=f"missing_{missing_what}",
+                external_message_id=None, rfc_message_id=None,
+                status_code=None, error=f"missing_{missing_what}; fallback Comment posted",
+            )
+
+        # Pre-flight: SMS opt-in. Fail-safe (unknown → allow).
+        opt_in = check_opt_in_sync(
+            job_id=acculynx_job_id,
+            correspondent_id=acculynx_correspondent_id,
+            phone=to_phone,
+            rep_slug=rep_slug,
+        )
+        if not opt_in.can_send:
+            log.warning(
+                "SMS BLOCKED (opt-in off) job=%s contact=%s: %s",
+                acculynx_job_id, acculynx_correspondent_id, opt_in.detail,
+            )
+            fallback_note = (
+                f"[AI Agent] DRAFT TEXT to {to_name or to_phone} — NOT SENT "
+                f"(contact has SMS opt-in OFF). To send: enable opt-in in AccuLynx "
+                f"then approve again, or send manually.\n\nProposed body:\n{body_text}"
+            )
+            try:
+                post_comment_sync(acculynx_job_id, fallback_note)
+            except Exception:
+                log.exception("Comment fallback failed on opt-in block")
+            return DispatchResult(
+                channel="sms", sent=False, dry_run=False,
+                blocked_reason="opt_in_off",
+                external_message_id=None, rfc_message_id=None,
+                status_code=None, error="opt_in_off; fallback Comment posted",
+            )
 
         result = send_text_sync(
             job_id=acculynx_job_id,
             correspondent_id=acculynx_correspondent_id,
             phone=to_phone,
             body_text=body_text,
+            rep_slug=rep_slug,
         )
 
-        # Success path
         if result.sent:
-            log.info("SMS sent via AccuLynx v3 (job=%s msg=%s)",
-                     acculynx_job_id, result.message_id)
+            log.info(
+                "SMS sent (job=%s sender=%s msg=%s)",
+                acculynx_job_id, result.sender_slug, result.message_id,
+            )
+            try:
+                log_sms_success(
+                    job_id=acculynx_job_id, rep_slug=result.sender_slug,
+                    to_phone=to_phone, message_id=result.message_id,
+                )
+            except Exception:
+                log.exception("log_sms_success failed (non-fatal)")
             return DispatchResult(
                 channel="sms", sent=True, dry_run=False, blocked_reason=None,
                 external_message_id=result.message_id, rfc_message_id=None,
                 status_code=result.status_code, error=None,
             )
 
-        # Failure path: ALWAYS land a Comment on the job so the rep sees the
-        # proposed text and can copy/paste it manually. Message must never be
-        # silently lost. The Comment is internal-only (homeowner won't see it).
+        # Failure path: post Comment fallback + alert Colin via email.
         log.warning(
-            "SMS send FAILED (job=%s, error=%s, status=%s) - falling back to Comment",
-            acculynx_job_id, result.error, result.status_code,
+            "SMS send FAILED (job=%s sender=%s error=%s status=%s) - falling back to Comment + alerting",
+            acculynx_job_id, result.sender_slug, result.error, result.status_code,
         )
         fallback_note = (
             f"[AI Agent] DRAFT TEXT to {to_name or to_phone} — SEND FAILED "
             f"(error: {result.error}). Please send manually via the Texts tab.\n\n"
             f"Proposed body:\n{body_text}"
         )
-        post_comment_sync(acculynx_job_id, fallback_note)
+        comment_posted = False
+        try:
+            post_comment_sync(acculynx_job_id, fallback_note)
+            comment_posted = True
+        except Exception:
+            log.exception("Comment fallback failed on SMS error")
+
+        try:
+            alert_sms_failure(
+                job_id=acculynx_job_id,
+                rep_slug=result.sender_slug or (rep_slug or ""),
+                rep_name=rep_name,
+                to_phone=to_phone,
+                to_name=to_name,
+                body_text=body_text,
+                result=result,
+                fallback_comment_posted=comment_posted,
+            )
+        except Exception:
+            log.exception("alert_sms_failure raised (non-fatal)")
 
         return DispatchResult(
             channel="sms", sent=False, dry_run=False,
             blocked_reason=f"v3_send_failed:{result.error}",
             external_message_id=None, rfc_message_id=None,
             status_code=result.status_code,
-            error=f"{result.error}; fallback Comment posted to job",
+            error=f"{result.error}; fallback Comment {'posted' if comment_posted else 'FAILED'}",
         )
 
     return DispatchResult(

@@ -10,6 +10,12 @@
 #      (Run: python scripts/inspect_rep_link.py to see all 16 users)
 #   4. Set SOLO_SENDER_MODE=false in .env
 #
+# Per-rep SMS impersonation (added 2026-05-17):
+#   acculynx_login_email + acculynx_profile_slug enable sending SMS via the
+#   rep's OWN AccuLynx session so the homeowner sees the rep's real number.
+#   The slug maps to acculynx/sessions/{slug}.json which holds 4 cookies.
+#   Seed each rep by running: python scripts/refresh_cookies.py --rep <slug> --headed
+#
 # AccuLynx user IDs already discovered (from /users):
 #   alexbohm@moderndayroof.com         → 0bb3a2a5-49fc-4f6d-8d89-a8c56855fc93 (CompanyAdmin)
 #   aliciaumberto@moderndayroof.com    → ecae74b2-a28d-4775-9c80-0851e6010ddb (LocationAdmin)
@@ -17,6 +23,14 @@
 #   austin@moderndayroof.com (Austin Hungate) → 88887648-9d02-4ece-ab42-56c0d64d07bc
 
 default_rep_email: colin@socialtheorymedia.com
+
+# The bot account that owns SMS sends when a lead has no assigned rep, or
+# when the assigned rep's session is unhealthy. This account must have
+# Calls & Texts permission + a provisioned AccuLynx phone number.
+bot_account:
+  acculynx_login_email: mdrai.acculynx@moderndayroof.com  # placeholder; update with actual login
+  acculynx_profile_slug: mdrai-acculynx
+  display_name: Modern Day Roofing AI Assistant
 
 reps:
   - rep_id: "*"
@@ -26,3 +40,39 @@ reps:
     title: Account Manager
     signature_phone: "540-553-6007"
     sendgrid_sender_email: colin@socialtheorymedia.com
+    # SMS impersonation. Empty acculynx_profile_slug = SMS falls back to bot.
+    acculynx_login_email: ""
+    acculynx_profile_slug: ""
+
+  # Pre-seeded entries for known reps (still inactive until solo_sender_mode=false).
+  # Fill acculynx_login_email + slug, then run:
+  #     python scripts/refresh_cookies.py --rep <slug> --headed
+  - rep_id: "88887648-9d02-4ece-ab42-56c0d64d07bc"
+    name: Austin Hungate
+    first_name: Austin
+    email: austin@moderndayroof.com
+    title: Sales Manager
+    signature_phone: "540-553-6007"
+    sendgrid_sender_email: austin@moderndayroof.com
+    acculynx_login_email: austin@moderndayroof.com
+    acculynx_profile_slug: austin
+
+  - rep_id: "4ea127be-7494-4b8c-a603-4b99b209ab24"
+    name: AJ
+    first_name: AJ
+    email: aj@moderndayroof.com
+    title: Sales
+    signature_phone: "540-553-6007"
+    sendgrid_sender_email: aj@moderndayroof.com
+    acculynx_login_email: aj@moderndayroof.com
+    acculynx_profile_slug: aj
+
+  - rep_id: "0bb3a2a5-49fc-4f6d-8d89-a8c56855fc93"
+    name: Alex Bohm
+    first_name: Alex
+    email: alexbohm@moderndayroof.com
+    title: Company Admin
+    signature_phone: "540-553-6007"
+    sendgrid_sender_email: alexbohm@moderndayroof.com
+    acculynx_login_email: alexbohm@moderndayroof.com
+    acculynx_profile_slug: alexbohm

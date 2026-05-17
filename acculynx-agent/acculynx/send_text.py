@@ -28,6 +28,7 @@ from typing import Optional
 import httpx
 
 from .internal_api import _cookies, USER_AGENT, is_configured
+from .rep_sessions import cookies_for_rep, REQUIRED_COOKIES, RECOMMENDED_COOKIES
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +43,28 @@ class TextSendResult:
     status_code: Optional[int]
     error: Optional[str]
     raw_response: Optional[str]
+    # The rep slug whose cookies were actually used to send (or
+    # BOT_FALLBACK_SLUG if we fell back, or "" if no usable session).
+    sender_slug: str = ""
+
+
+def _resolve_cookies(rep_slug: Optional[str]) -> tuple[dict[str, str], str]:
+    """Pick the right cookie set for an outbound text.
+
+    Priority: 1) the rep's own session  2) the bot fallback session
+              3) the legacy ACCULYNX_SESSION_COOKIE env blob (back-compat).
+    Returns (cookies_dict, effective_slug). When all sources are empty,
+    returns ({}, "").
+    """
+    cookies, effective_slug = cookies_for_rep(rep_slug, allow_fallback=True)
+    if cookies:
+        return cookies, effective_slug
+    # Legacy env-var path (pre-multitenant). Keep it working for now so the
+    # bot account's cookies pasted into .env still send while we transition.
+    legacy = _cookies()
+    if legacy and all(legacy.get(c) for c in REQUIRED_COOKIES):
+        return legacy, "legacy-env"
+    return {}, ""
 
 
 def _build_headers(job_id: str) -> dict[str, str]:
@@ -91,7 +114,7 @@ def _build_payload(job_id: str, correspondent_id: str, phone: str, body_text: st
     }
 
 
-def _parse_response(r: httpx.Response) -> TextSendResult:
+def _parse_response(r: httpx.Response, sender_slug: str = "") -> TextSendResult:
     """Classify the response into a TextSendResult."""
     status = r.status_code
     body = r.text[:1000]
@@ -99,15 +122,16 @@ def _parse_response(r: httpx.Response) -> TextSendResult:
     if status in (302, 401, 403):
         log.warning(
             "send_text: AUTH FAILED (%s) - cookies likely missing cf_clearance/"
-            "deviceThumbprint or expired. Run scripts/refresh_cookies.py.", status,
+            "deviceThumbprint or expired. Run scripts/refresh_cookies.py --rep %s.",
+            status, sender_slug or "<slug>",
         )
-        return TextSendResult(False, None, None, status, "auth", body)
+        return TextSendResult(False, None, None, status, "auth", body, sender_slug)
 
     if status == 500:
-        return TextSendResult(False, None, None, status, "server_500", body)
+        return TextSendResult(False, None, None, status, "server_500", body, sender_slug)
 
     if status not in (200, 201, 204):
-        return TextSendResult(False, None, None, status, f"unexpected:{status}", body)
+        return TextSendResult(False, None, None, status, f"unexpected:{status}", body, sender_slug)
 
     # 200 - the v3 endpoint returns a JSON array containing one record with
     # TextMessageID, Sender, Recipient, etc. Older variants return a bare
@@ -133,11 +157,12 @@ def _parse_response(r: httpx.Response) -> TextSendResult:
     # AccuLynx returns "00000000-..." when input is syntactically valid but
     # semantically rejected (wrong Type, missing field). Treat as failure.
     if new_msg_id and new_msg_id.replace("-", "").strip("0") == "":
-        return TextSendResult(False, None, None, status, "null_guid_schema_reject", body)
+        return TextSendResult(False, None, None, status, "null_guid_schema_reject", body, sender_slug)
 
     return TextSendResult(
         sent=True, delivered=None, message_id=new_msg_id,
         status_code=status, error=None, raw_response=body,
+        sender_slug=sender_slug,
     )
 
 
@@ -147,36 +172,42 @@ def send_text_sync(
     correspondent_id: str,
     phone: str,
     body_text: str,
+    rep_slug: Optional[str] = None,
 ) -> TextSendResult:
     """Synchronous send. Used by messaging.dispatch().
+
+    `rep_slug` selects which rep's cookies (and therefore which AccuLynx
+    phone number) the text is sent from. Falls back to the bot account if
+    the rep's session is missing/degraded.
 
     Returns TextSendResult; never raises. On auth failure (401/403) the
     dispatcher should fall back to posting an internal Comment so the rep
     sees the message and can send it manually.
     """
-    if not is_configured():
-        return TextSendResult(False, None, None, None, "cookies_not_configured", None)
     if not body_text or not body_text.strip():
         return TextSendResult(False, None, None, None, "empty_body", None)
     if not correspondent_id or not phone:
         return TextSendResult(False, None, None, None, "missing_recipient", None)
+
+    cookies, sender_slug = _resolve_cookies(rep_slug)
+    if not cookies:
+        return TextSendResult(False, None, None, None, "cookies_not_configured", None, "")
 
     url = f"{V3_BASE}/message-board/{job_id}/text-message"
     payload = _build_payload(job_id, correspondent_id, phone, body_text)
 
     try:
         with httpx.Client(
-            timeout=30,
-            cookies=_cookies(),
+            timeout=30, cookies=cookies,
             headers=_build_headers(job_id),
             follow_redirects=False,
         ) as c:
             r = c.post(url, json=payload)
     except Exception as exc:
         log.warning("send_text_sync: network error for job %s: %s", job_id, exc)
-        return TextSendResult(False, None, None, None, f"network:{exc}", None)
+        return TextSendResult(False, None, None, None, f"network:{exc}", None, sender_slug)
 
-    return _parse_response(r)
+    return _parse_response(r, sender_slug=sender_slug)
 
 
 async def send_text(
@@ -185,28 +216,30 @@ async def send_text(
     correspondent_id: str,
     phone: str,
     body_text: str,
+    rep_slug: Optional[str] = None,
 ) -> TextSendResult:
     """Async variant for callers already inside an event loop."""
-    if not is_configured():
-        return TextSendResult(False, None, None, None, "cookies_not_configured", None)
     if not body_text or not body_text.strip():
         return TextSendResult(False, None, None, None, "empty_body", None)
     if not correspondent_id or not phone:
         return TextSendResult(False, None, None, None, "missing_recipient", None)
+
+    cookies, sender_slug = _resolve_cookies(rep_slug)
+    if not cookies:
+        return TextSendResult(False, None, None, None, "cookies_not_configured", None, "")
 
     url = f"{V3_BASE}/message-board/{job_id}/text-message"
     payload = _build_payload(job_id, correspondent_id, phone, body_text)
 
     try:
         async with httpx.AsyncClient(
-            timeout=30,
-            cookies=_cookies(),
+            timeout=30, cookies=cookies,
             headers=_build_headers(job_id),
             follow_redirects=False,
         ) as c:
             r = await c.post(url, json=payload)
     except Exception as exc:
         log.warning("send_text: network error for job %s: %s", job_id, exc)
-        return TextSendResult(False, None, None, None, f"network:{exc}", None)
+        return TextSendResult(False, None, None, None, f"network:{exc}", None, sender_slug)
 
-    return _parse_response(r)
+    return _parse_response(r, sender_slug=sender_slug)

@@ -532,3 +532,86 @@ def format_messages_for_context(
         lines.append(f"  [{stamp}] {direction} {msg_type} by {who}{subj_line}")
         lines.append(f"      {body}")
     return "\n".join(lines)
+
+
+# =====================================================================
+# Correspondent lookup for SMS sends
+# =====================================================================
+import re as _re_corr
+
+
+def _normalize_phone(phone: str) -> str:
+    """Strip all non-digits + drop leading 1 (US country code)."""
+    digits = _re_corr.sub(r"\D", "", phone or "")
+    if len(digits) == 11 and digits.startswith("1"):
+        digits = digits[1:]
+    return digits
+
+
+_CORR_CANDIDATE_PATHS = (
+    "/jobs/{job_id}/correspondents",
+    "/jobs/{job_id}/contacts",
+    "/jobs/{job_id}/communications/contacts",
+)
+
+_CORR_ID_KEYS = ("Id", "CorrespondentId", "CorrespondentID", "ContactId", "ContactID")
+_CORR_PHONE_KEYS = ("Phone", "PhoneNumber", "Value", "MobilePhone", "MobileNumber", "Number")
+
+
+def get_sms_correspondent_id_sync(*, job_id: str, phone: str, rep_slug: Optional[str] = None) -> Optional[str]:
+    """Fetch the CorrespondentID for the contact on this job matching `phone`.
+
+    Returns None if not found (allows graceful fallback in the dispatcher).
+    Never raises. Tries each candidate v4 endpoint until one returns 200.
+    Matches on normalized US digits-only phone.
+    """
+    from .rep_sessions import cookies_for_rep
+    cookies, _ = cookies_for_rep(rep_slug, allow_fallback=True)
+    if not cookies:
+        cookies = _cookies()  # legacy env-var fallback
+    if not cookies:
+        return None
+
+    target = _normalize_phone(phone)
+    if not target:
+        return None
+
+    headers = {
+        "Accept": "application/json, text/plain, */*",
+        "User-Agent": USER_AGENT,
+        "Origin": "https://my.acculynx.com",
+        "Referer": f"https://my.acculynx.com/jobs/{job_id}/communications",
+    }
+
+    for tmpl in _CORR_CANDIDATE_PATHS:
+        url = f"{INTERNAL_BASE}{tmpl.format(job_id=job_id)}"
+        try:
+            with httpx.Client(timeout=15, cookies=cookies, headers=headers, follow_redirects=False) as c:
+                r = c.get(url)
+        except Exception:
+            continue
+        if r.status_code != 200:
+            continue
+        try:
+            data = r.json()
+        except Exception:
+            continue
+
+        entries = data if isinstance(data, list) else (data.get("items") or data.get("Correspondents") or [])
+        if not isinstance(entries, list):
+            continue
+
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            for pk in _CORR_PHONE_KEYS:
+                pv = entry.get(pk)
+                if pv and _normalize_phone(str(pv)) == target:
+                    for ik in _CORR_ID_KEYS:
+                        cid = entry.get(ik)
+                        if cid:
+                            return str(cid)
+        # Endpoint returned 200 but no match — stop here, don't try others.
+        return None
+
+    return None

@@ -39,10 +39,20 @@ class Rep:
     title: str
     signature_phone: str
     sendgrid_sender_email: str
+    # Per-rep SMS impersonation. Maps to acculynx/sessions/{slug}.json which
+    # stores the 4 cookies needed to send SMS through this rep's AccuLynx
+    # session (so the homeowner sees the rep's REAL provisioned number).
+    # Empty slug = SMS falls back to the bot account.
+    acculynx_login_email: str = ""
+    acculynx_profile_slug: str = ""
 
     @property
     def display(self) -> str:
         return f"{self.name} <{self.sendgrid_sender_email}>"
+
+    @property
+    def can_impersonate_for_sms(self) -> bool:
+        return bool(self.acculynx_profile_slug)
 
 
 @functools.lru_cache(maxsize=1)
@@ -66,7 +76,19 @@ def _row_to_rep(row: dict) -> Rep:
             or row.get("email")
             or settings.sendgrid_from_email
         ).strip(),
+        acculynx_login_email=(row.get("acculynx_login_email") or "").strip(),
+        acculynx_profile_slug=(row.get("acculynx_profile_slug") or "").strip(),
     )
+
+
+def bot_account() -> dict:
+    """The bot account block from reps.yaml (fallback identity for SMS)."""
+    data = _load_reps_yaml()
+    return data.get("bot_account") or {
+        "acculynx_login_email": "",
+        "acculynx_profile_slug": "mdrai-acculynx",
+        "display_name": "Modern Day Roofing AI Assistant",
+    }
 
 
 def resolve_rep(acculynx_user_id: Optional[str] = None) -> Rep:
@@ -110,4 +132,4 @@ def all_reps() -> list[Rep]:
     return [_row_to_rep(r) for r in (data.get("reps") or [])]
 
 
-__all__ = ["Rep", "resolve_rep", "all_reps"]
+__all__ = ["Rep", "resolve_rep", "all_reps", "bot_account"]

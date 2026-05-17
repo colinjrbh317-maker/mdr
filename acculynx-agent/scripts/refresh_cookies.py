@@ -1,37 +1,49 @@
-"""Headless Playwright login that refreshes the AccuLynx session cookies.
+"""Headless Playwright login that refreshes AccuLynx session cookies per-rep.
 
-The internal API at my.acculynx.com requires session cookies that expire
-every 30-60 days. Manually pasting from Chrome DevTools every couple
-months is fragile — when those cookies die, the agent loses access to
-Communications content. This script automates the refresh.
+The internal AccuLynx API requires four session cookies (.ASPXAUTH,
+ASP.NET_SessionId, cf_clearance, deviceThumbprint). For SMS-via-rep-
+impersonation, each sales rep needs their OWN four cookies so that texts
+go through that rep's AccuLynx session and land from THEIR provisioned
+phone number — not a single shared bot number.
 
-How it works:
-  1. Reads ACCULYNX_LOGIN_EMAIL + ACCULYNX_LOGIN_PASSWORD from .env
-  2. Opens a headless Chromium session
-  3. Navigates to my.acculynx.com login
-  4. Submits credentials
-  5. Waits for the post-login redirect that proves auth succeeded
-  6. Extracts the .ASPXAUTH + ASP.NET_SessionId + cf_clearance + deviceThumbprint cookies
-  7. Writes them back to .env as ACCULYNX_SESSION_COOKIE
-  8. Exits 0 on success, 1 on failure
+This script seeds and refreshes cookies for any rep slug:
 
-Usage:
-  python scripts/refresh_cookies.py             # one-shot refresh
-  python scripts/refresh_cookies.py --headed    # show the browser (debug)
+    python scripts/refresh_cookies.py                       # bot account (default)
+    python scripts/refresh_cookies.py --rep austin          # specific rep
+    python scripts/refresh_cookies.py --rep austin --headed # FIRST RUN per rep
+    python scripts/refresh_cookies.py --all                 # refresh every rep
 
-Designed to be run by:
-  - Cron / launchd weekly
-  - The cookie_health_job in engine/scheduler.py when expiry detected
-  - A human ops engineer when something goes sideways
+Each rep gets:
+  acculynx/profiles/{slug}/        - persistent Chrome profile (Cloudflare cookies)
+  acculynx/sessions/{slug}.json    - 4 captured cookies + metadata
+
+Credentials per rep come from .env vars named:
+  ACCULYNX_LOGIN_EMAIL_{SLUG}      e.g., ACCULYNX_LOGIN_EMAIL_AUSTIN
+  ACCULYNX_LOGIN_PASSWORD_{SLUG}   e.g., ACCULYNX_LOGIN_PASSWORD_AUSTIN
+
+For the bot account (default), uses:
+  ACCULYNX_LOGIN_EMAIL
+  ACCULYNX_LOGIN_PASSWORD
+
+First-run flow (required ONCE per rep to seed cf_clearance):
+  1. Run with --headed --rep <slug>
+  2. Browser opens. If credentials in .env, it submits them.
+  3. If 2FA appears, complete it manually. If a Cloudflare challenge appears,
+     wait for it to pass.
+  4. Script captures 4 cookies and writes to acculynx/sessions/{slug}.json.
+  5. Future runs can be headless because the persistent profile carries the
+     Cloudflare clearance forward.
 
 Caveats:
-  - If AccuLynx adds 2FA / MFA / CAPTCHA on the login form this breaks.
-  - Recommended: use a DEDICATED AccuLynx user account ("agent-bot@...")
-    so it's isolated from any human account that might enable 2FA.
+  - If AccuLynx adds 2FA/MFA on the login form, headless will break and
+    you need to re-do --headed.
+  - cf_clearance is IP+UA-bound. Running from a different machine requires
+    re-doing --headed from that machine.
 """
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import os
 import sys
@@ -41,32 +53,55 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from playwright.async_api import async_playwright
 
+from acculynx.rep_sessions import (
+    ALL_COOKIES,
+    BOT_FALLBACK_SLUG,
+    PROFILES_DIR,
+    REQUIRED_COOKIES,
+    check_health,
+    profile_dir,
+    save_session,
+)
+
 LOGIN_URL = "https://my.acculynx.com/signin"
-POST_LOGIN_DETECT = "my.acculynx.com"  # any my.acculynx.com URL after login = success
-COOKIES_TO_CAPTURE = (".ASPXAUTH", "ASP.NET_SessionId", "cf_clearance", "deviceThumbprint")
-ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
-ENV_KEY = "ACCULYNX_SESSION_COOKIE"
+POST_LOGIN_DETECT = "my.acculynx.com"
 
 
-PROFILE_DIR = Path(__file__).resolve().parent.parent / ".chrome_profile"
+def _creds_for_slug(slug: str) -> tuple[str, str]:
+    """Resolve email/password env vars for a rep slug.
 
-
-async def login_and_capture(*, email: str, password: str, headless: bool = True) -> dict:
-    """Login flow using a PERSISTENT Chrome profile.
-
-    Why persistent: Cloudflare's cf_clearance and AccuLynx's deviceThumbprint
-    are only set when Cloudflare actually CHALLENGES the request (JS proof of
-    work). A pure-headless Playwright session looks too clean and skips the
-    challenge -> no clearance cookie -> v3 send endpoint 401s. The fix: keep a
-    long-lived Chrome profile on disk. First run (--headed, manual login if
-    needed) earns the cookies; subsequent headless runs reuse the profile
-    and refresh just the .ASPXAUTH ticket via re-login.
-
-    Falls back to ephemeral context when the persistent profile is locked
-    (e.g. another instance is already running).
+    For the bot fallback we use the legacy ACCULYNX_LOGIN_EMAIL / _PASSWORD
+    so this stays backwards-compatible with the existing .env. For other
+    reps we use a slug-suffixed env var.
     """
-    use_persistent = PROFILE_DIR.exists() or not headless
-    PROFILE_DIR.mkdir(parents=True, exist_ok=True)
+    if slug == BOT_FALLBACK_SLUG:
+        return (
+            os.environ.get("ACCULYNX_LOGIN_EMAIL", ""),
+            os.environ.get("ACCULYNX_LOGIN_PASSWORD", ""),
+        )
+    suffix = slug.upper().replace("-", "_")
+    return (
+        os.environ.get(f"ACCULYNX_LOGIN_EMAIL_{suffix}", ""),
+        os.environ.get(f"ACCULYNX_LOGIN_PASSWORD_{suffix}", ""),
+    )
+
+
+async def login_and_capture(
+    *,
+    slug: str,
+    email: str,
+    password: str,
+    headless: bool = True,
+) -> dict:
+    """Login + warmup + cookie capture for a single rep slug.
+
+    Uses a per-slug persistent Chrome profile so Cloudflare's cf_clearance
+    survives across runs. First call (preferably --headed) earns the
+    clearance; subsequent headless calls reuse it.
+    """
+    prof_dir = profile_dir(slug)
+    use_persistent = prof_dir.exists() or not headless
+    prof_dir.mkdir(parents=True, exist_ok=True)
 
     async with async_playwright() as p:
         common_args = [
@@ -82,7 +117,7 @@ async def login_and_capture(*, email: str, password: str, headless: bool = True)
 
         if use_persistent:
             context = await p.chromium.launch_persistent_context(
-                user_data_dir=str(PROFILE_DIR),
+                user_data_dir=str(prof_dir),
                 headless=headless,
                 args=common_args,
                 user_agent=user_agent,
@@ -90,7 +125,7 @@ async def login_and_capture(*, email: str, password: str, headless: bool = True)
                 locale="en-US",
                 timezone_id="America/New_York",
             )
-            browser = None  # persistent context manages its own browser
+            browser = None
         else:
             browser = await p.chromium.launch(headless=headless, args=common_args)
             context = await browser.new_context(
@@ -104,45 +139,44 @@ async def login_and_capture(*, email: str, password: str, headless: bool = True)
         )
         page = await context.new_page()
 
-        # First visit the homepage (not the login form) so Cloudflare gets
-        # the chance to challenge a fresh session before any form interaction.
-        # On a persistent profile with valid cookies this just no-ops.
+        # Visit homepage first so Cloudflare gets to challenge a fresh
+        # session before any form interaction. No-op when profile is warm.
         try:
             await page.goto("https://my.acculynx.com/", wait_until="domcontentloaded", timeout=30000)
             await page.wait_for_timeout(2000)
         except Exception:
             pass
 
-        # Detect: are we already logged in from a previous persistent session?
-        # If so, skip the credential dance entirely.
+        # Already-logged-in detection (persistent profile case).
         try:
             if "/jobs" in page.url or "/dashboard" in page.url or (
                 "/signin" not in page.url and "/login" not in page.url and "my.acculynx.com" in page.url
             ):
-                # Try to navigate somewhere protected; if it sticks, we're in.
                 test_url = "https://my.acculynx.com/dashboard"
                 await page.goto(test_url, wait_until="domcontentloaded", timeout=15000)
                 if "/signin" not in page.url and "/login" not in page.url:
-                    print("Persistent session still valid - skipping credential entry")
+                    print(f"[{slug}] Persistent session valid — skipping credential entry")
                     return await _capture_cookies_after_warmup(page, context, browser)
         except Exception:
             pass
 
+        # Credential entry path.
+        if not email or not password:
+            await (browser.close() if browser else context.close())
+            raise RuntimeError(
+                f"No credentials for slug '{slug}'. Set "
+                f"ACCULYNX_LOGIN_EMAIL{'' if slug == BOT_FALLBACK_SLUG else '_' + slug.upper().replace('-', '_')} "
+                f"and ACCULYNX_LOGIN_PASSWORD... in .env."
+            )
+
         await page.goto(LOGIN_URL, wait_until="domcontentloaded")
 
-        # AccuLynx login form (verified 2026-05-03): name="Email" + name="Password",
-        # SIGN IN button has no type attribute. Fall-back selectors kept for resilience.
         email_selector_candidates = [
-            'input[name="Email"]',
-            '#Email',
-            'input[type="email"]',
-            'input[name="EmailAddress"]',
-            '#EmailAddress',
+            'input[name="Email"]', '#Email', 'input[type="email"]',
+            'input[name="EmailAddress"]', '#EmailAddress',
         ]
         password_selector_candidates = [
-            'input[name="Password"]',
-            '#Password',
-            'input[type="password"]',
+            'input[name="Password"]', '#Password', 'input[type="password"]',
         ]
 
         async def first_visible(selectors: list[str]):
@@ -159,18 +193,14 @@ async def login_and_capture(*, email: str, password: str, headless: bool = True)
         if not email_input:
             await (browser.close() if browser else context.close())
             raise RuntimeError("Could not find email input on login page")
-
         await email_input.fill(email)
 
         password_input = await first_visible(password_selector_candidates)
         if not password_input:
             await (browser.close() if browser else context.close())
             raise RuntimeError("Could not find password input on login page")
-
         await password_input.fill(password)
 
-        # Try common submit patterns. AccuLynx's SIGN IN button has no `type`
-        # attribute — match by text. Avoid the "Sign in with Google" variant.
         submitted = False
         for sel in [
             'button:has-text("SIGN IN"):not(:has-text("Google"))',
@@ -190,23 +220,32 @@ async def login_and_capture(*, email: str, password: str, headless: bool = True)
         if not submitted:
             await password_input.press("Enter")
 
-        # Wait for navigation away from /login (success signal)
         try:
             await page.wait_for_url(
                 lambda url: POST_LOGIN_DETECT in url and "/login" not in url and "/signin" not in url,
-                timeout=30000,
+                timeout=60000 if not headless else 30000,
             )
         except Exception:
-            await (browser.close() if browser else context.close())
-            raise RuntimeError("Login did not complete (still on login page after submit). 2FA, CAPTCHA, or wrong creds.")
+            # In headed mode, give the user a chance to clear 2FA / Cloudflare.
+            if not headless:
+                print(f"[{slug}] Login didn't auto-complete. If a 2FA / CAPTCHA is showing, complete it now. Waiting up to 120s...")
+                try:
+                    await page.wait_for_url(
+                        lambda url: POST_LOGIN_DETECT in url and "/login" not in url and "/signin" not in url,
+                        timeout=120000,
+                    )
+                except Exception:
+                    await (browser.close() if browser else context.close())
+                    raise RuntimeError("Login did not complete within 120s. 2FA, CAPTCHA, or wrong creds.")
+            else:
+                await (browser.close() if browser else context.close())
+                raise RuntimeError("Login did not complete (still on login page). Re-run with --headed.")
 
         return await _capture_cookies_after_warmup(page, context, browser)
 
 
 async def _capture_cookies_after_warmup(page, context, browser) -> dict:
-    """Visit a real job page so AccuLynx JS sets deviceThumbprint, then
-    return the 4 cookies we care about. Used by both the fresh-login and
-    persistent-session paths."""
+    """Warmup-navigate to a real job page so AccuLynx JS sets deviceThumbprint."""
     warmup_job_id = os.environ.get(
         "ACCULYNX_WARMUP_JOB_ID",
         "b54f39d8-ba98-4a79-97df-1112ab3a3ca8",  # TEST TEST - safe target
@@ -222,74 +261,71 @@ async def _capture_cookies_after_warmup(page, context, browser) -> dict:
         print(f"WARN: warmup navigation failed: {exc}", file=sys.stderr)
 
     all_cookies = await context.cookies()
-    captured = {c["name"]: c["value"] for c in all_cookies if c["name"] in COOKIES_TO_CAPTURE}
+    captured = {c["name"]: c["value"] for c in all_cookies if c["name"] in ALL_COOKIES}
     if browser is not None:
         await browser.close()
     else:
         await context.close()
 
-    # Hard requirement: core auth cookies. cf_clearance + deviceThumbprint
-    # are recoverable; warn but don't crash so email/comment paths still
-    # work, just SMS will fail until those are populated.
-    missing = [n for n in COOKIES_TO_CAPTURE if n not in captured]
-    if ".ASPXAUTH" not in captured or "ASP.NET_SessionId" not in captured:
+    missing = [n for n in ALL_COOKIES if n not in captured]
+    if not all(captured.get(c) for c in REQUIRED_COOKIES):
         raise RuntimeError(f"Login succeeded but core auth cookies missing: {missing}")
     if missing:
         print(
             f"WARN: Captured only {sorted(captured.keys())}; missing {missing}. "
-            "SMS send (v3 endpoint) will 401 until these are populated. "
-            "First-time setup: run with --headed and log in manually; the "
-            "persistent profile at .chrome_profile/ will then carry the "
-            "Cloudflare clearance for subsequent headless runs.",
+            "SMS will 401 until cf_clearance + deviceThumbprint populate. "
+            "Run with --headed to earn the Cloudflare clearance the first time.",
             file=sys.stderr,
         )
     return captured
 
 
-def write_env(cookies: dict) -> None:
-    """Replace the ACCULYNX_SESSION_COOKIE line in .env (or append if missing)."""
-    cookie_str = "; ".join(f"{k}={v}" for k, v in cookies.items() if v)
-    text = ENV_PATH.read_text(encoding="utf-8") if ENV_PATH.exists() else ""
-    lines = text.splitlines()
-    new_lines: list[str] = []
-    replaced = False
-    for line in lines:
-        if line.startswith(f"{ENV_KEY}="):
-            new_lines.append(f"{ENV_KEY}='{cookie_str}'")
-            replaced = True
-        else:
-            new_lines.append(line)
-    if not replaced:
-        new_lines.append(f"{ENV_KEY}='{cookie_str}'")
-    ENV_PATH.write_text("\n".join(new_lines).rstrip() + "\n", encoding="utf-8")
+async def refresh_one(slug: str, headless: bool) -> int:
+    email, password = _creds_for_slug(slug)
+    print(f"\n=== Refreshing session for slug='{slug}' (headless={headless}) ===")
+    try:
+        cookies = await login_and_capture(
+            slug=slug, email=email, password=password, headless=headless,
+        )
+    except Exception as exc:
+        print(f"[{slug}] FAILED: {exc}", file=sys.stderr)
+        return 1
+    save_session(rep_slug=slug, cookies=cookies, rep_email=email)
+    h = check_health(slug)
+    print(f"[{slug}] saved. status={h.status}, cookies={sorted(cookies.keys())}")
+    return 0
 
 
 async def main() -> int:
-    headless = "--headed" not in sys.argv
+    parser = argparse.ArgumentParser(description="Refresh AccuLynx session cookies per rep.")
+    parser.add_argument("--rep", default=BOT_FALLBACK_SLUG, help=f"Rep slug to refresh (default: {BOT_FALLBACK_SLUG})")
+    parser.add_argument("--all", action="store_true", help="Refresh every rep in config/reps.yaml that has a profile slug.")
+    parser.add_argument("--headed", action="store_true", help="Show the browser (use for first-run per rep).")
+    args = parser.parse_args()
 
     # Lazily load env so settings.py loads .env first
     from config.settings import settings  # noqa: F401
 
-    email = os.environ.get("ACCULYNX_LOGIN_EMAIL", "")
-    password = os.environ.get("ACCULYNX_LOGIN_PASSWORD", "")
-    if not email or not password:
-        print(
-            "Missing ACCULYNX_LOGIN_EMAIL or ACCULYNX_LOGIN_PASSWORD in .env.\n"
-            "Add a dedicated AccuLynx bot user's credentials, then re-run.",
-            file=sys.stderr,
-        )
-        return 1
+    headless = not args.headed
 
-    try:
-        cookies = await login_and_capture(email=email, password=password, headless=headless)
-    except Exception as exc:
-        print(f"Refresh failed: {exc}", file=sys.stderr)
-        return 1
+    if args.all:
+        from config.reps import all_reps, bot_account
+        slugs: list[str] = []
+        bot = bot_account()
+        if bot.get("acculynx_profile_slug"):
+            slugs.append(bot["acculynx_profile_slug"])
+        for rep in all_reps():
+            if rep.acculynx_profile_slug and rep.acculynx_profile_slug not in slugs:
+                slugs.append(rep.acculynx_profile_slug)
+        if not slugs:
+            print("No rep slugs configured. Edit config/reps.yaml.", file=sys.stderr)
+            return 1
+        rc = 0
+        for slug in slugs:
+            rc |= await refresh_one(slug, headless=headless)
+        return rc
 
-    write_env(cookies)
-    print(f"Refreshed {len(cookies)} cookies, written to {ENV_PATH}")
-    print(f"Captured: {sorted(cookies.keys())}")
-    return 0
+    return await refresh_one(args.rep, headless=headless)
 
 
 if __name__ == "__main__":

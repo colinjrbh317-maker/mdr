@@ -79,6 +79,16 @@ class Settings(BaseSettings):
     # Defaults to colinjrbh317@gmail.com so tomorrow's demo works out of the box.
     test_recipient_email: str = "colinjrbh317@gmail.com"
 
+    # ── SMS failure alerting ──
+    sms_alert_recipient: str = "colinjrbh317@gmail.com"
+    sms_alerts_enabled: bool = True
+
+    # ── SMS opt-in pre-flight check ──
+    # Before POSTing to AccuLynx's v3 text endpoint, look up the contact's
+    # SMS opt-in flag and short-circuit if it's OFF. Fail-safe: any error
+    # determining state allows the send. Flip to false to bypass entirely.
+    sms_opt_in_check_enabled: bool = True
+
     # ── Business Hours ──
     business_hours_start: int = 8
     business_hours_end: int = 18
@@ -127,6 +137,11 @@ class Settings(BaseSettings):
     # dedicated AccuLynx bot user, NOT a human rep account.
     acculynx_login_email: str = ""
     acculynx_login_password: str = ""
+
+    # ── Verdict logging to Google Sheets ──
+    # Spreadsheet ID for the testbench verdict log. Auth is via the gws CLI
+    # (keyring-backed). Empty value disables sheets logging gracefully.
+    verdict_log_sheet_id: str = ""
 
     class Config:
         env_prefix = ""
