@@ -6,7 +6,17 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "audit": "node audit-site.mjs",
+    "verify": "astro check && playwright test && node audit-site.mjs",
+    "verify:quick": "astro check && playwright test",
+    "verify:sms": "node scripts/verify-acculynx-sms.mjs",
+    "verify:contact": "node scripts/verify-contact-form.mjs",
+    "audit:perf": "lighthouse http://localhost:4321 --output json --output-path .verify/lighthouse.json --chrome-flags=--headless --quiet",
+    "audit:a11y": "axe http://localhost:4321 --save .verify/axe.json --exit",
+    "audit:links": "linkinator http://localhost:4321 --recurse --skip 'mailto:|tel:'"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",

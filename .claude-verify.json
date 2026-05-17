@@ -1,0 +1,38 @@
+{
+  "$schema": "https://raw.githubusercontent.com/colinryan/claude-verify/main/schema.json",
+  "archetype": "web-astro",
+  "commands": ["pnpm build", "pnpm test"],
+  "urls": [
+    {"path": "/", "name": "home"},
+    {"path": "/services", "name": "services-listing"},
+    {"path": "/services/roof-replacement", "name": "service-detail"},
+    {"path": "/areas/roanoke", "name": "area-page"},
+    {"path": "/contact", "name": "contact-form", "interactions": ["fill-form", "submit"]},
+    {"path": "/gallery", "name": "gallery"}
+  ],
+  "emailRoundtrip": {
+    "provider": "mailtrap",
+    "expectSubjectContains": "MDR contact lead",
+    "timeoutMs": 60000
+  },
+  "smsRoundtrip": {
+    "provider": "twilio-test",
+    "via": "acculynx-v3",
+    "script": "scripts/verify-acculynx-sms.mjs"
+  },
+  "dataReadback": [
+    {"system": "sanity", "query": "*[_type=='lead']|order(_createdAt desc)[0]{name, phone, _createdAt}"}
+  ],
+  "factCheck": [
+    {"url": "/contact", "mustContain": ["alicia", "modernroofers"], "case": "insensitive"}
+  ],
+  "deployTarget": "vercel",
+  "budgets": {"lcp": 2500, "cls": 0.1, "tbt": 200, "a11yCritical": 0, "a11ySerious": 0},
+  "postDeployChecks": ["posthog-errors-5m", "broken-links"],
+  "firecrawl": {
+    "driftDetection": {"enabled": true, "url": "https://modernroofers.com", "schedule": "nightly"},
+    "competitors": ["https://cenvarroofing.com", "https://romanroofing.com"]
+  },
+  "maxIterations": 3,
+  "skip": []
+}
