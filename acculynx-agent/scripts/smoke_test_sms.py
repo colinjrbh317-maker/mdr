@@ -196,6 +196,7 @@ def run_live_send(t: Tally, rep_slug: str | None) -> None:
             to_phone=PHONE,
             to_name=NAME,
             body_text=body,
+            lead_id=JOB_ID,
             acculynx_job_id=JOB_ID,
             acculynx_correspondent_id=CORRESPONDENT_ID,
             rep_slug=rep_slug,
