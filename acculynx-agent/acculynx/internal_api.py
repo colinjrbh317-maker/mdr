@@ -548,70 +548,134 @@ def _normalize_phone(phone: str) -> str:
     return digits
 
 
-_CORR_CANDIDATE_PATHS = (
-    "/jobs/{job_id}/correspondents",
-    "/jobs/{job_id}/contacts",
-    "/jobs/{job_id}/communications/contacts",
+# Internal v3 address-book endpoint. Captured from a live my.acculynx.com
+# session HAR on 2026-05-17. Returns SMS-eligible correspondents AND staff
+# for a job along with PhoneNumber, IsOptedIn, and CorrespondentType
+# (0=staff, 1=homeowner/contact).
+#
+# Empirically: passing only requestingTypes[]=5 returns 0 entries. The
+# endpoint requires at least one of types 0/1/2 alongside 5 to materialize
+# the response. We pass all four — the consumer filters CorrespondentType==1
+# for SMS targets.
+_ADDRESS_BOOK_PATH = (
+    "/api/v3/message-board/{job_id}/address-book"
+    "?requestingTypes%5B%5D=0&requestingTypes%5B%5D=1"
+    "&requestingTypes%5B%5D=2&requestingTypes%5B%5D=5"
 )
-
-_CORR_ID_KEYS = ("Id", "CorrespondentId", "CorrespondentID", "ContactId", "ContactID")
-_CORR_PHONE_KEYS = ("Phone", "PhoneNumber", "Value", "MobilePhone", "MobileNumber", "Number")
+_ADDRESS_BOOK_BASE = "https://my.acculynx.com"
 
 
-def get_sms_correspondent_id_sync(*, job_id: str, phone: str, rep_slug: Optional[str] = None) -> Optional[str]:
-    """Fetch the CorrespondentID for the contact on this job matching `phone`.
-
-    Returns None if not found (allows graceful fallback in the dispatcher).
-    Never raises. Tries each candidate v4 endpoint until one returns 200.
-    Matches on normalized US digits-only phone.
+def _fetch_address_book_sync(*, job_id: str, rep_slug: Optional[str] = None) -> Optional[list[dict]]:
+    """Fetch the full SMS address book for a job. Returns list of dicts:
+        {ID, DisplayName, PhoneNumber, IsOptedIn, CorrespondentType}
+    Returns None on any failure.
     """
     from .rep_sessions import cookies_for_rep
     cookies, _ = cookies_for_rep(rep_slug, allow_fallback=True)
     if not cookies:
-        cookies = _cookies()  # legacy env-var fallback
+        cookies = _cookies()
     if not cookies:
         return None
 
-    target = _normalize_phone(phone)
-    if not target:
-        return None
-
+    url = f"{_ADDRESS_BOOK_BASE}{_ADDRESS_BOOK_PATH.format(job_id=job_id)}"
     headers = {
         "Accept": "application/json, text/plain, */*",
         "User-Agent": USER_AGENT,
         "Origin": "https://my.acculynx.com",
         "Referer": f"https://my.acculynx.com/jobs/{job_id}/communications",
     }
-
-    for tmpl in _CORR_CANDIDATE_PATHS:
-        url = f"{INTERNAL_BASE}{tmpl.format(job_id=job_id)}"
+    try:
+        with httpx.Client(timeout=15, cookies=cookies, headers=headers, follow_redirects=False) as c:
+            r = c.get(url)
+    except Exception as exc:
+        log.warning("address-book fetch raised for job=%s: %r", job_id, exc)
         try:
-            with httpx.Client(timeout=15, cookies=cookies, headers=headers, follow_redirects=False) as c:
-                r = c.get(url)
+            from messaging.alerts import alert_sev2
+            alert_sev2(
+                source="acculynx.internal_api.address_book",
+                error="network_exception",
+                message=str(exc),
+                context={"job_id": job_id, "rep_slug": rep_slug},
+            )
         except Exception:
-            continue
-        if r.status_code != 200:
-            continue
-        try:
-            data = r.json()
-        except Exception:
-            continue
-
-        entries = data if isinstance(data, list) else (data.get("items") or data.get("Correspondents") or [])
-        if not isinstance(entries, list):
-            continue
-
-        for entry in entries:
-            if not isinstance(entry, dict):
-                continue
-            for pk in _CORR_PHONE_KEYS:
-                pv = entry.get(pk)
-                if pv and _normalize_phone(str(pv)) == target:
-                    for ik in _CORR_ID_KEYS:
-                        cid = entry.get(ik)
-                        if cid:
-                            return str(cid)
-        # Endpoint returned 200 but no match — stop here, don't try others.
+            pass
         return None
+    if r.status_code != 200:
+        log.warning("address-book non-200 (job=%s status=%s)", job_id, r.status_code)
+        try:
+            from messaging.alerts import alert_sev1, alert_sev2
+            if r.status_code in (401, 403):
+                alert_sev1(
+                    source="acculynx.internal_api.address_book",
+                    error=f"auth_{r.status_code}",
+                    message="bot/rep session rejected by address-book endpoint",
+                    context={"job_id": job_id, "status": r.status_code, "rep_slug": rep_slug},
+                )
+            else:
+                alert_sev2(
+                    source="acculynx.internal_api.address_book",
+                    error=f"status_{r.status_code}",
+                    context={"job_id": job_id, "rep_slug": rep_slug},
+                )
+        except Exception:
+            pass
+        return None
+    try:
+        data = r.json()
+    except Exception:
+        return None
+    if not isinstance(data, list):
+        return None
+    return data
 
+
+def get_sms_correspondent_id_sync(*, job_id: str, phone: str, rep_slug: Optional[str] = None) -> Optional[str]:
+    """Fetch the CorrespondentID for the contact on this job matching `phone`.
+
+    Returns None if not found (allows graceful fallback in the dispatcher).
+    Never raises. Matches on normalized US digits-only phone.
+    """
+    target = _normalize_phone(phone)
+    if not target:
+        return None
+    entries = _fetch_address_book_sync(job_id=job_id, rep_slug=rep_slug)
+    if not entries:
+        return None
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        # Only homeowners/contacts can receive outbound texts; staff are type 0.
+        if entry.get("CorrespondentType") != 1:
+            continue
+        pv = entry.get("PhoneNumber")
+        if pv and _normalize_phone(str(pv)) == target:
+            cid = entry.get("ID")
+            if cid:
+                return str(cid)
+    return None
+
+
+def get_sms_opt_in_sync(*, job_id: str, phone: str, rep_slug: Optional[str] = None) -> Optional[bool]:
+    """Return the IsOptedIn flag for the contact matching `phone` on this job.
+
+    Returns True/False when known, None on unknown / lookup failure. Fail-safe
+    semantics live in opt_in_check.py — this function just reports raw state.
+    """
+    target = _normalize_phone(phone)
+    if not target:
+        return None
+    entries = _fetch_address_book_sync(job_id=job_id, rep_slug=rep_slug)
+    if not entries:
+        return None
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("CorrespondentType") != 1:
+            continue
+        pv = entry.get("PhoneNumber")
+        if pv and _normalize_phone(str(pv)) == target:
+            val = entry.get("IsOptedIn")
+            if isinstance(val, bool):
+                return val
+            return None
     return None

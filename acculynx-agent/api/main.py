@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from api.approvals import router as approvals_router
+from api.dashboard import router as dashboard_router, public_router as dashboard_public_router
 from api.review import router as review_router
 from api.webhooks import router as webhooks_router
 from config.settings import settings
@@ -73,6 +74,8 @@ app.add_middleware(
 app.include_router(review_router)
 app.include_router(approvals_router)
 app.include_router(webhooks_router)
+app.include_router(dashboard_router, prefix="/api/dash", tags=["dashboard"])
+app.include_router(dashboard_public_router, prefix="/api", tags=["dashboard-public"])
 
 
 @app.get("/")

@@ -317,6 +317,26 @@ async def create_approval_request(
             lead=lead, message=msg, rep=rep, links=links,
         )
 
+    # Append the rep-feedback button to every approval email so reps have a
+    # one-click path to flag broken drafts. Uses HMAC-signed URL so the
+    # dashboard can trust the (approval_id, rep_slug) tuple without login.
+    try:
+        from messaging.feedback import render_email_footer
+        rep_slug = getattr(rep, "acculynx_profile_slug", "") or (rep.email or "").split("@")[0]
+        fb_text, fb_html = render_email_footer(
+            approval_id=approval.id,
+            rep_slug=rep_slug,
+            lead_id=lead_id,
+        )
+        text_body = text_body + fb_text
+        # Inject before the closing </body> tag if present, else append.
+        if "</body>" in html_body:
+            html_body = html_body.replace("</body>", fb_html + "</body>")
+        else:
+            html_body = html_body + fb_html
+    except Exception:
+        log.exception("feedback footer injection failed (non-fatal)")
+
     sent = dispatch(
         channel="email",
         to_email=rep.email,

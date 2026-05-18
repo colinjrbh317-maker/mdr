@@ -91,6 +91,19 @@ def dispatch(
             status_code=None, error=None,
         )
 
+    # Operator-controlled kill switch (dashboard). Persists across restarts via
+    # data/runtime_state.json so a UI click takes effect immediately without
+    # rewriting .env or restarting the agent. Treated as DRY_RUN for both
+    # channels.
+    from db.runtime_state import get_kill_switch
+    if get_kill_switch():
+        log.info("KILL_SWITCH active: short-circuiting %s send (dry_run)", channel)
+        return DispatchResult(
+            channel=channel, sent=False, dry_run=True,
+            blocked_reason="kill_switch", external_message_id=None,
+            rfc_message_id=None, status_code=None, error=None,
+        )
+
     blocked = _allowlist_blocks(lead_id)
     if blocked:
         log.info("ALLOWLIST_BLOCK: %s", blocked)

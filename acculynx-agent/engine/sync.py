@@ -52,8 +52,28 @@ def _normalize_category(s: str) -> str:
     return " ".join(s.strip().lower().split())
 
 RESIDENTIAL_JOB_CATEGORIES: frozenset[str] = frozenset({
+    # AccuLynx's most common top-level category — accounts for the vast majority of MDR's jobs.
+    _normalize_category("Residential"),
+    # Sub-types we may also encounter (older accounts use these instead of "Residential").
     _normalize_category("Residential Roof Repair / Service"),
     _normalize_category("Roof Replacement - Retail"),
+    _normalize_category("Roof Replacement- Retail"),     # AccuLynx whitespace variant
+    _normalize_category("Roof Repair / Service"),
+    _normalize_category("Roof Repair/ Service"),         # AccuLynx whitespace variant
+    _normalize_category("New Construction Roof"),         # residential new build
+    _normalize_category("Roof Replacement"),              # generic
+})
+
+# Categories we explicitly DO want to skip — used as a backup denylist.
+# If a category isn't in RESIDENTIAL_JOB_CATEGORIES AND isn't in this denylist,
+# we DEFAULT to residential (safer to send than to silently skip real prospects).
+NON_RESIDENTIAL_DENYLIST: frozenset[str] = frozenset({
+    _normalize_category("Property Management"),
+    _normalize_category("Commercial"),
+    _normalize_category("Commercial / Flat Roof"),
+    _normalize_category("Townside Work Order"),
+    _normalize_category("General Contractor"),
+    _normalize_category("Home Builder"),
 })
 
 # Track sync health for pre-send checklist
@@ -70,11 +90,18 @@ def get_sync_health() -> dict:
 
 
 def _is_residential(job: dict) -> bool:
-    """Return True only if the job's jobCategory is in the residential allowlist.
+    """Return True for residential jobs. Conservative-default-residential:
 
-    Handles jobCategory as either a dict ({"name": "..."}) or a bare string,
-    matching the same dual-format pattern used by _extract_string_field().
-    Returns False if the field is missing or not in RESIDENTIAL_JOB_CATEGORIES.
+    - Allowlist match → residential (True)
+    - Denylist match → non-residential (False)
+    - Anything else (unknown category, blank, etc.) → DEFAULT TO RESIDENTIAL (True)
+
+    Rationale: skipping a real homeowner because of an unfamiliar category
+    name silently breaks the cadence. Rejecting only things we're CONFIDENT
+    are non-residential is far safer for a small contractor like MDR whose
+    AccuLynx is overwhelmingly residential.
+
+    Handles jobCategory as either a dict ({"name": "..."}) or a bare string.
     """
     raw = job.get("jobCategory")
     if isinstance(raw, dict):
@@ -82,8 +109,15 @@ def _is_residential(job: dict) -> bool:
     elif raw:
         name = str(raw)
     else:
+        # Missing jobCategory → default to residential (safer than skipping).
+        return True
+    norm = _normalize_category(name)
+    if norm in RESIDENTIAL_JOB_CATEGORIES:
+        return True
+    if norm in NON_RESIDENTIAL_DENYLIST:
         return False
-    return _normalize_category(name) in RESIDENTIAL_JOB_CATEGORIES
+    # Unknown category → default to residential.
+    return True
 
 
 async def sync_pipeline() -> dict:
@@ -92,7 +126,11 @@ async def sync_pipeline() -> dict:
     stats = {"synced": 0, "new": 0, "updated": 0, "skipped_backfill": 0, "non_residential_skipped": 0, "errors": 0}
 
     try:
-        jobs = await get_all_pages("/jobs", {}, page_size=10, max_pages=200)
+        # AccuLynx /jobs has ~7,500+ records (Cancelled/Closed dominate, with
+        # Prospects/Leads scattered throughout). Old limits of page_size=10 ×
+        # max_pages=200 = 2,000 records. That cut off before we ever hit the
+        # Prospect cohort. Bump to 25 × 500 = 12,500 to cover everything safely.
+        jobs = await get_all_pages("/jobs", {}, page_size=25, max_pages=500)
     except Exception as e:
         print(f"❌ AccuLynx sync failed: {e}")
         _last_sync_success = False
@@ -221,6 +259,25 @@ async def _upsert_lead(session: AsyncSession, job: dict) -> str:
                 mod = mod.replace(tzinfo=timezone.utc)
             if (now - mod).days <= 3:  # activity within last 3 days = re-engaged
                 _set_layer(existing, "ESTIMATE_FOLLOWUP", now)
+
+        # ── Backfill re-promotion ──
+        # A lead inserted as skipped_backfill on first sync (modifiedDate
+        # outside 90-day window) keeps layer_name=None forever even after
+        # AccuLynx eventually modifies it. Promote it now if it's active,
+        # in a cadence-eligible milestone, and recently modified.
+        if (
+            existing.layer_name is None
+            and existing.is_active
+            and existing.agent_status != "Stopped"
+            and milestone in MILESTONE_TO_LAYER
+            and acculynx_modified
+        ):
+            mod = acculynx_modified
+            if mod.tzinfo is None:
+                mod = mod.replace(tzinfo=timezone.utc)
+            if (now - mod).days <= BACKFILL_CUTOFF_DAYS:
+                layer_name = determine_layer(milestone, days_since_activity=0)
+                _set_layer(existing, layer_name, now)
 
         return "updated"
 

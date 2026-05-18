@@ -37,8 +37,100 @@ async def sync_job() -> None:
     try:
         stats = await sync_pipeline()
         log.info("sync_job stats: %s", stats)
-    except Exception:
+    except Exception as exc:
         log.exception("sync_job failed")
+        try:
+            from messaging.alerts import alert_sev1
+            alert_sev1(
+                source="engine.scheduler.sync_job",
+                error="sync_crashed",
+                message=str(exc),
+                context={"exception_type": type(exc).__name__},
+            )
+        except Exception:
+            pass
+
+
+async def digest_flush_job() -> None:
+    """Flush the SEV-2 digest hourly. No-op when empty."""
+    try:
+        from messaging.alerts import flush_digest
+        n = flush_digest()
+        if n:
+            log.info("digest_flush_job: sent digest with %d events", n)
+    except Exception:
+        log.exception("digest_flush_job failed")
+
+
+async def _park_failed_draft(entry: dict, touch: dict, lead, draft: dict) -> None:
+    """Park a postflight-exhausted draft for human review.
+
+    Behavior: write a MessageQueue row with status='needs_review' holding the
+    last-attempt body + the postflight reasons, mark the lead is_paused=True,
+    and emit a SEV-1 alert so Colin sees it within seconds.
+
+    The lead stays paused until the operator hits Resume / Send-As-Was / Skip
+    from the dashboard.
+    """
+    lead_id = entry.get("lead_id")
+    try:
+        async with async_session() as session:
+            row = MessageQueue(
+                lead_id=lead_id,
+                channel=draft.get("channel") or touch.get("channel") or "email",
+                recipient_email=lead.contact_email,
+                recipient_phone=lead.contact_phone,
+                subject=draft.get("subject"),
+                body=draft.get("body") or "(no body returned)",
+                cadence_name=entry.get("layer_name"),
+                touch_index=touch.get("touch_index"),
+                content_type=touch.get("content_type"),
+                status="needs_review",
+                skip_reason="postflight_exhausted: "
+                + "; ".join(draft.get("postflight_reasons") or []),
+            )
+            session.add(row)
+
+            # Pause the lead so cadence doesn't keep retrying every 5 min.
+            r = await session.execute(select(Lead).where(Lead.id == lead_id))
+            lead_row = r.scalar_one_or_none()
+            if lead_row is not None:
+                lead_row.is_paused = True
+                if hasattr(lead_row, "pause_reason"):
+                    lead_row.pause_reason = "postflight_exhausted"
+
+            await session.commit()
+            parked_id = row.id
+    except Exception:
+        log.exception("_park_failed_draft: DB write failed for %s", lead_id)
+        parked_id = None
+
+    # Alert (SEV-1) — Colin sees this within ~30s.
+    try:
+        from messaging.alerts import alert_sev1
+        alert_sev1(
+            source="engine.scheduler.cadence_job",
+            error="postflight_exhausted",
+            message=(
+                f"Lead {lead.contact_name or lead_id} parked after "
+                f"{draft.get('regenerations', '?')} regeneration attempts."
+            ),
+            context={
+                "lead_id": lead_id,
+                "contact_name": lead.contact_name,
+                "milestone": lead.milestone,
+                "layer": entry.get("layer_name"),
+                "touch_index": touch.get("touch_index"),
+                "channel": draft.get("channel"),
+                "subject": draft.get("subject"),
+                "rejected_body": (draft.get("body") or "")[:600],
+                "postflight_reasons": draft.get("postflight_reasons") or [],
+                "needs_review_id": parked_id,
+                "dashboard_url": "https://app.moderndayroof.com/tracking/needs-review",
+            },
+        )
+    except Exception:
+        log.exception("_park_failed_draft: alert failed (non-fatal)")
 
 
 async def cadence_job() -> None:
@@ -81,6 +173,10 @@ async def cadence_job() -> None:
                     continue
                 if not draft.get("postflight_ok"):
                     log.info("postflight failed for %s: %s", lead_id, draft.get("postflight_reasons"))
+                    # MAX_REGENERATIONS exhausted — park the draft for review,
+                    # pause the lead, alert Colin. Lead is unstuck via the
+                    # dashboard's Resume / Send-As-Was / Skip actions.
+                    await _park_failed_draft(entry, touch, lead, draft)
                     continue
                 # Decide: autonomous or approval-gated?
                 if touch.get("autonomous_ok") and not is_business_hours():
@@ -219,8 +315,10 @@ def start_scheduler() -> None:
     # Cookie health check at 09:00 ET daily — early enough that you can
     # refresh during the workday if it fails
     _scheduler.add_job(cookie_health_job, CronTrigger(hour=9, minute=0), id="cookie_health", replace_existing=True)
+    # Hourly SEV-2 alert digest flush
+    _scheduler.add_job(digest_flush_job, IntervalTrigger(minutes=60), id="digest_flush", replace_existing=True)
     _scheduler.start()
-    log.info("Scheduler started: sync=%dm, cadence=5m, escalation=30m, cookie_health=09:00",
+    log.info("Scheduler started: sync=%dm, cadence=5m, escalation=30m, cookie_health=09:00, digest=60m",
              settings.acculynx_poll_interval_minutes)
 
 

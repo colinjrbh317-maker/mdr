@@ -40,7 +40,7 @@ from typing import Optional
 
 import httpx
 
-from .internal_api import INTERNAL_BASE, USER_AGENT
+from .internal_api import INTERNAL_BASE, USER_AGENT, get_sms_opt_in_sync
 from .rep_sessions import cookies_for_rep
 from config.settings import settings
 
@@ -169,9 +169,12 @@ def check_opt_in_sync(
     """Pre-flight check before sending SMS via AccuLynx.
 
     Fail-safe: any inability to determine state allows the send. The only
-    way this returns can_send=False is when we get a 200 from a candidate
-    endpoint, locate the contact entry by id, find an opt-in-ish boolean
-    field, and it is False.
+    way this returns can_send=False is when the address-book endpoint
+    returns 200, the contact entry is located by phone, and IsOptedIn is
+    explicitly false.
+
+    Backed by the /api/v3/message-board/{job_id}/address-book endpoint
+    (see internal_api.get_sms_opt_in_sync) which returns IsOptedIn directly.
     """
     phone_n = _normalize_phone(phone)
 
@@ -189,143 +192,43 @@ def check_opt_in_sync(
             detail="check disabled by settings",
         )
 
-    cookies, effective_slug = cookies_for_rep(rep_slug)
-    if not cookies:
-        log.info(
-            "opt_in_check: no session cookies for rep_slug=%s; allowing send "
-            "(job=%s correspondent=%s)",
-            rep_slug, job_id, correspondent_id,
-        )
-        return OptInResult(
-            can_send=True,
-            opt_in_state="unknown",
-            correspondent_id=correspondent_id,
-            phone_normalized=phone_n,
-            raw_field_seen=None,
-            detail="no session; allowing send",
-        )
-
-    headers = _headers(job_id)
-    last_status: Optional[int] = None
-    matched_entry: Optional[dict] = None
-    matched_url: Optional[str] = None
-
-    with httpx.Client(
-        timeout=15,
-        cookies=cookies,
-        headers=headers,
-        follow_redirects=False,
-    ) as c:
-        for path in _CANDIDATE_PATHS:
-            url = f"{INTERNAL_BASE}{path.format(job_id=job_id)}"
-            try:
-                r = c.get(url)
-            except Exception as exc:
-                log.info(
-                    "opt_in_check: network error on %s: %s (job=%s sender=%s)",
-                    url, exc, job_id, effective_slug,
-                )
-                continue
-            last_status = r.status_code
-            if r.status_code != 200:
-                log.info(
-                    "opt_in_check: %s returned %s (job=%s sender=%s)",
-                    url, r.status_code, job_id, effective_slug,
-                )
-                continue
-            try:
-                data = r.json()
-            except Exception as exc:
-                log.info(
-                    "opt_in_check: %s 200 but JSON parse failed: %s",
-                    url, exc,
-                )
-                continue
-            # First 200 wins. Try to find the matching entry here.
-            for entry in _iter_entries(data):
-                if _entry_matches(entry, correspondent_id):
-                    matched_entry = entry
-                    matched_url = url
-                    break
-            # Whether or not we found the entry, we stop trying further
-            # candidates: this endpoint owns the contact list for this job.
-            matched_url = matched_url or url
-            break
-
-    if last_status is None or (matched_url is None and last_status != 200):
-        log.info(
-            "opt_in_check: all candidate endpoints failed (last_status=%s); "
-            "allowing send (job=%s correspondent=%s)",
-            last_status, job_id, correspondent_id,
-        )
-        return OptInResult(
-            can_send=True,
-            opt_in_state="endpoint_failed",
-            correspondent_id=correspondent_id,
-            phone_normalized=phone_n,
-            raw_field_seen=None,
-            detail="all candidate endpoints failed; allowing send",
-        )
-
-    if matched_entry is None:
-        log.info(
-            "opt_in_check: endpoint %s returned 200 but correspondent_id=%s "
-            "not present in response; allowing send (job=%s)",
-            matched_url, correspondent_id, job_id,
-        )
-        return OptInResult(
-            can_send=True,
-            opt_in_state="unknown",
-            correspondent_id=correspondent_id,
-            phone_normalized=phone_n,
-            raw_field_seen=None,
-            detail="endpoint OK but correspondent not found in response; allowing send",
-        )
-
-    field = _find_opt_in_field(matched_entry)
-    if field is None:
-        log.info(
-            "opt_in_check: endpoint %s returned 200 and matched correspondent=%s "
-            "but no opt-in field found; allowing send (job=%s keys=%s)",
-            matched_url, correspondent_id, job_id, list(matched_entry.keys()),
-        )
-        return OptInResult(
-            can_send=True,
-            opt_in_state="unknown",
-            correspondent_id=correspondent_id,
-            phone_normalized=phone_n,
-            raw_field_seen=None,
-            detail="endpoint OK but no opt-in field found in response; allowing send",
-        )
-
-    key_name, value = field
-    raw = f"{key_name}={'true' if value else 'false'}"
-    if value:
-        log.info(
-            "opt_in_check: SMS opt-in ON (%s) for correspondent=%s job=%s",
-            raw, correspondent_id, job_id,
-        )
+    state = get_sms_opt_in_sync(job_id=job_id, phone=phone, rep_slug=rep_slug)
+    if state is True:
         return OptInResult(
             can_send=True,
             opt_in_state="on",
             correspondent_id=correspondent_id,
             phone_normalized=phone_n,
-            raw_field_seen=raw,
-            detail=f"opt-in confirmed via {key_name}",
+            raw_field_seen="IsOptedIn=true",
+            detail="opt-in confirmed via address-book",
         )
-
+    if state is False:
+        log.info(
+            "opt_in_check: SMS opt-in OFF for correspondent=%s job=%s; "
+            "dispatcher should fall back to Comment",
+            correspondent_id, job_id,
+        )
+        return OptInResult(
+            can_send=False,
+            opt_in_state="off",
+            correspondent_id=correspondent_id,
+            phone_normalized=phone_n,
+            raw_field_seen="IsOptedIn=false",
+            detail="contact has SMS opt-in OFF in AccuLynx",
+        )
+    # state is None — unknown. Fail-safe allow.
     log.info(
-        "opt_in_check: SMS opt-in OFF (%s) for correspondent=%s job=%s; "
-        "dispatcher should fall back to Comment",
-        raw, correspondent_id, job_id,
+        "opt_in_check: state unknown (address-book lookup failed or contact "
+        "not found); allowing send (job=%s correspondent=%s)",
+        job_id, correspondent_id,
     )
     return OptInResult(
-        can_send=False,
-        opt_in_state="off",
+        can_send=True,
+        opt_in_state="unknown",
         correspondent_id=correspondent_id,
         phone_normalized=phone_n,
-        raw_field_seen=raw,
-        detail="contact has SMS opt-in OFF in AccuLynx",
+        raw_field_seen=None,
+        detail="address-book lookup unknown; allowing send",
     )
 
 

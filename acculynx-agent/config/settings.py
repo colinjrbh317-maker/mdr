@@ -143,6 +143,28 @@ class Settings(BaseSettings):
     # (keyring-backed). Empty value disables sheets logging gracefully.
     verdict_log_sheet_id: str = ""
 
+    # ── Rep feedback funnel ──
+    # Spreadsheet ID for the rep feedback log (populated by the dashboard
+    # /api/feedback endpoint via the gws CLI). Empty disables sheet logging.
+    feedback_log_sheet_id: str = ""
+
+    # HMAC secret used to sign feedback-button URLs. Distinct from
+    # jwt_secret so we can rotate them independently.
+    feedback_hmac_secret: str = ""
+
+    # ── Dashboard auth ──
+    # Single shared password for app.moderndayroof.com/tracking. Sets a
+    # signed HttpOnly cookie (HMAC with tracking_session_secret).
+    tracking_password: str = ""
+    tracking_session_secret: str = ""
+    # Shared secret for the dashboard <-> agent API. Sent as
+    # X-Dashboard-Secret on every /api/dash/* request.
+    dashboard_api_secret: str = ""
+
+    # Where the dashboard lives. Used to build the feedback button URLs and
+    # the postflight-pause alert links in alert emails.
+    dashboard_base_url: str = "https://app.moderndayroof.com/tracking"
+
     class Config:
         env_prefix = ""
         case_sensitive = False

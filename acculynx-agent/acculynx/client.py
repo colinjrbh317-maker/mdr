@@ -25,14 +25,50 @@ def _headers() -> Dict[str, str]:
 
 
 async def get(path: str, params: Optional[Dict[str, Any]] = None) -> httpx.Response:
-    """Make an authenticated GET request with rate limiting."""
+    """Make an authenticated GET request with rate limiting.
+
+    On failure, emits a tiered alert (SEV-1 on auth errors, SEV-2 on transient
+    5xx/network) before re-raising. Callers still get the same exception
+    behavior as before.
+    """
     async with _semaphore:
         async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.get(
-                f"{BASE_URL}{path}",
-                headers=_headers(),
-                params=params or {},
-            )
+            try:
+                resp = await client.get(
+                    f"{BASE_URL}{path}",
+                    headers=_headers(),
+                    params=params or {},
+                )
+            except Exception as exc:
+                try:
+                    from messaging.alerts import alert_sev2
+                    alert_sev2(
+                        source="acculynx.client.get",
+                        error="network_exception",
+                        message=str(exc),
+                        context={"path": path},
+                    )
+                except Exception:
+                    pass
+                raise
+            if resp.status_code >= 400:
+                try:
+                    from messaging.alerts import alert_sev1, alert_sev2
+                    if resp.status_code in (401, 403):
+                        alert_sev1(
+                            source="acculynx.client.get",
+                            error=f"auth_{resp.status_code}",
+                            message="AccuLynx v2 rejected the API key",
+                            context={"path": path, "status": resp.status_code},
+                        )
+                    else:
+                        alert_sev2(
+                            source="acculynx.client.get",
+                            error=f"status_{resp.status_code}",
+                            context={"path": path, "status": resp.status_code},
+                        )
+                except Exception:
+                    pass
             resp.raise_for_status()
             return resp
 

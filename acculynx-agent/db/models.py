@@ -16,6 +16,7 @@ from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -249,4 +250,123 @@ class TestbenchVerdict(Base):
     decision_ms = Column(Integer, nullable=True)
 
     # Timestamp
+    created_at = Column(DateTime, default=func.now(), index=True)
+
+
+class InboundReplyVerdict(Base):
+    """Verdicts on inbound responder behavior — captured during testbench reply simulation.
+
+    Self-annealing data: which classifications were wrong, which AI replies the user
+    edited and how, which escalation calls the user disagreed with.
+    """
+    __tablename__ = "inbound_reply_verdicts"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    # Original outbound context
+    original_draft_id = Column(String, nullable=True, index=True)
+    lead_ref = Column(String, nullable=False, index=True)
+    lead_kind = Column(String, nullable=False)
+    layer = Column(String, nullable=True)
+    touch_index = Column(Integer, nullable=True)
+    original_subject = Column(Text, nullable=True)
+    original_body = Column(Text, nullable=True)
+
+    # The simulated homeowner reply
+    simulated_reply = Column(Text, nullable=False)
+
+    # AI's classification
+    classification_category = Column(String, nullable=False, index=True)
+    classification_confidence = Column(Float, nullable=False)
+    classification_reasoning = Column(Text, nullable=True)
+    suggested_action = Column(String, nullable=False)  # respond | escalate_rep | escalate_sierra
+
+    # AI's response (if any) — null for escalations
+    ai_response_body = Column(Text, nullable=True)
+    response_postflight_ok = Column(Boolean, nullable=True)
+    response_postflight_reasons = Column(Text, nullable=True)  # JSON
+    response_regenerations = Column(Integer, default=0)
+
+    # The verdict on the AI's behavior
+    verdict = Column(String, nullable=False, index=True)  # thumbs_up | thumbs_down | edit
+    classification_correct = Column(Boolean, nullable=True)  # was the category right?
+    edited_response = Column(Text, nullable=True)
+    notes = Column(Text, nullable=True)
+    reviewer = Column(String, nullable=False)
+    decision_ms = Column(Integer, nullable=True)
+
+    created_at = Column(DateTime, default=func.now(), index=True)
+
+
+class QueueSession(Base):
+    """A pre-generated batch of drafts for the queue testbench. One row per leads-batch."""
+    __tablename__ = "queue_sessions"
+
+    id = Column(String, primary_key=True)  # uuid
+    reviewer = Column(String, nullable=False)
+    batch_size = Column(Integer, nullable=False)
+    service_filter = Column(String, nullable=True)
+    age_filter = Column(String, nullable=True)
+    layer_filter = Column(String, nullable=True)
+    sync_first = Column(Boolean, default=False)
+    prepared_count = Column(Integer, default=0)
+    failed_count = Column(Integer, default=0)
+    current_index = Column(Integer, default=0)  # for resume
+    created_at = Column(DateTime, default=func.now(), index=True)
+    last_active_at = Column(DateTime, default=func.now())
+
+
+class QueueDraft(Base):
+    """A single pre-generated draft within a QueueSession."""
+    __tablename__ = "queue_drafts"
+
+    id = Column(String, primary_key=True)  # uuid
+    queue_session_id = Column(String, nullable=False, index=True)
+    lead_id = Column(String, nullable=False, index=True)
+    queue_position = Column(Integer, nullable=False)  # 0-indexed
+    layer_name = Column(String, nullable=False)
+    touch_index = Column(Integer, nullable=False)
+    channel = Column(String, nullable=False)
+    content_type = Column(String, nullable=True)
+    subject = Column(Text, nullable=True)
+    body = Column(Text, nullable=False)
+    postflight_ok = Column(Boolean, default=True)
+    postflight_reasons = Column(Text, nullable=True)  # JSON
+    regenerations = Column(Integer, default=0)
+    template_hash = Column(String, nullable=True)
+    # Verdict (filled when reviewer casts one)
+    verdict = Column(String, nullable=True)  # send | edit | reject | null
+    edited_body = Column(Text, nullable=True)
+    notes = Column(Text, nullable=True)
+    decision_ms = Column(Integer, nullable=True)
+    verdict_at = Column(DateTime, nullable=True)
+    # Send-to-inbox tracking
+    sent_to_inbox_at = Column(DateTime, nullable=True)
+    paste_back_reply = Column(Text, nullable=True)
+    paste_back_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=func.now())
+
+
+class RepFeedback(Base):
+    """Feedback submitted by a rep from an approval email link.
+
+    Captures "this draft was off / something broke" signals from reps in
+    near-real-time so prompt regressions surface within a day rather than
+    a week.
+    """
+    __tablename__ = "rep_feedback"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    approval_id = Column(Integer, nullable=True, index=True)
+    message_id = Column(Integer, nullable=True, index=True)
+    lead_id = Column(String, nullable=True, index=True)
+    rep_slug = Column(String, nullable=True, index=True)
+    rep_email = Column(String, nullable=True)
+    severity = Column(Integer, nullable=True)  # 1-5, optional
+    category = Column(String, nullable=True)   # "tone" | "facts" | "broken" | "other"
+    body = Column(Text, nullable=False)
+    resolved = Column(Boolean, default=False, index=True)
+    resolved_at = Column(DateTime, nullable=True)
+    resolved_by = Column(String, nullable=True)
+    sheet_row_id = Column(String, nullable=True)  # Google Sheet append response
     created_at = Column(DateTime, default=func.now(), index=True)
