@@ -4,6 +4,7 @@ import { createLead, addJobNote, addJobMessage, formatFinancingNote } from "@/li
 import { sendLeadConfirmationSMS } from "@/lib/twilio";
 import { getBusinessHoursInfo } from "@/lib/business-hours";
 import { sendLeadConfirmationEmail } from "@/lib/lead-confirmation-email";
+import { sendSierraNotification } from "@/lib/sierra-notification";
 
 export const prerender = false;
 
@@ -206,6 +207,28 @@ export const POST: APIRoute = async ({ request }) => {
 
           await addJobNote(result.jobId, noteLines);
         }
+
+        // Sierra notification email — every web form callback gets a parallel email
+        // to Sierra so she gets a reaction signal without having to actively watch
+        // AccuLynx. AccuLynx note still lands (above) as the durable record;
+        // this is the push signal.
+        // Fire-and-forget: never throw into the form pipeline.
+        sendSierraNotification({
+          name: name.trim(),
+          phone: phone.trim(),
+          email: email?.trim() || "",
+          address: addressStr,
+          service: service?.trim() || "",
+          message: message?.trim() || "",
+          source: source || "",
+          landing_page: landing_page || "",
+          gclid: gclid || "",
+          fclid: fclid || "",
+          chat_context: chat_context || "",
+          sms_consent: sms_consent === true,
+          priority: priority || "",
+          acculynx_job_id: result.jobId,
+        }).catch((err) => console.error("[SierraNotif] async error:", err));
       } else {
         console.error("[AccuLynx] Lead creation failed — falling through to Sheets");
         acculynxStatus = "failed";
