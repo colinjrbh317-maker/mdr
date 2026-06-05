@@ -176,6 +176,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || "https://modernda
     {!isStudio && <Hotjar />}
     {!isStudio && <IntentTracker />}
 
+    {/* CallRail — call tracking + dynamic number insertion (site-wide: home, contact, all pages) */}
+    {!isStudio && <script is:inline async src="https://cdn.callrail.com/companies/904563833/db5b9b6d949d4a364995/12/swap.js"></script>}
+
   </head>
   <body class="min-h-screen flex flex-col">
     {/* Google Tag Manager (noscript) — must be first child of <body>. */}
