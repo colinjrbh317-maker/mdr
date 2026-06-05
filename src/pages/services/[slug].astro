@@ -792,6 +792,34 @@ const serviceJsonLd = {
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
       {/* Main Content (2/3) */}
       <div class="lg:col-span-2">
+        {/* VELUX Certified Installer widget — compliance: skylights featured on a dedicated page; widget is the primary content, placed first */}
+        {slug === "skylights" && (
+          <ScrollReveal>
+            <div class="mb-10 rounded-2xl border border-border bg-surface-alt p-6 sm:p-8 not-prose">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-5 mb-6">
+                <div class="shrink-0 rounded-lg border border-border px-4 py-3 text-center leading-tight">
+                  <span class="block text-xl font-extrabold tracking-tight text-text-primary">VELUX<sup class="text-xs align-super">®</sup></span>
+                  <span class="block text-[11px] font-semibold uppercase tracking-wide text-text-body">Certified Installer</span>
+                </div>
+                <div>
+                  <h2 class="text-2xl font-bold text-text-primary m-0">Explore VELUX Skylights for Your Home</h2>
+                  <p class="text-text-body m-0 mt-1">
+                    Browse models, see what fits your space, and request your free quote — straight from VELUX's tool below.
+                  </p>
+                </div>
+              </div>
+              <div
+                id="velux-brochure"
+                data-cta-link="https://moderndayroof.com/contact"
+                data-cta-text="Get a Free Quote"
+                data-installer-domain="https://moderndayroof.com"
+              >
+              </div>
+              <script is:inline src="https://veluxsolutions.com/installer-embed/velux-roofer.js"></script>
+            </div>
+          </ScrollReveal>
+        )}
+
         {service.body && slug !== "timber-seal" && (
           <ScrollReveal>
             <div class="prose prose-lg max-w-none text-text-body prose-headings:text-text-primary prose-headings:mt-10 prose-headings:mb-4 prose-a:text-accent prose-strong:text-text-primary prose-img:rounded-xl prose-p:leading-relaxed prose-li:leading-relaxed">
