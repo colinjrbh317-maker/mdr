@@ -19,8 +19,9 @@
 
 import { getBusinessHoursInfo } from "./business-hours";
 
-const RESEND_API_KEY = import.meta.env.RESEND_API_KEY;
-const FROM_EMAIL = import.meta.env.INTERNAL_NOTIFICATION_FROM ?? "Modern Day Roofing Leads <leads@moderndayroof.com>";
+const SENDGRID_API_KEY = import.meta.env.SENDGRID_API_KEY;
+const FROM_EMAIL = import.meta.env.INTERNAL_NOTIFICATION_FROM ?? "leads@moderndayroof.com";
+const FROM_NAME = "Modern Day Roofing Leads";
 const SIERRA_EMAIL = import.meta.env.SIERRA_NOTIFICATION_EMAIL ?? "sierraduncanmdr@gmail.com";
 
 interface SierraNotificationData {
@@ -62,8 +63,8 @@ const SOURCE_LABELS: Record<string, string> = {
  * error. Never throws into the form pipeline.
  */
 export async function sendSierraNotification(data: SierraNotificationData): Promise<boolean> {
-  if (!RESEND_API_KEY) {
-    console.log("[SierraNotif] RESEND_API_KEY not set — skipping (CRM note still lands)");
+  if (!SENDGRID_API_KEY) {
+    console.log("[SierraNotif] SENDGRID_API_KEY not set — skipping (CRM note still lands)");
     return false;
   }
   if (!SIERRA_EMAIL || !SIERRA_EMAIL.includes("@")) {
@@ -167,24 +168,26 @@ export async function sendSierraNotification(data: SierraNotificationData): Prom
   const text = textLines.join("\n");
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Authorization": `Bearer ${SENDGRID_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: FROM_EMAIL,
-        to: SIERRA_EMAIL,
+        personalizations: [{ to: [{ email: SIERRA_EMAIL }] }],
+        from: { email: FROM_EMAIL, name: FROM_NAME },
         subject,
-        html,
-        text,
+        content: [
+          { type: "text/plain", value: text },
+          { type: "text/html", value: html },
+        ],
       }),
     });
 
     if (!res.ok) {
       const errBody = await res.text().catch(() => "");
-      console.error(`[SierraNotif] Resend rejected (${res.status}):`, errBody);
+      console.error(`[SierraNotif] SendGrid rejected (${res.status}):`, errBody);
       return false;
     }
     console.log(`[SierraNotif] Sent to ${SIERRA_EMAIL} for lead ${data.name}`);
